@@ -84,14 +84,19 @@ function ContributionsContent() {
   const pendingAmount = contributions.filter((c) => c.status === "pending").reduce((sum, c) => sum + c.amount, 0)
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse delay-500"></div>
+      </div>
+
+      <header className="border-b border-border/20 bg-card/30 backdrop-blur-xl relative z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Link href="/dashboard">
-                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-lg flex items-center justify-center cursor-pointer hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-primary/25">
                   <span className="text-primary-foreground font-bold text-lg">Z</span>
                 </div>
               </Link>
@@ -102,8 +107,8 @@ function ContributionsContent() {
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
-                <Avatar>
-                  <AvatarFallback className="bg-primary text-primary-foreground">
+                <Avatar className="ring-2 ring-primary/20">
+                  <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
                     {user?.name?.charAt(0)?.toUpperCase() || "U"}
                   </AvatarFallback>
                 </Avatar>
@@ -112,7 +117,12 @@ function ContributionsContent() {
                   <p className="text-xs text-muted-foreground">{user?.organization || "Individual Partner"}</p>
                 </div>
               </div>
-              <Button variant="outline" size="sm" onClick={logout}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={logout}
+                className="glass-card hover:scale-105 transition-all duration-300 bg-transparent"
+              >
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
               </Button>
@@ -121,56 +131,60 @@ function ContributionsContent() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="space-y-8">
-          {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
+            <Card className="glass-card hover-tilt group border-primary/20 hover:border-primary/40 transition-all duration-500 animate-fade-in">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Verified</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <DollarSign className="h-4 w-4 text-primary group-hover:scale-110 transition-transform duration-300" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${totalContributions.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-primary animate-number-glow">
+                  ${totalContributions.toLocaleString()}
+                </div>
                 <p className="text-xs text-muted-foreground">
                   Across {contributions.filter((c) => c.status === "verified").length} contributions
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="glass-card hover-tilt group border-accent/20 hover:border-accent/40 transition-all duration-500 animate-fade-in delay-100">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
+                <Clock className="h-4 w-4 text-accent group-hover:scale-110 transition-transform duration-300" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${pendingAmount.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-accent animate-number-glow">
+                  ${pendingAmount.toLocaleString()}
+                </div>
                 <p className="text-xs text-muted-foreground">
                   {contributions.filter((c) => c.status === "pending").length} contributions pending
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="glass-card hover-tilt group border-secondary/20 hover:border-secondary/40 transition-all duration-500 animate-fade-in delay-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">This Month</CardTitle>
-                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <Calendar className="h-4 w-4 text-secondary group-hover:scale-110 transition-transform duration-300" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$500</div>
+                <div className="text-2xl font-bold text-secondary animate-number-glow">$500</div>
                 <p className="text-xs text-muted-foreground">Goal: $500 (100%)</p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Action Button */}
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center animate-fade-in delay-300">
             <div>
-              <h2 className="text-2xl font-bold">Contribution History</h2>
+              <h2 className="text-2xl font-bold text-balance">Contribution History</h2>
               <p className="text-muted-foreground">View and manage all your contributions</p>
             </div>
-            <Button asChild>
+            <Button
+              asChild
+              className="glass-button hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-primary/25"
+            >
               <Link href="/contributions/new">
                 <Plus className="w-4 h-4 mr-2" />
                 Log New Contribution
@@ -178,22 +192,41 @@ function ContributionsContent() {
             </Button>
           </div>
 
-          {/* Contributions List */}
-          <Tabs defaultValue="all" className="space-y-6">
-            <TabsList>
-              <TabsTrigger value="all">All Contributions</TabsTrigger>
-              <TabsTrigger value="verified">Verified</TabsTrigger>
-              <TabsTrigger value="pending">Pending</TabsTrigger>
-              <TabsTrigger value="rejected">Rejected</TabsTrigger>
+          <Tabs defaultValue="all" className="space-y-6 animate-fade-in delay-400">
+            <TabsList className="glass-card">
+              <TabsTrigger value="all" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
+                All Contributions
+              </TabsTrigger>
+              <TabsTrigger
+                value="verified"
+                className="data-[state=active]:bg-secondary/20 data-[state=active]:text-secondary"
+              >
+                Verified
+              </TabsTrigger>
+              <TabsTrigger value="pending" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">
+                Pending
+              </TabsTrigger>
+              <TabsTrigger
+                value="rejected"
+                className="data-[state=active]:bg-destructive/20 data-[state=active]:text-destructive"
+              >
+                Rejected
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="all" className="space-y-4">
-              {contributions.map((contribution) => (
-                <Card key={contribution.id} className="hover:shadow-md transition-shadow">
+              {contributions.map((contribution, index) => (
+                <Card
+                  key={contribution.id}
+                  className={`glass-card hover-tilt transition-all duration-500 animate-fade-in border-primary/10 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/10`}
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        {getStatusIcon(contribution.status)}
+                        <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
+                          {getStatusIcon(contribution.status)}
+                        </div>
                         <div>
                           <h3 className="font-semibold">{contribution.description}</h3>
                           <p className="text-sm text-muted-foreground">
@@ -210,10 +243,15 @@ function ContributionsContent() {
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <p className="text-2xl font-bold">${contribution.amount}</p>
+                          <p className="text-2xl font-bold animate-number-glow">${contribution.amount}</p>
                           {getStatusBadge(contribution.status)}
                         </div>
-                        <Button variant="outline" size="sm" asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                          className="glass-button hover:scale-105 transition-all duration-300 bg-transparent"
+                        >
                           <Link href={contribution.proofUrl} target="_blank">
                             <FileText className="w-4 h-4 mr-2" />
                             View Proof

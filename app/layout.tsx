@@ -4,6 +4,9 @@ import { Inter, JetBrains_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "./globals.css"
+import { ThemeProvider } from "@/components/theme-provider"
+import { PageTransition } from "@/components/page-transition"
+import { GamificationProvider } from "@/components/gamification-provider"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -58,9 +61,15 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>
       <body className={`font-sans ${inter.variable} ${jetbrainsMono.variable} antialiased`}>
-        <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
+          <GamificationProvider>
+            <PageTransition>
+              <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+            </PageTransition>
+          </GamificationProvider>
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>

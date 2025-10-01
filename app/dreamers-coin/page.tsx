@@ -1,6 +1,9 @@
 "use client"
 
 import { AuthGuard, useAuth } from "@/components/auth-guard"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { CoinDropAnimation } from "@/components/coin-drop-animation"
+import { SlotMachineCounter } from "@/components/slot-machine-counter"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -23,9 +26,14 @@ import {
   Target,
 } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
+import { motion } from "framer-motion"
+import { useState, useEffect } from "react"
 
 function DreamersCoinContent() {
   const { user, logout } = useAuth()
+  const [showCoinDrop, setShowCoinDrop] = useState(false)
+  const [redeemingPerk, setRedeemingPerk] = useState<number | null>(null)
 
   // Calculate coins based on rank (higher rank = more coins)
   const calculateCoinsFromRank = (rank: number) => {
@@ -167,37 +175,113 @@ function DreamersCoinContent() {
     { date: "2023-12-30", amount: +400, reason: "Monthly ranking #4", type: "earned" },
   ]
 
+  const handleRedeemPerk = (perkId: number) => {
+    setRedeemingPerk(perkId)
+    setShowCoinDrop(true)
+
+    setTimeout(() => {
+      setRedeemingPerk(null)
+      setShowCoinDrop(false)
+    }, 3000)
+  }
+
+  useEffect(() => {
+    // Trigger coin drop animation on page load
+    const timer = setTimeout(() => {
+      setShowCoinDrop(true)
+      setTimeout(() => setShowCoinDrop(false), 2000)
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+      },
+    },
+  }
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-float" />
+        <div className="absolute top-3/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float-delayed" />
+        <div className="absolute bottom-1/4 left-1/3 w-48 h-48 bg-accent/10 rounded-full blur-3xl animate-pulse-slow" />
+      </div>
+
+      <CoinDropAnimation isActive={showCoinDrop} coinCount={userCoins} />
+
       {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm">
+      <motion.header
+        className="glass-card border-b border-border/50 sticky top-0 z-50 backdrop-blur-xl"
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <motion.div
+              className="flex items-center gap-3"
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
               <Link href="/dashboard">
-                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors">
-                  <span className="text-primary-foreground font-bold text-lg">Z</span>
-                </div>
+                <motion.div
+                  className="relative w-12 h-12 cursor-pointer neon-glow-blue"
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <Image src="/images/zeroup-partners-logo.png" alt="ZeroUp Partners" fill className="object-contain" />
+                </motion.div>
               </Link>
               <div>
                 <h1 className="text-xl font-bold text-foreground">Dreamers Coin</h1>
                 <p className="text-sm text-muted-foreground">Your rewards wallet</p>
               </div>
-            </div>
+            </motion.div>
             <div className="flex items-center gap-4">
               <nav className="hidden md:flex items-center gap-4">
-                <Link href="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link
+                  href="/dashboard"
+                  className="text-muted-foreground hover:text-primary transition-all duration-300 hover:glow-text"
+                >
                   Dashboard
                 </Link>
-                <Link href="/community" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link
+                  href="/community"
+                  className="text-muted-foreground hover:text-primary transition-all duration-300 hover:glow-text"
+                >
                   Community
                 </Link>
-                <Link href="/contributions" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link
+                  href="/contributions"
+                  className="text-muted-foreground hover:text-primary transition-all duration-300 hover:glow-text"
+                >
                   Contributions
                 </Link>
               </nav>
-              <div className="flex items-center gap-3">
-                <Avatar>
+              <ThemeToggle />
+              <motion.div
+                className="flex items-center gap-3"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
+                <Avatar className="ring-2 ring-primary/20 neon-glow-blue">
                   <AvatarFallback className="bg-primary text-primary-foreground">
                     {user?.name?.charAt(0)?.toUpperCase() || "U"}
                   </AvatarFallback>
@@ -206,234 +290,383 @@ function DreamersCoinContent() {
                   <p className="text-sm font-medium">{user?.name}</p>
                   <p className="text-xs text-muted-foreground">{user?.organization || "Individual Partner"}</p>
                 </div>
-              </div>
-              <Button variant="outline" size="sm" onClick={logout}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button variant="outline" size="sm" onClick={logout} className="neon-button bg-transparent">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
+              </motion.div>
             </div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="space-y-8">
-          {/* Header */}
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold text-balance">Dreamers Coin Wallet</h2>
-            <p className="text-muted-foreground">
+      <main className="container mx-auto px-4 py-8 relative z-10">
+        <motion.div className="space-y-8" variants={containerVariants} initial="hidden" animate="visible">
+          <motion.div className="space-y-2 animate-slide-up" variants={itemVariants}>
+            <h2 className="text-3xl font-bold text-balance bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Dreamers Coin Wallet
+            </h2>
+            <p className="text-muted-foreground animate-fade-in-delayed">
               Earn coins based on your leaderboard ranking and redeem them for exclusive perks and recognition.
             </p>
-          </div>
+          </motion.div>
 
           {/* Wallet Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card className="md:col-span-2 bg-gradient-to-br from-primary/10 to-secondary/10 border-primary/20">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Wallet className="w-5 h-5" />
-                      Your Wallet
-                    </CardTitle>
-                    <CardDescription>Current balance and rank</CardDescription>
-                  </div>
-                  <div className="text-right">
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      {getRankIcon(userRank)}
-                      <span>Rank #{userRank}</span>
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
-                      <Coins className="w-6 h-6 text-primary" />
-                    </div>
+          <motion.div className="grid grid-cols-1 md:grid-cols-4 gap-6" variants={containerVariants}>
+            <motion.div
+              className="md:col-span-2"
+              variants={itemVariants}
+              whileHover={{
+                y: -5,
+                transition: { type: "spring", stiffness: 300, damping: 10 },
+              }}
+            >
+              <Card className="glass-card hover-tilt neon-glow-purple bg-gradient-to-br from-primary/10 to-secondary/10 border-primary/20 transition-all duration-500 relative overflow-hidden">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-3xl font-bold">{userCoins.toLocaleString()}</p>
-                      <p className="text-sm text-muted-foreground">Dreamers Coins</p>
+                      <CardTitle className="flex items-center gap-2">
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                        >
+                          <Wallet className="w-5 h-5" />
+                        </motion.div>
+                        Your Wallet
+                      </CardTitle>
+                      <CardDescription>Current balance and rank</CardDescription>
+                    </div>
+                    <div className="text-right">
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <motion.div
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+                        >
+                          {getRankIcon(userRank)}
+                        </motion.div>
+                        <span>Rank #{userRank}</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Next rank bonus</span>
-                      <span className="font-medium">+200 coins</span>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <motion.div
+                        className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center"
+                        animate={{
+                          boxShadow: [
+                            "0 0 0px rgba(234, 179, 8, 0)",
+                            "0 0 20px rgba(234, 179, 8, 0.5)",
+                            "0 0 0px rgba(234, 179, 8, 0)",
+                          ],
+                        }}
+                        transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY }}
+                      >
+                        <motion.div
+                          animate={{ rotate: [0, 360] }}
+                          transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                        >
+                          <Coins className="w-6 h-6 text-primary" />
+                        </motion.div>
+                      </motion.div>
+                      <div>
+                        <p className="text-3xl font-bold">
+                          <SlotMachineCounter value={userCoins} duration={2} className="text-3xl font-bold" />
+                        </p>
+                        <p className="text-sm text-muted-foreground">Dreamers Coins</p>
+                      </div>
                     </div>
-                    <Progress value={75} className="h-2" />
-                    <p className="text-xs text-muted-foreground">Improve your ranking to earn more coins next month</p>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Next rank bonus</span>
+                        <span className="font-medium">+200 coins</span>
+                      </div>
+                      <Progress value={75} className="h-2" />
+                      <p className="text-xs text-muted-foreground">
+                        Improve your ranking to earn more coins next month
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </motion.div>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">This Month</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">+400</div>
-                <p className="text-xs text-muted-foreground">Coins earned</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
-                <ShoppingBag className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">200</div>
-                <p className="text-xs text-muted-foreground">On perks & badges</p>
-              </CardContent>
-            </Card>
-          </div>
+            {[
+              {
+                title: "This Month",
+                value: 400,
+                prefix: "+",
+                subtitle: "Coins earned",
+                icon: TrendingUp,
+                glowColor: "neon-glow-green",
+              },
+              {
+                title: "Total Spent",
+                value: 200,
+                subtitle: "On perks & badges",
+                icon: ShoppingBag,
+                glowColor: "neon-glow-red",
+              },
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                variants={itemVariants}
+                whileHover={{
+                  y: -5,
+                  transition: { type: "spring", stiffness: 300, damping: 10 },
+                }}
+              >
+                <Card className={`glass-card hover-tilt ${stat.glowColor} transition-all duration-500`}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                    <motion.div whileHover={{ rotate: 360, scale: 1.1 }} transition={{ duration: 0.6 }}>
+                      <stat.icon className="h-4 w-4 text-muted-foreground animate-pulse-slow" />
+                    </motion.div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold animate-number-glow">
+                      <SlotMachineCounter value={stat.value} prefix={stat.prefix} duration={1.5} />
+                    </div>
+                    <p className="text-xs text-muted-foreground">{stat.subtitle}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
 
           {/* Main Content Tabs */}
-          <Tabs defaultValue="leaderboard" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="leaderboard">Coin Leaderboard</TabsTrigger>
-              <TabsTrigger value="redeem">Redeem Perks</TabsTrigger>
-              <TabsTrigger value="history">Transaction History</TabsTrigger>
-            </TabsList>
+          <motion.div variants={itemVariants}>
+            <Tabs defaultValue="leaderboard" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-3 glass-card">
+                <TabsTrigger value="leaderboard">Coin Leaderboard</TabsTrigger>
+                <TabsTrigger value="redeem">Redeem Perks</TabsTrigger>
+                <TabsTrigger value="history">Transaction History</TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="leaderboard" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Coin Leaderboard</CardTitle>
-                  <CardDescription>Partners ranked by coins earned this month</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {leaderboard.map((partner) => (
-                      <div
-                        key={partner.rank}
-                        className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
-                          partner.isCurrentUser
-                            ? "bg-primary/10 border border-primary/20"
-                            : "bg-muted/50 hover:bg-muted/70"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          {getRankIcon(partner.rank)}
-                          <Avatar className="w-10 h-10">
-                            <AvatarFallback
-                              className={partner.isCurrentUser ? "bg-primary text-primary-foreground" : ""}
+              <TabsContent value="leaderboard" className="space-y-6">
+                <Card className="glass-card neon-glow-blue">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      Coin Leaderboard
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                    </CardTitle>
+                    <CardDescription>Partners ranked by coins earned this month</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {leaderboard.map((partner, index) => (
+                        <motion.div
+                          key={partner.rank}
+                          className={`flex items-center gap-4 p-4 rounded-lg transition-all duration-300 glass-card hover-tilt animate-fade-in ${
+                            partner.isCurrentUser
+                              ? "bg-primary/10 border border-primary/20 neon-glow-accent"
+                              : "hover:bg-muted/70"
+                          }`}
+                          initial={{ opacity: 0, x: -50 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.5, delay: index * 0.1 }}
+                          style={{ animationDelay: `${index * 100}ms` }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <motion.div
+                              animate={
+                                partner.rank <= 3
+                                  ? {
+                                      scale: [1, 1.1, 1],
+                                      rotate: [0, 5, -5, 0],
+                                    }
+                                  : {}
+                              }
+                              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
                             >
-                              {partner.avatar}
-                            </AvatarFallback>
-                          </Avatar>
-                        </div>
+                              {getRankIcon(partner.rank)}
+                            </motion.div>
+                            <Avatar className="w-10 h-10">
+                              <AvatarFallback
+                                className={partner.isCurrentUser ? "bg-primary text-primary-foreground" : ""}
+                              >
+                                {partner.avatar}
+                              </AvatarFallback>
+                            </Avatar>
+                          </div>
 
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="font-semibold">{partner.name}</p>
-                            {partner.isCurrentUser && <Badge variant="secondary">You</Badge>}
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <p className="font-semibold">{partner.name}</p>
+                              {partner.isCurrentUser && <Badge variant="secondary">You</Badge>}
+                            </div>
+                            <p className="text-sm text-muted-foreground">{partner.organization}</p>
                           </div>
-                          <p className="text-sm text-muted-foreground">{partner.organization}</p>
-                        </div>
 
-                        <div className="text-right space-y-1">
-                          <div className="flex items-center gap-2">
-                            <Coins className="w-4 h-4 text-primary" />
-                            <p className="font-bold text-lg">{partner.coins}</p>
+                          <div className="text-right space-y-1">
+                            <div className="flex items-center gap-2">
+                              <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                              >
+                                <Coins className="w-4 h-4 text-primary" />
+                              </motion.div>
+                              <p className="font-bold text-lg">
+                                <SlotMachineCounter value={partner.coins} duration={1 + index * 0.2} />
+                              </p>
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              ${partner.totalContributions.toLocaleString()} contributed
+                            </p>
                           </div>
-                          <p className="text-sm text-muted-foreground">
-                            ${partner.totalContributions.toLocaleString()} contributed
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-            <TabsContent value="redeem" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {availablePerks.map((perk) => (
-                  <Card key={perk.id} className={`transition-all ${perk.available ? "hover:shadow-md" : "opacity-60"}`}>
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          {perk.icon}
-                          <div>
-                            <CardTitle className="text-lg">{perk.name}</CardTitle>
-                            <Badge variant="outline" className="text-xs">
-                              {perk.category}
-                            </Badge>
+              <TabsContent value="redeem" className="space-y-6">
+                <motion.div
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                  variants={containerVariants}
+                >
+                  {availablePerks.map((perk, index) => (
+                    <motion.div
+                      key={perk.id}
+                      variants={itemVariants}
+                      whileHover={{
+                        y: -8,
+                        scale: 1.02,
+                        transition: { type: "spring", stiffness: 300, damping: 10 },
+                      }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Card
+                        className={`glass-card hover-tilt transition-all duration-500 h-full animate-slide-up ${
+                          perk.available ? "neon-glow cursor-pointer" : "opacity-60"
+                        } ${redeemingPerk === perk.id ? "animate-pulse-glow" : ""}`}
+                        style={{ animationDelay: `${index * 100}ms` }}
+                      >
+                        <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <motion.div
+                                whileHover={{ rotate: 360, scale: 1.1 }}
+                                transition={{ duration: 0.6 }}
+                                animate={
+                                  redeemingPerk === perk.id
+                                    ? {
+                                        rotate: 360,
+                                        scale: [1, 1.2, 1],
+                                      }
+                                    : {}
+                                }
+                              >
+                                {perk.icon}
+                              </motion.div>
+                              <div>
+                                <CardTitle className="text-lg">{perk.name}</CardTitle>
+                                <Badge variant="outline" className="text-xs">
+                                  {perk.category}
+                                </Badge>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <p className="text-sm text-muted-foreground">{perk.description}</p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Coins className="w-4 h-4 text-primary" />
-                            <span className="font-bold">{perk.cost}</span>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            <p className="text-sm text-muted-foreground">{perk.description}</p>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <motion.div
+                                  animate={{ rotate: 360 }}
+                                  transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                                >
+                                  <Coins className="w-4 h-4 text-primary" />
+                                </motion.div>
+                                <span className="font-bold">{perk.cost}</span>
+                              </div>
+                              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                <Button
+                                  size="sm"
+                                  disabled={!perk.available || redeemingPerk === perk.id}
+                                  variant={perk.available ? "default" : "secondary"}
+                                  onClick={() => perk.available && handleRedeemPerk(perk.id)}
+                                  className={perk.available ? "neon-button" : ""}
+                                >
+                                  {redeemingPerk === perk.id
+                                    ? "Redeeming..."
+                                    : perk.available
+                                      ? "Redeem"
+                                      : "Insufficient Coins"}
+                                </Button>
+                              </motion.div>
+                            </div>
                           </div>
-                          <Button
-                            size="sm"
-                            disabled={!perk.available}
-                            variant={perk.available ? "default" : "secondary"}
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </TabsContent>
+
+              <TabsContent value="history" className="space-y-6">
+                <Card className="glass-card neon-glow-green">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      Transaction History
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                    </CardTitle>
+                    <CardDescription>Your recent coin earnings and spending</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {coinHistory.map((transaction, index) => (
+                        <motion.div
+                          key={index}
+                          className="flex items-center gap-4 p-4 glass-card hover-tilt rounded-lg animate-fade-in"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.5, delay: index * 0.1 }}
+                          style={{ animationDelay: `${index * 200}ms` }}
+                        >
+                          <motion.div
+                            className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                              transaction.type === "earned" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
+                            }`}
+                            whileHover={{ rotate: 360, scale: 1.1 }}
+                            transition={{ duration: 0.6 }}
                           >
-                            {perk.available ? "Redeem" : "Insufficient Coins"}
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="history" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Transaction History</CardTitle>
-                  <CardDescription>Your recent coin earnings and spending</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {coinHistory.map((transaction, index) => (
-                      <div key={index} className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
-                        <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            transaction.type === "earned" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
-                          }`}
-                        >
-                          {transaction.type === "earned" ? (
-                            <TrendingUp className="w-5 h-5" />
-                          ) : (
-                            <ShoppingBag className="w-5 h-5" />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-medium">{transaction.reason}</p>
-                          <p className="text-sm text-muted-foreground">{transaction.date}</p>
-                        </div>
-                        <div
-                          className={`text-right font-bold ${
-                            transaction.type === "earned" ? "text-green-600" : "text-red-600"
-                          }`}
-                        >
-                          {transaction.type === "earned" ? "+" : ""}
-                          {transaction.amount}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
+                            {transaction.type === "earned" ? (
+                              <TrendingUp className="w-5 h-5" />
+                            ) : (
+                              <ShoppingBag className="w-5 h-5" />
+                            )}
+                          </motion.div>
+                          <div className="flex-1">
+                            <p className="font-medium">{transaction.reason}</p>
+                            <p className="text-sm text-muted-foreground">{transaction.date}</p>
+                          </div>
+                          <div
+                            className={`text-right font-bold ${
+                              transaction.type === "earned" ? "text-green-600" : "text-red-600"
+                            }`}
+                          >
+                            <SlotMachineCounter
+                              value={Math.abs(transaction.amount)}
+                              prefix={transaction.type === "earned" ? "+" : "-"}
+                              duration={1}
+                            />
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </motion.div>
+        </motion.div>
       </main>
     </div>
   )
