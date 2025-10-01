@@ -1,4 +1,4 @@
-# Partners Hope app
+# ZeroUo Partners Hub app
 
 *Automatically synced with your [v0.app](https://v0.app) deployments*
 
