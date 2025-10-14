@@ -1,0 +1,9 @@
+
+[
+  {
+    "origin": ["https://9000-firebase-zeroup-partners-hub-1759323094616.cluster-64pjnskmlbaxowh5lzq6i7v4ra.cloudworkstations.dev"],
+    "method": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "responseHeader": ["Content-Type", "x-goog-resumable"],
+    "maxAgeSeconds": 3600
+  }
+]

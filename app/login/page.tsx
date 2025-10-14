@@ -3,20 +3,20 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/contexts/auth-context" // Import the useAuth hook
+import { useAuth } from "@/contexts/auth-context"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { auth } from "@/lib/firebase/client"
+import toast from "react-hot-toast"
 
 // UI Components
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Eye, EyeOff, ArrowLeft } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Eye, EyeOff, ArrowLeft, TriangleAlert } from "lucide-react"
 import Link from "next/link"
 
-// A full-page loader to prevent flickering and show a loading state.
 function FullPageLoader() {
   return (
     <div className="flex h-screen w-full items-center justify-center bg-background">
@@ -26,17 +26,16 @@ function FullPageLoader() {
 }
 
 export default function LoginPage() {
-  const { user, isLoading: isAuthLoading } = useAuth() // Use auth state
+  const { user, isLoading: isAuthLoading } = useAuth()
   const router = useRouter()
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false) // This is for form submission
-  const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState({ title: "", message: "" })
 
   useEffect(() => {
-    // If auth is no longer loading and a user object exists, redirect to the dashboard.
     if (!isAuthLoading && user) {
       router.push("/dashboard")
     }
@@ -45,42 +44,62 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setError("")
+    setError({ title: "", message: "" })
+
+    const toastId = toast.loading("Signing in...");
 
     try {
       await signInWithEmailAndPassword(auth, email, password)
-      // On success, the useEffect above will handle the redirect.
-      // isLoading will remain true, showing the loader until the redirect happens.
+      toast.success("Login successful! Redirecting...", { id: toastId });
+      // The useEffect will handle the redirect automatically.
     } catch (err: any) {
-      let errorMessage = "Login failed. Please check your credentials."
-      if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
-        errorMessage = "Invalid email or password. Please try again."
-      } else if (err.code) {
-        errorMessage = err.message
+      let errorTitle = "Login Failed"
+      let errorMessage = "An unexpected error occurred. Please try again."
+
+      switch (err.code) {
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+        case 'auth/invalid-credential':
+          errorTitle = "Invalid Credentials"
+          errorMessage = "The email or password you entered is incorrect. Please check your details and try again."
+          break
+        case 'auth/invalid-email':
+          errorTitle = "Invalid Email Format"
+          errorMessage = "Please enter a valid email address."
+          break
+        case 'auth/user-disabled':
+          errorTitle = "Account Disabled"
+          errorMessage = "Your account has been disabled. Please contact support for assistance."
+          break
+        case 'auth/too-many-requests':
+            errorTitle = "Too Many Attempts"
+            errorMessage = "Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later."
+            break
+        default:
+          console.error("Firebase Auth Error:", err)
+          break
       }
-      setError(errorMessage)
-      setIsLoading(false) // Only reset loading state on error
+      toast.error(errorTitle, { id: toastId });
+      setError({ title: errorTitle, message: errorMessage })
+      setIsLoading(false)
     }
   }
 
-  // While the auth state is being checked, or if the user is found and we are redirecting,
-  // show the full page loader. This prevents the login form from flashing.
-  if (isAuthLoading || user) {
+  if (isAuthLoading) {
     return <FullPageLoader />
   }
 
-  // If we're done loading and there's no user, render the login form.
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
-        <div className="text-center space-y-2">
+         <div className="text-center space-y-2">
           <Link href="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to home
           </Link>
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-xl">Z</span>
+           <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="relative w-12 h-12">
+                <img src="/images/zeroup-partners-logo.png" alt="ZeroUp Partners" className="object-contain" />
             </div>
             <div className="text-left">
               <h1 className="text-lg font-bold text-foreground">ZeroUp Initiative</h1>
@@ -92,13 +111,15 @@ export default function LoginPage() {
         <Card className="border-0 shadow-xl">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Welcome back</CardTitle>
-            <CardDescription>Sign in to your partner account to track contributions and view impact</CardDescription>
+            <CardDescription>Sign in to your partner account to continue your impact.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
-              {error && (
+              {error.message && (
                 <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
+                  <TriangleAlert className="h-4 w-4" />
+                  <AlertTitle>{error.title}</AlertTitle>
+                  <AlertDescription>{error.message}</AlertDescription>
                 </Alert>
               )}
 
@@ -140,7 +161,7 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="text-right">
                 <Link href="/forgot-password" className="text-sm text-primary hover:underline">
                   Forgot password?
                 </Link>

@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { PageTransition } from "@/components/page-transition"
 import { GamificationProvider } from "@/components/gamification-provider"
 import { AuthProvider } from "@/contexts/auth-context"
+import { Toaster } from "react-hot-toast"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -69,6 +70,12 @@ export default function RootLayout({
             <GamificationProvider>
               <PageTransition>
                 <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+                 <Toaster
+                    position="bottom-right"
+                    toastOptions={{
+                      duration: 5000,
+                    }}
+                  />
               </PageTransition>
             </GamificationProvider>
           </AuthProvider>

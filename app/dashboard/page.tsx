@@ -1,9 +1,11 @@
 'use client'
 
 import type React from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useAuth } from "@/contexts/auth-context"
-import { auth } from "@/lib/firebase/client"
+import { auth, db } from "@/lib/firebase/client"
+import { collection, query, where, onSnapshot } from "firebase/firestore"
 import ProtectedRoute from "@/components/auth/protected-route"
 
 // UI Components
@@ -11,28 +13,53 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { DollarSign, Target, TrendingUp, Award, Plus, BarChart, Users, LogOut } from "lucide-react"
+import { DollarSign, Target, TrendingUp, Award, Plus, BarChart, Users, LogOut, Heart } from "lucide-react"
 
 function DashboardPage() {
   const { user } = useAuth()
+  const [totalContributions, setTotalContributions] = useState(0);
+  const [myContributions, setMyContributions] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      // Listener for all approved contributions
+      const paymentsQuery = query(collection(db, "payments"), where("status", "==", "approved"));
+      const unsubscribeTotal = onSnapshot(paymentsQuery, (snapshot) => {
+        let total = 0;
+        snapshot.forEach((doc) => {
+          total += doc.data().amount;
+        });
+        setTotalContributions(total);
+        setIsLoading(false); // Set loading to false once we have the data
+      });
+
+      // Listener for the current user's contributions
+      const myPaymentsQuery = query(
+        collection(db, "payments"), 
+        where("userId", "==", user.uid),
+        where("status", "==", "approved")
+      );
+      const unsubscribeMine = onSnapshot(myPaymentsQuery, (snapshot) => {
+        let myTotal = 0;
+        snapshot.forEach((doc) => {
+          myTotal += doc.data().amount;
+        });
+        setMyContributions(myTotal);
+      });
+
+      // Cleanup listeners on component unmount
+      return () => {
+        unsubscribeTotal();
+        unsubscribeMine();
+      };
+    }
+  }, [user]);
+
 
   const logout = async () => {
     await auth.signOut()
   }
-
-  // Dummy data based on the screenshot
-  const stats = {
-    totalContributions: 2450,
-    contributionChange: "+12%",
-    monthlyGoal: 500,
-    currentMonthContribution: 425,
-    impactScore: 94,
-    impactPercentile: "Top 10%",
-    badgesEarned: 7,
-    newBadges: 3,
-  }
-
-  const monthlyProgress = (stats.currentMonthContribution / stats.monthlyGoal) * 100
 
   return (
     <div className="min-h-screen bg-background">
@@ -41,27 +68,23 @@ function DashboardPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-lg">Z</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-foreground">Partners Hub</h1>
-                <p className="text-sm text-muted-foreground">Partner Dashboard</p>
-              </div>
+              <Link href="/dashboard" className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-lg">Z</span>
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-foreground">Partners Hub</h1>
+                  <p className="text-sm text-muted-foreground">Partner Dashboard</p>
+                </div>
+              </Link>
             </div>
             <div className="flex items-center gap-4">
               <nav className="hidden md:flex items-center gap-4 text-sm font-medium">
                 <Link href="/contributions" className="text-muted-foreground hover:text-foreground transition-colors">
                   Contributions
                 </Link>
-                <Link href="/analytics" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Analytics
-                </Link>
-                <Link href="/community" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Community
-                </Link>
-                 <Link href="/resources" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Resources
+                <Link href="/projects" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Projects
                 </Link>
               </nav>
               <div className="flex items-center gap-3">
@@ -101,39 +124,36 @@ function DashboardPage() {
 
               {/* Grid of Stat Cards */}
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="card-glow-effect card-glow-green">
+                <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Contributions</CardTitle>
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">${stats.totalContributions.toLocaleString()}</div>
-                    <p className="text-xs text-muted-foreground">{stats.contributionChange} from last month</p>
+                    <div className="text-2xl font-bold">{isLoading ? '...' : `₦${totalContributions.toLocaleString()}`}</div>
+                    <p className="text-xs text-muted-foreground">Live total of all partner funds</p>
                   </CardContent>
                 </Card>
 
-                <Card className="card-glow-effect card-glow-blue">
+                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Monthly Goal</CardTitle>
-                    <Target className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium">My Contributions</CardTitle>
+                    <Heart className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{monthlyProgress.toFixed(0)}%</div>
-                    <p className="text-xs text-muted-foreground">
-                      ${stats.currentMonthContribution} of ${stats.monthlyGoal} goal
-                    </p>
-                    <Progress value={monthlyProgress} className="mt-2" />
+                    <div className="text-2xl font-bold">{isLoading ? '...' : `₦${myContributions.toLocaleString()}`}</div>
+                     <p className="text-xs text-muted-foreground">Your personal impact</p>
                   </CardContent>
                 </Card>
 
-                <Card className="card-glow-effect card-glow-purple">
+                <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Impact Score</CardTitle>
                     <TrendingUp className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.impactScore}</div>
-                    <p className="text-xs text-muted-foreground">{stats.impactPercentile} of partners</p>
+                    <div className="text-2xl font-bold">0</div>
+                    <p className="text-xs text-muted-foreground">Coming Soon</p>
                   </CardContent>
                 </Card>
 
@@ -143,14 +163,14 @@ function DashboardPage() {
                     <Award className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.badgesEarned}</div>
-                    <p className="text-xs text-muted-foreground">{stats.newBadges} new this month</p>
+                    <div className="text-2xl font-bold">0</div>
+                    <p className="text-xs text-muted-foreground">Coming Soon</p>
                   </CardContent>
                 </Card>
               </div>
 
               {/* Grid of Action Cards */}
-              <div className="grid gap-6 md:grid-cols-3">
+              <div className="grid gap-6 md:grid-cols-2">
                 <Link href="/contributions/new">
                     <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
                         <CardHeader className="flex flex-row items-center gap-4">
@@ -158,34 +178,21 @@ function DashboardPage() {
                                 <Plus className="h-6 w-6 text-primary" />
                             </div>
                             <div>
-                                <CardTitle>Log Contribution</CardTitle>
-                                <CardDescription>Record your monthly contribution</CardDescription>
+                                <CardTitle>Log a New Contribution</CardTitle>
+                                <CardDescription>Submit your monthly support.</CardDescription>
                             </div>
                         </CardHeader>
                     </Card>
                 </Link>
-                <Link href="/analytics">
+                <Link href="/projects">
                     <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
                         <CardHeader className="flex flex-row items-center gap-4">
                             <div className="bg-primary/10 p-3 rounded-md">
                                 <BarChart className="h-6 w-6 text-primary" />
                             </div>
                             <div>
-                                <CardTitle>View Analytics</CardTitle>
-                                <CardDescription>See your impact dashboard</CardDescription>
-                            </div>
-                        </CardHeader>
-                    </Card>
-                </Link>
-                <Link href="/community">
-                    <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
-                        <CardHeader className="flex flex-row items-center gap-4">
-                            <div className="bg-primary/10 p-3 rounded-md">
-                                <Users className="h-6 w-6 text-primary" />
-                            </div>
-                            <div>
-                                <CardTitle>Community</CardTitle>
-                                <CardDescription>Connect with other partners</CardDescription>
+                                <CardTitle>Fund a Project</CardTitle>
+                                <CardDescription>Direct your funds to a specific cause.</CardDescription>
                             </div>
                         </CardHeader>
                     </Card>
@@ -197,7 +204,6 @@ function DashboardPage() {
   )
 }
 
-// Wrap the page with the ProtectedRoute to ensure only authenticated users can access it.
 export default function ProtectedDashboard() {
   return (
     <ProtectedRoute>

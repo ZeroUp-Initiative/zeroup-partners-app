@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -11,7 +12,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAcpEr3RseZdfekkRJcMZ69y_QSusI21gs",
   authDomain: "zeroup-partners-hub-5404-34b69.firebaseapp.com",
   projectId: "zeroup-partners-hub-5404-34b69",
-  storageBucket: "zeroup-partners-hub-5404-34b69.appspot.com",
+  storageBucket: "zeroup-partners-hub-5404-34b69.firebasestorage.app",
   messagingSenderId: "71869767739",
   appId: "1:71869767739:web:0c7ffdfc110b4bceb5bc1e"
 };
@@ -20,3 +21,4 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const storage = getStorage(app);

@@ -1,14 +1,55 @@
 "use client"
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowRight, TrendingUp, Target, Award, Globe, Heart, Menu } from "lucide-react"
+import { ArrowRight, TrendingUp, Target, Award, Globe, Heart, Menu, Users } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import Link from "next/link"
 import Image from "next/image"
+import { db } from "@/lib/firebase/client";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 
 export default function HomePage() {
+  const [totalContributions, setTotalContributions] = useState(0);
+  const [partnerCount, setPartnerCount] = useState(0);
+  const [fundedProjectsCount, setFundedProjectsCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Listener for total contributions
+    const paymentsQuery = query(collection(db, "payments"), where("status", "==", "approved"));
+    const unsubscribePayments = onSnapshot(paymentsQuery, (querySnapshot) => {
+      let total = 0;
+      querySnapshot.forEach((doc) => {
+        total += doc.data().amount;
+      });
+      setTotalContributions(total);
+    });
+
+    // Listener for total partners (users)
+    const usersQuery = query(collection(db, "users"));
+    const unsubscribeUsers = onSnapshot(usersQuery, (querySnapshot) => {
+      setPartnerCount(querySnapshot.size);
+    });
+
+    // Listener for fully funded projects
+    const projectsQuery = query(collection(db, "projects"), where("status", "==", "fully-funded"));
+    const unsubscribeProjects = onSnapshot(projectsQuery, (querySnapshot) => {
+      setFundedProjectsCount(querySnapshot.size);
+    });
+    
+    setIsLoading(false);
+
+    // Cleanup listeners on component unmount
+    return () => {
+      unsubscribePayments();
+      unsubscribeUsers();
+      unsubscribeProjects();
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-background relative">
       {/* Header */}
@@ -25,26 +66,17 @@ export default function HomePage() {
               </div>
             </div>
             <nav className="hidden md:flex items-center gap-6">
-              <Link
-                href="#about"
-                className="text-muted-foreground hover:text-foreground transition-colors hover:text-[var(--neon-blue)]"
-              >
+              <Link href="#about" className="text-muted-foreground hover:text-foreground transition-colors">
                 About
               </Link>
-              <Link
-                href="#impact"
-                className="text-muted-foreground hover:text-foreground transition-colors hover:text-[var(--neon-blue)]"
-              >
-                Impact
+              <Link href="/projects" className="text-muted-foreground hover:text-foreground transition-colors">
+                Projects
               </Link>
-              <Link
-                href="#partners"
-                className="text-muted-foreground hover:text-foreground transition-colors hover:text-[var(--neon-blue)]"
-              >
+              <Link href="#partners" className="text-muted-foreground hover:text-foreground transition-colors">
                 Partners
               </Link>
               <ThemeToggle />
-              <Button asChild className="btn-neon neon-glow-blue">
+              <Button asChild>
                 <Link href="/login">Partner Login</Link>
               </Button>
             </nav>
@@ -62,7 +94,7 @@ export default function HomePage() {
       <section className="py-20 px-4 gradient-hero relative overflow-hidden">
         <div className="container mx-auto max-w-6xl relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8 animate-slide-in-up">
+            <div className="space-y-8">
               <div className="space-y-4">
                 <Badge variant="secondary" className="w-fit glass-card">
                   <Globe className="w-4 h-4 mr-2" />
@@ -77,7 +109,7 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" asChild className="text-lg px-8 btn-neon bg-white text-black hover:bg-white/90">
+                <Button size="lg" asChild className="text-lg px-8 bg-white text-black hover:bg-white/90">
                   <Link href="/signup">
                     Become a Partner
                     <ArrowRight className="w-5 h-5 ml-2" />
@@ -89,51 +121,38 @@ export default function HomePage() {
                   asChild
                   className="text-lg px-8 glass-card text-white border-white/30 hover:bg-white/10 bg-transparent"
                 >
-                  <Link href="#impact">View Impact</Link>
+                  <Link href="/projects">View Impact</Link>
                 </Button>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              {[
-                { value: "2,500+", label: "Active Partners", glow: "neon-glow-blue" },
-                { value: "$1.2M", label: "Total Contributions", glow: "neon-glow-purple" },
-                { value: "150+", label: "Projects Funded", glow: "neon-glow-teal" },
-                { value: "95%", label: "Impact Rate", glow: "neon-glow-green" },
-              ].map((stat, index) => (
-                <Card
-                  key={index}
-                  className={`
-                    glass-card ${stat.glow} card-hover-effect float-animation text-white
-                    ${index === 1 || index === 3 ? "mt-8" : index === 2 ? "-mt-4" : ""}
-                    animate-slide-in-up-delay-${index + 1}
-                  `}
-                >
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-2xl font-bold text-white">{stat.value}</CardTitle>
-                    <CardDescription className="text-white/80">{stat.label}</CardDescription>
-                  </CardHeader>
-                </Card>
-              ))}
+              {
+                isLoading ? <Card className="glass-card text-white"><CardHeader><CardTitle>Loading...</CardTitle></CardHeader></Card> :
+                [
+                  { value: partnerCount.toLocaleString(), label: "Active Partners", glow: "neon-glow-blue" },
+                  { value: `₦${totalContributions.toLocaleString()}`, label: "Total Contributions", glow: "neon-glow-purple" },
+                  { value: fundedProjectsCount.toLocaleString(), label: "Projects Funded", glow: "neon-glow-teal" },
+                  { value: "95%", label: "Impact Rate", glow: "neon-glow-green" }, // This remains static for now
+                ].map((stat, index) => (
+                  <Card
+                    key={index}
+                    className={`glass-card ${stat.glow} card-hover-effect text-white ${index === 1 || index === 3 ? "mt-8" : index === 2 ? "-mt-4" : ""}`}>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-2xl font-bold text-white">{stat.value}</CardTitle>
+                      <CardDescription className="text-white/80">{stat.label}</CardDescription>
+                    </CardHeader>
+                  </Card>
+                ))
+              }
             </div>
           </div>
         </div>
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
-          <div
-            className="absolute top-3/4 right-1/4 w-1 h-1 bg-white/30 rounded-full animate-pulse"
-            style={{ animationDelay: "1s" }}
-          ></div>
-          <div
-            className="absolute top-1/2 left-3/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"
-            style={{ animationDelay: "2s" }}
-          ></div>
-        </div>
       </section>
 
-      {/* Features Section */}
-      <section id="about" className="py-20 px-4 bg-background">
+      {/* Features Section and below are unchanged */}
+       <section id="about" className="py-20 px-4 bg-background">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center space-y-4 mb-16 animate-slide-in-up">
+          <div className="text-center space-y-4 mb-16">
             <h2 className="text-4xl font-bold text-balance">
               Built for partners who care about <span className="gradient-text">real impact</span>
             </h2>
@@ -150,30 +169,24 @@ export default function HomePage() {
                 title: "Contribution Tracking",
                 description:
                   "Log monthly contributions with proof of payment and track your partnership journey over time.",
-                glow: "neon-glow-blue",
               },
               {
                 icon: Target,
                 title: "Impact Analytics",
                 description:
                   "View detailed dashboards showing how your contributions drive real change and measurable outcomes.",
-                glow: "neon-glow-purple",
               },
               {
                 icon: Award,
                 title: "Recognition System",
                 description:
                   "Earn badges and milestones as you reach contribution goals and celebrate achievements with the community.",
-                glow: "neon-glow-teal",
               },
             ].map((feature, index) => (
-              <Card
-                key={index}
-                className={`glass-card ${feature.glow} card-hover-effect h-full animate-slide-in-up-delay-${index + 1}`}
-              >
+              <Card key={index} className={`glass-card card-hover-effect h-full`}>
                 <CardHeader>
-                  <div className="w-12 h-12 bg-gradient-to-br from-[var(--neon-blue)] to-[var(--neon-purple)] rounded-lg flex items-center justify-center mb-4">
-                    <feature.icon className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
+                    <feature.icon className="w-6 h-6 text-primary-foreground" />
                   </div>
                   <CardTitle>{feature.title}</CardTitle>
                   <CardDescription>{feature.description}</CardDescription>
@@ -184,10 +197,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto max-w-4xl text-center">
-          <div className="space-y-8 animate-slide-in-up">
+          <div className="space-y-8">
             <div className="space-y-4">
               <h2 className="text-4xl font-bold text-balance">Ready to make a difference?</h2>
               <p className="text-xl text-muted-foreground text-pretty">
@@ -195,7 +207,7 @@ export default function HomePage() {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" asChild className="text-lg px-8 btn-neon neon-glow-blue">
+              <Button size="lg" asChild className="text-lg px-8">
                 <Link href="/signup">
                   Start Your Partnership
                   <Heart className="w-5 h-5 ml-2" />
@@ -209,7 +221,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-border bg-muted/30 py-12 px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-4 gap-8">
@@ -235,14 +246,11 @@ export default function HomePage() {
                 <Link href="/dashboard" className="block text-muted-foreground hover:text-foreground transition-colors">
                   Dashboard
                 </Link>
-                <Link
-                  href="/contributions"
-                  className="block text-muted-foreground hover:text-foreground transition-colors"
-                >
+                <Link href="/contributions" className="block text-muted-foreground hover:text-foreground transition-colors">
                   Contributions
                 </Link>
-                <Link href="/analytics" className="block text-muted-foreground hover:text-foreground transition-colors">
-                  Analytics
+                <Link href="/projects" className="block text-muted-foreground hover:text-foreground transition-colors">
+                  Projects
                 </Link>
               </div>
             </div>
@@ -252,14 +260,8 @@ export default function HomePage() {
                 <Link href="/partners" className="block text-muted-foreground hover:text-foreground transition-colors">
                   Partners
                 </Link>
-                <Link
-                  href="/leaderboard"
-                  className="block text-muted-foreground hover:text-foreground transition-colors"
-                >
+                <Link href="/leaderboard" className="block text-muted-foreground hover:text-foreground transition-colors">
                   Leaderboard
-                </Link>
-                <Link href="/bridge-ai" className="block text-muted-foreground hover:text-foreground transition-colors">
-                  Bridge AI
                 </Link>
               </div>
             </div>
@@ -271,9 +273,6 @@ export default function HomePage() {
                 </Link>
                 <Link href="/contact" className="block text-muted-foreground hover:text-foreground transition-colors">
                   Contact Us
-                </Link>
-                <Link href="/resources" className="block text-muted-foreground hover:text-foreground transition-colors">
-                  Resources
                 </Link>
               </div>
             </div>
