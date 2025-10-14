@@ -1,138 +1,152 @@
-"use client";
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/auth-context';
-import { auth, db } from '@/lib/firebase/client';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+'use client'
 
-export default function Signup() {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [organization, setOrganization] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-  const { user, isLoading } = useAuth();
+import type React from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
+import { createUserWithEmailAndPassword } from "firebase/auth"
+import { auth, db } from "@/lib/firebase/client"
+import { doc, setDoc, serverTimestamp } from "firebase/firestore"
+
+// UI Components
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { ArrowLeft } from "lucide-react"
+import Link from "next/link"
+
+function FullPageLoader() {
+  return (
+    <div className="flex h-screen w-full items-center justify-center bg-background">
+      <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
+    </div>
+  )
+}
+
+export default function SignupPage() {
+  const { user, isLoading: isAuthLoading } = useAuth()
+  const router = useRouter()
+
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [organization, setOrganization] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
 
   useEffect(() => {
-    // Redirect if user is logged in and auth state is no longer loading
-    if (!isLoading && user) {
-      router.push('/dashboard');
+    if (!isAuthLoading && user) {
+      router.push("/dashboard")
     }
-  }, [user, isLoading, router]);
+  }, [user, isAuthLoading, router])
 
   const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    if (password.length < 6) {
-      setError('Password should be at least 6 characters');
-      return;
-    }
+    e.preventDefault()
+    setIsLoading(true)
+    setError("")
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      const firebaseUser = userCredential.user
 
-      // Create a user document in Firestore
-      await setDoc(doc(db, 'users', user.uid), {
+      await setDoc(doc(db, "users", firebaseUser.uid), {
         firstName,
         lastName,
         email,
-        organization,
-      });
+        organization: organization || "", // Optional field
+        createdAt: serverTimestamp(),
+      })
 
-      // Redirect is now handled by the useEffect hook
-      // router.push('/dashboard');
-    } catch (error: any) {
-      setError(error.message);
-      console.error("Error signing up:", error);
+      // On success, the useEffect will handle the redirect.
+    } catch (err: any) {
+      let errorMessage = "Signup failed. Please try again."
+      if (err.code === "auth/email-already-in-use") {
+        errorMessage = "This email is already in use. Please try logging in."
+      } else if (err.code === "auth/weak-password") {
+        errorMessage = "Your password must be at least 6 characters long."
+      } else if (err.code) {
+        errorMessage = err.message
+      }
+      setError(errorMessage)
+      setIsLoading(false) // Re-enable form on error
     }
-  };
-  
-  // While loading auth state, you can show a loader or nothing
-  if (isLoading || user) {
-    return <div>Loading...</div>; // Or a spinner component
+  }
+
+  if (isAuthLoading || user) {
+    return <FullPageLoader />
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center text-gray-900">Create Your Account</h2>
-        <form onSubmit={handleSignup} className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="firstName" className="text-sm font-medium text-gray-700">First Name</label>
-              <input
-                id="firstName"
-                name="firstName"
-                type="text"
-                required
-                className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md space-y-6">
+        <div className="text-center space-y-2">
+          <Link href="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to home
+          </Link>
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-xl">Z</span>
             </div>
-            <div>
-              <label htmlFor="lastName" className="text-sm font-medium text-gray-700">Last Name</label>
-              <input
-                id="lastName"
-                name="lastName"
-                type="text"
-                required
-                className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
+            <div className="text-left">
+              <h1 className="text-lg font-bold text-foreground">ZeroUp Initiative</h1>
+              <p className="text-sm text-muted-foreground">Partners Hub</p>
             </div>
           </div>
-          <div>
-            <label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="text-sm font-medium text-gray-700">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              required
-              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <div>
-            <label htmlFor="organization" className="text-sm font-medium text-gray-700">Organization (Optional)</label>
-            <input
-              id="organization"
-              name="organization"
-              type="text"
-              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              value={organization}
-              onChange={(e) => setOrganization(e.target.value)}
-            />
-          </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <div>
-            <button type="submit" className="w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              Sign Up
-            </button>
-          </div>
-        </form>
+        </div>
+
+        <Card className="border-0 shadow-xl">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Create a Partner Account</CardTitle>
+            <CardDescription>Join our network to start making a difference</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSignup} className="space-y-4">
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              <div className="flex gap-4">
+                <div className="space-y-2 w-1/2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} required disabled={isLoading} />
+                </div>
+                <div className="space-y-2 w-1/2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} required disabled={isLoading} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={isLoading} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="organization">Organization (Optional)</Label>
+                <Input id="organization" value={organization} onChange={(e) => setOrganization(e.target.value)} disabled={isLoading} />
+              </div>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Creating Account..." : "Create Account"}
+              </Button>
+            </form>
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link href="/login" className="text-primary hover:underline font-medium">
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
-  );
+  )
 }

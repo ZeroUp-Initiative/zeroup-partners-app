@@ -1,8 +1,13 @@
-"use client"
+'use client'
 
 import type React from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context" // Import the useAuth hook
+import { signInWithEmailAndPassword } from "firebase/auth"
+import { auth } from "@/lib/firebase/client"
 
-import { useState } from "react"
+// UI Components
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,17 +15,32 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Eye, EyeOff, ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { signInWithEmailAndPassword } from "firebase/auth"
-import { auth } from "@/lib/firebase/client"
+
+// A full-page loader to prevent flickering and show a loading state.
+function FullPageLoader() {
+  return (
+    <div className="flex h-screen w-full items-center justify-center bg-background">
+      <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
+    </div>
+  )
+}
 
 export default function LoginPage() {
+  const { user, isLoading: isAuthLoading } = useAuth() // Use auth state
+  const router = useRouter()
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false) // This is for form submission
   const [error, setError] = useState("")
-  const router = useRouter()
+
+  useEffect(() => {
+    // If auth is no longer loading and a user object exists, redirect to the dashboard.
+    if (!isAuthLoading && user) {
+      router.push("/dashboard")
+    }
+  }, [user, isAuthLoading, router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -29,11 +49,9 @@ export default function LoginPage() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password)
-      // The user session is now managed by Firebase.
-      // We can redirect to the dashboard.
-      router.push("/dashboard")
+      // On success, the useEffect above will handle the redirect.
+      // isLoading will remain true, showing the loader until the redirect happens.
     } catch (err: any) {
-      // Handle Firebase errors
       let errorMessage = "Login failed. Please check your credentials."
       if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
         errorMessage = "Invalid email or password. Please try again."
@@ -41,15 +59,20 @@ export default function LoginPage() {
         errorMessage = err.message
       }
       setError(errorMessage)
-    } finally {
-      setIsLoading(false)
+      setIsLoading(false) // Only reset loading state on error
     }
   }
 
+  // While the auth state is being checked, or if the user is found and we are redirecting,
+  // show the full page loader. This prevents the login form from flashing.
+  if (isAuthLoading || user) {
+    return <FullPageLoader />
+  }
+
+  // If we're done loading and there's no user, render the login form.
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
-        {/* Header */}
         <div className="text-center space-y-2">
           <Link href="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -66,7 +89,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Login Form */}
         <Card className="border-0 shadow-xl">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Welcome back</CardTitle>
@@ -89,6 +111,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -102,6 +125,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    disabled={isLoading}
                   />
                   <Button
                     type="button"
@@ -109,12 +133,9 @@ export default function LoginPage() {
                     size="sm"
                     className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                     onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground" />
-                    )}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
               </div>
