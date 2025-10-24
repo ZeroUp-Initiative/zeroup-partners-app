@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 'use client'
 
 import { useState, useEffect } from "react"
@@ -84,7 +86,7 @@ function ContributionsContent() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "approved": return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case "verified": return <CheckCircle className="w-4 h-4 text-green-500" />;
       case "pending": return <Clock className="w-4 h-4 text-yellow-500" />;
       case "rejected": return <AlertCircle className="w-4 h-4 text-red-500" />;
       default: return <Clock className="w-4 h-4 text-gray-500" />;
@@ -93,15 +95,15 @@ function ContributionsContent() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "approved": return <Badge className="bg-green-500 text-white">Approved</Badge>;
+      case "verified": return <Badge className="bg-green-500 text-white">Verified</Badge>;
       case "pending": return <Badge variant="outline">Pending</Badge>;
       case "rejected": return <Badge variant="destructive">Rejected</Badge>;
       default: return <Badge variant="outline">Unknown</Badge>;
     }
   };
   
-  const totalContributions = contributions.filter(c => c.status === 'approved').reduce((sum, c) => sum + c.amount, 0);
-  const verifiedCount = contributions.filter((c) => c.status === "approved").length;
+  const totalContributions = contributions.filter(c => c.status === 'verified').reduce((sum, c) => sum + c.amount, 0);
+  const verifiedCount = contributions.filter((c) => c.status === "verified").length;
   const pendingAmount = contributions.filter((c) => c.status === "pending").reduce((sum, c) => sum + c.amount, 0);
   const pendingCount = contributions.filter((c) => c.status === "pending").length;
 
@@ -148,7 +150,7 @@ function ContributionsContent() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Approved</CardTitle>
+                <CardTitle className="text-sm font-medium">Total Verified</CardTitle>
                 <CheckCircle className="h-4 w-4 text-green-500" />
               </CardHeader>
               <CardContent>

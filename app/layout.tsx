@@ -5,10 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { PageTransition } from "@/components/page-transition"
-import { GamificationProvider } from "@/components/gamification-provider"
-import { AuthProvider } from "@/contexts/auth-context"
-import { Toaster } from "react-hot-toast"
+import { AppProviders } from "@/components/app-providers"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -66,19 +63,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>
       <body className={`font-sans ${inter.variable} ${jetbrainsMono.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
-          <AuthProvider>
-            <GamificationProvider>
-              <PageTransition>
-                <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
-                 <Toaster
-                    position="bottom-right"
-                    toastOptions={{
-                      duration: 5000,
-                    }}
-                  />
-              </PageTransition>
-            </GamificationProvider>
-          </AuthProvider>
+          <AppProviders>
+            <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+          </AppProviders>
         </ThemeProvider>
         <Analytics />
       </body>

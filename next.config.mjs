@@ -35,6 +35,12 @@ const nextConfig = {
       },
     ]
   },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals = [...config.externals, 'firebase', 'firebase/firestore'];
+    }
+    return config;
+  },
 }
 
 export default nextConfig

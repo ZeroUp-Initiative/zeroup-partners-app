@@ -5,77 +5,65 @@ import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase/client';
 
-// Enhanced UserProfile to include real-time data like totalContributions
 interface UserProfile {
   firstName: string;
   lastName: string;
   organization?: string;
-  totalContributions?: number; // This will be updated in real-time
+  role?: string;
+  totalContributions?: number;
 }
 
-interface AuthContextType {
+interface AuthState {
   user: (FirebaseUser & Partial<UserProfile>) | null;
   isLoading: boolean;
+  isLoggedIn: boolean;
   error: string | null;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<(FirebaseUser & Partial<UserProfile>) | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [authState, setAuthState] = useState<AuthState>({
+    user: null,
+    isLoading: true,
+    isLoggedIn: false,
+    error: null,
+  });
 
   useEffect(() => {
-    let unsubscribeFromFirestore: (() => void) | null = null;
-
-    const unsubscribeFromAuth = onAuthStateChanged(auth, (firebaseUser) => {
-      // First, immediately update the auth state.
-      // This is crucial to prevent the loading deadlock.
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
-        // Set user with Firebase data first, and stop loading.
-        setUser(firebaseUser);
-        setIsLoading(false);
-
-        // Now, listen for profile data from Firestore.
         const userDocRef = doc(db, 'users', firebaseUser.uid);
-        unsubscribeFromFirestore = onSnapshot(userDocRef, (doc) => {
-          if (doc.exists()) {
-            const userProfile = doc.data() as UserProfile;
-            // Merge profile data into the existing user state.
-            setUser(prevUser => ({ ...prevUser!, ...userProfile }));
-          } else {
-            // User is authenticated, but no profile document exists.
-            // This is a valid state; they may need to create a profile.
-            console.warn(`User profile for ${firebaseUser.uid} not found in Firestore.`);
+        const unsubscribeFirestore = onSnapshot(userDocRef, 
+          (doc) => {
+            const userProfile = (doc.exists() ? doc.data() : {}) as UserProfile;
+            setAuthState({
+              user: { ...firebaseUser, ...userProfile },
+              isLoading: false,
+              isLoggedIn: true,
+              error: null,
+            });
+          },
+          (error) => {
+            console.error("Error fetching user profile:", error);
+            setAuthState(s => ({ ...s, isLoading: false, error: "Failed to load user profile." }));
           }
-        }, (error) => {
-          // This error is for the Firestore listener, not authentication itself.
-          console.error("Error listening to user profile:", error);
-          setError("Could not load user profile. Please try refreshing.");
-        });
-
+        );
+        return unsubscribeFirestore;
       } else {
-        // User is signed out.
-        setUser(null);
-        setIsLoading(false);
-        if (unsubscribeFromFirestore) {
-          unsubscribeFromFirestore();
-        }
+        setAuthState({
+          user: null,
+          isLoading: false,
+          isLoggedIn: false,
+          error: null,
+        });
       }
     });
-
-    // Cleanup function to unsubscribe from auth and firestore listeners on component unmount.
-    return () => {
-      unsubscribeFromAuth();
-      if (unsubscribeFromFirestore) {
-        unsubscribeFromFirestore();
-      }
-    };
+    return () => unsubscribe();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, error }}>
+    <AuthContext.Provider value={authState}>
       {children}
     </AuthContext.Provider>
   );

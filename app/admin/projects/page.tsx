@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 'use client'
 
 import { useState, useEffect } from "react"
@@ -109,7 +111,7 @@ function AdminProjectsPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="description">Project Description</Label>
-                <Textarea id="description" name="description" placeholder="Describe the project\'s goals and impact." value={newProject.description} onChange={handleInputChange} required />
+                <Textarea id="description" name="description" placeholder="Describe the project's goals and impact." value={newProject.description} onChange={handleInputChange} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="fundingGoal">Funding Goal (₦)</Label>
