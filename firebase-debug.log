@@ -1,0 +1,681 @@
+[debug] [2025-10-24T21:07:19.012Z] ----------------------------------------------------------------------
+[debug] [2025-10-24T21:07:19.014Z] Command:       /nix/store/ixbb20farqh1f4fqbmsn6b1ixn8mc8ij-nodejs-20.18.1/bin/node /home/user/.global_modules/bin/firebase deploy
+[debug] [2025-10-24T21:07:19.014Z] CLI Version:   14.22.0
+[debug] [2025-10-24T21:07:19.015Z] Platform:      linux
+[debug] [2025-10-24T21:07:19.015Z] Node Version:  v20.18.1
+[debug] [2025-10-24T21:07:19.015Z] Time:          Fri Oct 24 2025 21:07:19 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-10-24T21:07:19.015Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-10-24T21:07:19.216Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:07:19.216Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:07:19.218Z] >>> [apiv2][query] GET https://monospace-pa.googleapis.com/v1/workspaces/zeroup-partners-hub-54042322 [none]
+[debug] [2025-10-24T21:07:20.105Z] <<< [apiv2][status] GET https://monospace-pa.googleapis.com/v1/workspaces/zeroup-partners-hub-54042322 200
+[debug] [2025-10-24T21:07:20.106Z] <<< [apiv2][body] GET https://monospace-pa.googleapis.com/v1/workspaces/zeroup-partners-hub-54042322 {"workspaceId":"zeroup-partners-hub-54042322","name":"ZeroUp Partners Hub","workspaceRedirectUrl":"firebase-zeroup-partners-hub-1759323094616.cluster-64pjnskmlbaxowh5lzq6i7v4ra.cloudworkstations.dev","status":"WORKSPACE_STATUS_RUNNING","lastAccessDatetime":"2025-10-24T20:28:05.749711Z","failureReason":"Starting your workstation timed out since your container took over 897 seconds to start.","workspaceTemplate":"WORKSPACE_TEMPLATE_FLUTTER","owner":"SELF","serviceAccountEmail":"msp-1440283495949092068@monospace-3.iam.gserviceaccount.com","gitRepoUrl":"https://github.com/magnusimam/v0-partners-hope-app.git","enableNix":true,"ownerEmail":"zeroupacademy@gmail.com","workstationAccessToken":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vd29ya3N0YXRpb25zIiwiYXVkIjoiZmlyZWJhc2UtemVyb3VwLXBhcnRuZXJzLWh1Yi0xNzU5MzIzMDk0NjE2LmNsdXN0ZXItNjRwam5za21sYmF4b3doNWx6cTZpN3Y0cmEuY2xvdWR3b3Jrc3RhdGlvbnMuZGV2IiwiaWF0IjoxNzYxMzQwMDM5LCJleHAiOjE3NjE0MjY0Mzl9.5upo8aokGHpZAjmqsdwzkIjwRozGk-V53lDR3fOk6S3Y5mAGAXwt4RH1XTpQe4MnM9DGtluR8oqtO9-GqNjrpKydw5ghGogNIGxvlWCHsJc_uWZp55JIDIuuih1kEXX9SvCcIQWmKJzMwgrOprQgqIQJo9MBvOYUR86OQH8vmtOMBpD4jN8lEiuys0paRkrTTnJ4fv3hq5I62nAKoaCiBwWG_zUkD5aAFDageK0hQBtZgc2zFHWYvceZQslZTHv3WlVfGSu_P6NoHqqdq-45sEdBjNHThPVztLUSZrsOK1auAmZMAj1YVTt_JRWUnOubSYOxopMwLoIIWqJR6HA9Fg","firebaseProjectId":"zeroup-partners-hub-5404-34b69"}
+[debug] [2025-10-24T21:07:20.107Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T21:07:20.107Z] > authorizing via signed-in user (zeroupacademy@gmail.com)
+[debug] [2025-10-24T21:07:20.107Z] [iam] checking project zeroup-partners-hub-5404-34b69 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2025-10-24T21:07:20.108Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:07:20.108Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:07:20.108Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions [none]
+[debug] [2025-10-24T21:07:20.108Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions x-goog-quota-user=projects/zeroup-partners-hub-5404-34b69
+[debug] [2025-10-24T21:07:20.108Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-10-24T21:07:20.698Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions 200
+[debug] [2025-10-24T21:07:20.699Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-10-24T21:07:20.699Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:07:20.699Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:07:20.700Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69 [none]
+[debug] [2025-10-24T21:07:20.901Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69 200
+[debug] [2025-10-24T21:07:20.901Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69 {"projectId":"zeroup-partners-hub-5404-34b69","projectNumber":"71869767739","displayName":"Firebase app","name":"projects/zeroup-partners-hub-5404-34b69","resources":{"hostingSite":"zeroup-partners-hub-5404-34b69"},"state":"ACTIVE","etag":"1_fd7f4d67-3e55-466c-b12a-2ee1564c1b80"}
+[debug] [2025-10-24T21:07:22.182Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:07:22.182Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:07:22.183Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites pageToken=&pageSize=10
+[debug] [2025-10-24T21:07:23.013Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites 200
+[debug] [2025-10-24T21:07:23.013Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites {"sites":[{"name":"projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69","defaultUrl":"https://zeroup-partners-hub-5404-34b69.web.app","appId":"1:71869767739:web:0c7ffdfc110b4bceb5bc1e","type":"DEFAULT_SITE"}]}
+[debug] [2025-10-24T21:07:23.014Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:07:23.014Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:07:23.014Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:71869767739:web:0c7ffdfc110b4bceb5bc1e/config [none]
+[debug] [2025-10-24T21:07:23.634Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:71869767739:web:0c7ffdfc110b4bceb5bc1e/config 200
+[debug] [2025-10-24T21:07:23.634Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:71869767739:web:0c7ffdfc110b4bceb5bc1e/config {"projectId":"zeroup-partners-hub-5404-34b69","appId":"1:71869767739:web:0c7ffdfc110b4bceb5bc1e","storageBucket":"zeroup-partners-hub-5404-34b69.firebasestorage.app","apiKey":"AIzaSyAcpEr3RseZdfekkRJcMZ69y_QSusI21gs","authDomain":"zeroup-partners-hub-5404-34b69.firebaseapp.com","messagingSenderId":"71869767739","projectNumber":"71869767739","version":"2"}
+[info] 
+   Thank you for trying our early preview of Next.js support on Firebase Hosting.
+   During the preview, support is best-effort and breaking changes can be expected. Proceed with caution.
+
+   Documentation: https://firebase.google.com/docs/hosting/frameworks/nextjs
+   File a bug: https://github.com/firebase/firebase-tools/issues/new?template=bug_report.md
+   Submit a feature request: https://github.com/firebase/firebase-tools/issues/new?template=feature_request.md
+
+   We'd love to learn from you. Express your interest in helping us shape the future of Firebase Hosting: https://goo.gle/41enW5X
+
+[debug] [2025-10-24T21:07:26.798Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:07:26.798Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:07:26.798Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69 [none]
+[debug] [2025-10-24T21:07:26.998Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69 200
+[debug] [2025-10-24T21:07:26.998Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69 {"name":"projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69","defaultUrl":"https://zeroup-partners-hub-5404-34b69.web.app","appId":"1:71869767739:web:0c7ffdfc110b4bceb5bc1e","type":"DEFAULT_SITE"}
+[info]   ▲ Next.js 14.2.16
+
+[info] 
+
+[info]    Creating an optimized production build ...
+
+[info] Failed to compile.
+
+
+[info] ./app/admin/projects/page.tsx
+Error: 
+  x The "use client" directive must be placed before other expressions. Move it to the top of the file to resolve this issue.
+   ,-[/home/user/v0-partners-hope-app/app/admin/projects/page.tsx:1:1]
+ 1 | export const dynamic = 'force-dynamic'
+ 2 | 
+ 3 | 'use client'
+   : ^^^^^^^^^^^^
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+ 6 | import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore"
+   `----
+
+  x You're importing a component that needs useState. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  | Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  | 
+  | 
+   ,-[/home/user/v0-partners-hope-app/app/admin/projects/page.tsx:2:1]
+ 2 | 
+ 3 | 'use client'
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+   :          ^^^^^^^^
+ 6 | import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore"
+ 7 | import { db } from "@/lib/firebase/client"
+ 8 | import ProtectedRoute from "@/components/auth/protected-route"
+   `----
+
+  x You're importing a component that needs useEffect. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  | Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  | 
+  | 
+   ,-[/home/user/v0-partners-hope-app/app/admin/projects/page.tsx:2:1]
+ 2 | 
+ 3 | 'use client'
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+   :                    ^^^^^^^^^
+ 6 | import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore"
+ 7 | import { db } from "@/lib/firebase/client"
+ 8 | import ProtectedRoute from "@/components/auth/protected-route"
+   `----
+
+Import trace for requested module:
+./app/admin/projects/page.tsx
+
+./app/contributions/page.tsx
+Error: 
+  x The "use client" directive must be placed before other expressions. Move it to the top of the file to resolve this issue.
+   ,-[/home/user/v0-partners-hope-app/app/contributions/page.tsx:1:1]
+ 1 | export const dynamic = 'force-dynamic'
+ 2 | 
+ 3 | 'use client'
+   : ^^^^^^^^^^^^
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+ 6 | import ProtectedRoute from "@/components/auth/protected-route"
+   `----
+
+  x You're importing a component that needs useState. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  | Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  | 
+  | 
+   ,-[/home/user/v0-partners-hope-app/app/contributions/page.tsx:2:1]
+ 2 | 
+ 3 | 'use client'
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+   :          ^^^^^^^^
+ 6 | import ProtectedRoute from "@/components/auth/protected-route"
+ 7 | import { useAuth } from "@/contexts/auth-context"
+ 8 | import { Button } from "@/components/ui/button"
+   `----
+
+  x You're importing a component that needs useEffect. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  | Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  | 
+  | 
+   ,-[/home/user/v0-partners-hope-app/app/contributions/page.tsx:2:1]
+ 2 | 
+ 3 | 'use client'
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+   :                    ^^^^^^^^^
+ 6 | import ProtectedRoute from "@/components/auth/protected-route"
+ 7 | import { useAuth } from "@/contexts/auth-context"
+ 8 | import { Button } from "@/components/ui/button"
+   `----
+
+Import trace for requested module:
+./app/contributions/page.tsx
+
+
+
+[info] > Build failed because of webpack errors
+
+[debug] [2025-10-24T21:07:37.482Z] Error: ENOENT: no such file or directory, open '/home/user/v0-partners-hope-app/.next/export-marker.json'
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-10-24T21:09:42.527Z] ----------------------------------------------------------------------
+[debug] [2025-10-24T21:09:42.529Z] Command:       /nix/store/ixbb20farqh1f4fqbmsn6b1ixn8mc8ij-nodejs-20.18.1/bin/node /home/user/.global_modules/bin/firebase deploy
+[debug] [2025-10-24T21:09:42.530Z] CLI Version:   14.22.0
+[debug] [2025-10-24T21:09:42.530Z] Platform:      linux
+[debug] [2025-10-24T21:09:42.530Z] Node Version:  v20.18.1
+[debug] [2025-10-24T21:09:42.530Z] Time:          Fri Oct 24 2025 21:09:42 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-10-24T21:09:42.530Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-10-24T21:09:42.724Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:09:42.724Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:09:42.727Z] >>> [apiv2][query] GET https://monospace-pa.googleapis.com/v1/workspaces/zeroup-partners-hub-54042322 [none]
+[debug] [2025-10-24T21:09:43.723Z] <<< [apiv2][status] GET https://monospace-pa.googleapis.com/v1/workspaces/zeroup-partners-hub-54042322 200
+[debug] [2025-10-24T21:09:43.723Z] <<< [apiv2][body] GET https://monospace-pa.googleapis.com/v1/workspaces/zeroup-partners-hub-54042322 {"workspaceId":"zeroup-partners-hub-54042322","name":"ZeroUp Partners Hub","workspaceRedirectUrl":"firebase-zeroup-partners-hub-1759323094616.cluster-64pjnskmlbaxowh5lzq6i7v4ra.cloudworkstations.dev","status":"WORKSPACE_STATUS_RUNNING","lastAccessDatetime":"2025-10-24T20:28:05.749711Z","failureReason":"Starting your workstation timed out since your container took over 897 seconds to start.","workspaceTemplate":"WORKSPACE_TEMPLATE_FLUTTER","owner":"SELF","serviceAccountEmail":"msp-1440283495949092068@monospace-3.iam.gserviceaccount.com","gitRepoUrl":"https://github.com/magnusimam/v0-partners-hope-app.git","enableNix":true,"ownerEmail":"zeroupacademy@gmail.com","workstationAccessToken":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vd29ya3N0YXRpb25zIiwiYXVkIjoiZmlyZWJhc2UtemVyb3VwLXBhcnRuZXJzLWh1Yi0xNzU5MzIzMDk0NjE2LmNsdXN0ZXItNjRwam5za21sYmF4b3doNWx6cTZpN3Y0cmEuY2xvdWR3b3Jrc3RhdGlvbnMuZGV2IiwiaWF0IjoxNzYxMzQwMTgzLCJleHAiOjE3NjE0MjY1ODN9.sNDJDmPEiKddSodVYo4xsRwukMP9MdMSo_8cUkLsbfbyqE4YWUsrCZpKf6_BTCjsdQGd4vyfwGo8RUTAZsBj9vRDBcJlYd6EPbjoNF9yCO4VpYZfZP2BpPbrWhdX_oMGcqFgkhxhLWSd6PO5Sm-5vQBczf_i7Xg6VXRxf8QqwMaJCrqQ2zlfEZ5lQ-ruVIbqmmQXasPiBdwXAnbhhga86x67mnXhC50FCiYl4PgUlRj5Rvv23Skgwd8byOoXDD5a6XOcR8CvVVzsiRGU_yuX9EH3yNzjB4wwIp69a_8-WdNPtAg6XG4XcZfG4E4wJIimPtdfyXC1H_rO_YEadEV11A","firebaseProjectId":"zeroup-partners-hub-5404-34b69"}
+[debug] [2025-10-24T21:09:43.724Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T21:09:43.725Z] > authorizing via signed-in user (zeroupacademy@gmail.com)
+[debug] [2025-10-24T21:09:43.725Z] [iam] checking project zeroup-partners-hub-5404-34b69 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2025-10-24T21:09:43.725Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:09:43.725Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:09:43.725Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions [none]
+[debug] [2025-10-24T21:09:43.726Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions x-goog-quota-user=projects/zeroup-partners-hub-5404-34b69
+[debug] [2025-10-24T21:09:43.726Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-10-24T21:09:44.324Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions 200
+[debug] [2025-10-24T21:09:44.324Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-10-24T21:09:44.325Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:09:44.325Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:09:44.325Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69 [none]
+[debug] [2025-10-24T21:09:44.509Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69 200
+[debug] [2025-10-24T21:09:44.509Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69 {"projectId":"zeroup-partners-hub-5404-34b69","projectNumber":"71869767739","displayName":"Firebase app","name":"projects/zeroup-partners-hub-5404-34b69","resources":{"hostingSite":"zeroup-partners-hub-5404-34b69"},"state":"ACTIVE","etag":"1_fd7f4d67-3e55-466c-b12a-2ee1564c1b80"}
+[debug] [2025-10-24T21:09:45.832Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:09:45.832Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:09:45.833Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites pageToken=&pageSize=10
+[debug] [2025-10-24T21:09:46.638Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites 200
+[debug] [2025-10-24T21:09:46.639Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites {"sites":[{"name":"projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69","defaultUrl":"https://zeroup-partners-hub-5404-34b69.web.app","appId":"1:71869767739:web:0c7ffdfc110b4bceb5bc1e","type":"DEFAULT_SITE"}]}
+[debug] [2025-10-24T21:09:46.639Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:09:46.639Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:09:46.639Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:71869767739:web:0c7ffdfc110b4bceb5bc1e/config [none]
+[debug] [2025-10-24T21:09:47.216Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:71869767739:web:0c7ffdfc110b4bceb5bc1e/config 200
+[debug] [2025-10-24T21:09:47.216Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:71869767739:web:0c7ffdfc110b4bceb5bc1e/config {"projectId":"zeroup-partners-hub-5404-34b69","appId":"1:71869767739:web:0c7ffdfc110b4bceb5bc1e","storageBucket":"zeroup-partners-hub-5404-34b69.firebasestorage.app","apiKey":"AIzaSyAcpEr3RseZdfekkRJcMZ69y_QSusI21gs","authDomain":"zeroup-partners-hub-5404-34b69.firebaseapp.com","messagingSenderId":"71869767739","projectNumber":"71869767739","version":"2"}
+[info] 
+   Thank you for trying our early preview of Next.js support on Firebase Hosting.
+   During the preview, support is best-effort and breaking changes can be expected. Proceed with caution.
+
+   Documentation: https://firebase.google.com/docs/hosting/frameworks/nextjs
+   File a bug: https://github.com/firebase/firebase-tools/issues/new?template=bug_report.md
+   Submit a feature request: https://github.com/firebase/firebase-tools/issues/new?template=feature_request.md
+
+   We'd love to learn from you. Express your interest in helping us shape the future of Firebase Hosting: https://goo.gle/41enW5X
+
+[debug] [2025-10-24T21:09:50.460Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:09:50.460Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:09:50.460Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69 [none]
+[debug] [2025-10-24T21:09:50.632Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69 200
+[debug] [2025-10-24T21:09:50.633Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69 {"name":"projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69","defaultUrl":"https://zeroup-partners-hub-5404-34b69.web.app","appId":"1:71869767739:web:0c7ffdfc110b4bceb5bc1e","type":"DEFAULT_SITE"}
+[info]   ▲ Next.js 14.2.16
+
+[info] 
+
+[info]    Creating an optimized production build ...
+
+[info] Failed to compile.
+
+
+[info] ./app/admin/projects/page.tsx
+Error: 
+  x The "use client" directive must be placed before other expressions. Move it to the top of the file to resolve this issue.
+   ,-[/home/user/v0-partners-hope-app/app/admin/projects/page.tsx:1:1]
+ 1 | export const dynamic = 'force-dynamic'
+ 2 | 
+ 3 | 'use client'
+   : ^^^^^^^^^^^^
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+ 6 | import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore"
+   `----
+
+  x You're importing a component that needs useState. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  | Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  | 
+  | 
+   ,-[/home/user/v0-partners-hope-app/app/admin/projects/page.tsx:2:1]
+ 2 | 
+ 3 | 'use client'
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+   :          ^^^^^^^^
+ 6 | import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore"
+ 7 | import { db } from "@/lib/firebase/client"
+ 8 | import ProtectedRoute from "@/components/auth/protected-route"
+   `----
+
+  x You're importing a component that needs useEffect. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  | Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  | 
+  | 
+   ,-[/home/user/v0-partners-hope-app/app/admin/projects/page.tsx:2:1]
+ 2 | 
+ 3 | 'use client'
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+   :                    ^^^^^^^^^
+ 6 | import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore"
+ 7 | import { db } from "@/lib/firebase/client"
+ 8 | import ProtectedRoute from "@/components/auth/protected-route"
+   `----
+
+Import trace for requested module:
+./app/admin/projects/page.tsx
+
+./app/contributions/page.tsx
+Error: 
+  x The "use client" directive must be placed before other expressions. Move it to the top of the file to resolve this issue.
+   ,-[/home/user/v0-partners-hope-app/app/contributions/page.tsx:1:1]
+ 1 | export const dynamic = 'force-dynamic'
+ 2 | 
+ 3 | 'use client'
+   : ^^^^^^^^^^^^
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+ 6 | import ProtectedRoute from "@/components/auth/protected-route"
+   `----
+
+  x You're importing a component that needs useState. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  | Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  | 
+  | 
+   ,-[/home/user/v0-partners-hope-app/app/contributions/page.tsx:2:1]
+ 2 | 
+ 3 | 'use client'
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+   :          ^^^^^^^^
+ 6 | import ProtectedRoute from "@/components/auth/protected-route"
+ 7 | import { useAuth } from "@/contexts/auth-context"
+ 8 | import { Button } from "@/components/ui/button"
+   `----
+
+  x You're importing a component that needs useEffect. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  | Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  | 
+  | 
+   ,-[/home/user/v0-partners-hope-app/app/contributions/page.tsx:2:1]
+ 2 | 
+ 3 | 'use client'
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+   :                    ^^^^^^^^^
+ 6 | import ProtectedRoute from "@/components/auth/protected-route"
+ 7 | import { useAuth } from "@/contexts/auth-context"
+ 8 | import { Button } from "@/components/ui/button"
+   `----
+
+Import trace for requested module:
+./app/contributions/page.tsx
+
+
+[info] 
+
+[info] > Build failed because of webpack errors
+
+[debug] [2025-10-24T21:09:55.854Z] Error: ENOENT: no such file or directory, open '/home/user/v0-partners-hope-app/.next/export-marker.json'
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-10-24T21:14:04.739Z] ----------------------------------------------------------------------
+[debug] [2025-10-24T21:14:04.741Z] Command:       /nix/store/ixbb20farqh1f4fqbmsn6b1ixn8mc8ij-nodejs-20.18.1/bin/node /home/user/.global_modules/bin/firebase deploy
+[debug] [2025-10-24T21:14:04.741Z] CLI Version:   14.22.0
+[debug] [2025-10-24T21:14:04.742Z] Platform:      linux
+[debug] [2025-10-24T21:14:04.742Z] Node Version:  v20.18.1
+[debug] [2025-10-24T21:14:04.742Z] Time:          Fri Oct 24 2025 21:14:04 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-10-24T21:14:04.742Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-10-24T21:14:04.958Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:04.959Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:04.962Z] >>> [apiv2][query] GET https://monospace-pa.googleapis.com/v1/workspaces/zeroup-partners-hub-54042322 [none]
+[debug] [2025-10-24T21:14:05.685Z] <<< [apiv2][status] GET https://monospace-pa.googleapis.com/v1/workspaces/zeroup-partners-hub-54042322 200
+[debug] [2025-10-24T21:14:05.685Z] <<< [apiv2][body] GET https://monospace-pa.googleapis.com/v1/workspaces/zeroup-partners-hub-54042322 {"workspaceId":"zeroup-partners-hub-54042322","name":"ZeroUp Partners Hub","workspaceRedirectUrl":"firebase-zeroup-partners-hub-1759323094616.cluster-64pjnskmlbaxowh5lzq6i7v4ra.cloudworkstations.dev","status":"WORKSPACE_STATUS_RUNNING","lastAccessDatetime":"2025-10-24T20:28:05.749711Z","failureReason":"Starting your workstation timed out since your container took over 897 seconds to start.","workspaceTemplate":"WORKSPACE_TEMPLATE_FLUTTER","owner":"SELF","serviceAccountEmail":"msp-1440283495949092068@monospace-3.iam.gserviceaccount.com","gitRepoUrl":"https://github.com/magnusimam/v0-partners-hope-app.git","enableNix":true,"ownerEmail":"zeroupacademy@gmail.com","workstationAccessToken":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vd29ya3N0YXRpb25zIiwiYXVkIjoiZmlyZWJhc2UtemVyb3VwLXBhcnRuZXJzLWh1Yi0xNzU5MzIzMDk0NjE2LmNsdXN0ZXItNjRwam5za21sYmF4b3doNWx6cTZpN3Y0cmEuY2xvdWR3b3Jrc3RhdGlvbnMuZGV2IiwiaWF0IjoxNzYxMzQwNDQ1LCJleHAiOjE3NjE0MjY4NDV9.dcGZgOUfCtfVyM7jkrDwP-hkyBWotTqAMQNiO6bEPvUtA6fOdo_V_L8RD32VtUuaE4Lw9nRN15VV9-NgRdiofQirGXmo0q02U4v1s0BfoeIRwJPNubAXL4AxFSd0AzaCGfbDkdQCb1ZjMKg6HGwARXOxbwMVxF6BMSqe3pwRYVU2ZKj50oZd_CT18mU0GEfrBtHmqE9zQ9Oy6HZJJkFxMb5McnsWP6Sj9hkTbQmiwMBs7fcCidWmlXI321IZEG4kWS8bvTArotN5epg6Fab3GSln1bv1_JTf5fSY-tFCWLXxBS1IJK0SPnFJA_Ltdz8gdPbExYOFioelCiVwapY67w","firebaseProjectId":"zeroup-partners-hub-5404-34b69"}
+[debug] [2025-10-24T21:14:05.686Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T21:14:05.686Z] > authorizing via signed-in user (zeroupacademy@gmail.com)
+[debug] [2025-10-24T21:14:05.686Z] [iam] checking project zeroup-partners-hub-5404-34b69 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2025-10-24T21:14:05.687Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:05.687Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:05.687Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions [none]
+[debug] [2025-10-24T21:14:05.687Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions x-goog-quota-user=projects/zeroup-partners-hub-5404-34b69
+[debug] [2025-10-24T21:14:05.687Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-10-24T21:14:06.279Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions 200
+[debug] [2025-10-24T21:14:06.279Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-10-24T21:14:06.279Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:06.280Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:06.280Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69 [none]
+[debug] [2025-10-24T21:14:06.473Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69 200
+[debug] [2025-10-24T21:14:06.473Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69 {"projectId":"zeroup-partners-hub-5404-34b69","projectNumber":"71869767739","displayName":"Firebase app","name":"projects/zeroup-partners-hub-5404-34b69","resources":{"hostingSite":"zeroup-partners-hub-5404-34b69"},"state":"ACTIVE","etag":"1_fd7f4d67-3e55-466c-b12a-2ee1564c1b80"}
+[debug] [2025-10-24T21:14:07.791Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:07.791Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:07.792Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites pageToken=&pageSize=10
+[debug] [2025-10-24T21:14:08.572Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites 200
+[debug] [2025-10-24T21:14:08.572Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites {"sites":[{"name":"projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69","defaultUrl":"https://zeroup-partners-hub-5404-34b69.web.app","appId":"1:71869767739:web:0c7ffdfc110b4bceb5bc1e","type":"DEFAULT_SITE"}]}
+[debug] [2025-10-24T21:14:08.573Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:08.573Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:08.573Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:71869767739:web:0c7ffdfc110b4bceb5bc1e/config [none]
+[debug] [2025-10-24T21:14:09.344Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:71869767739:web:0c7ffdfc110b4bceb5bc1e/config 200
+[debug] [2025-10-24T21:14:09.344Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:71869767739:web:0c7ffdfc110b4bceb5bc1e/config {"projectId":"zeroup-partners-hub-5404-34b69","appId":"1:71869767739:web:0c7ffdfc110b4bceb5bc1e","storageBucket":"zeroup-partners-hub-5404-34b69.firebasestorage.app","apiKey":"AIzaSyAcpEr3RseZdfekkRJcMZ69y_QSusI21gs","authDomain":"zeroup-partners-hub-5404-34b69.firebaseapp.com","messagingSenderId":"71869767739","projectNumber":"71869767739","version":"2"}
+[info] 
+   Thank you for trying our early preview of Next.js support on Firebase Hosting.
+   During the preview, support is best-effort and breaking changes can be expected. Proceed with caution.
+
+   Documentation: https://firebase.google.com/docs/hosting/frameworks/nextjs
+   File a bug: https://github.com/firebase/firebase-tools/issues/new?template=bug_report.md
+   Submit a feature request: https://github.com/firebase/firebase-tools/issues/new?template=feature_request.md
+
+   We'd love to learn from you. Express your interest in helping us shape the future of Firebase Hosting: https://goo.gle/41enW5X
+
+[debug] [2025-10-24T21:14:12.650Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:12.650Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:12.650Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69 [none]
+[debug] [2025-10-24T21:14:12.827Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69 200
+[debug] [2025-10-24T21:14:12.827Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69 {"name":"projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69","defaultUrl":"https://zeroup-partners-hub-5404-34b69.web.app","appId":"1:71869767739:web:0c7ffdfc110b4bceb5bc1e","type":"DEFAULT_SITE"}
+[info]   ▲ Next.js 14.2.16
+
+[info] 
+
+[info]    Creating an optimized production build ...
+
+[info] Failed to compile.
+
+./app/admin/projects/page.tsx
+Error: 
+  x The "use client" directive must be placed before other expressions. Move it to the top of the file to resolve this issue.
+   ,-[/home/user/v0-partners-hope-app/app/admin/projects/page.tsx:1:1]
+ 1 | export const dynamic = 'force-dynamic'
+ 2 | 
+ 3 | 'use client'
+   : ^^^^^^^^^^^^
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+ 6 | import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore"
+   `----
+
+  x You're importing a component that needs useState. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  | Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  | 
+  | 
+   ,-[/home/user/v0-partners-hope-app/app/admin/projects/page.tsx:2:1]
+ 2 | 
+ 3 | 'use client'
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+   :          ^^^^^^^^
+ 6 | import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore"
+ 7 | import { db } from "@/lib/firebase/client"
+ 8 | import ProtectedRoute from "@/components/auth/protected-route"
+   `----
+
+  x You're importing a component that needs useEffect. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  | Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  | 
+  | 
+   ,-[/home/user/v0-partners-hope-app/app/admin/projects/page.tsx:2:1]
+ 2 | 
+ 3 | 'use client'
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+   :                    ^^^^^^^^^
+ 6 | import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore"
+ 7 | import { db } from "@/lib/firebase/client"
+ 8 | import ProtectedRoute from "@/components/auth/protected-route"
+   `----
+
+Import trace for requested module:
+./app/admin/projects/page.tsx
+
+./app/contributions/page.tsx
+Error: 
+  x The "use client" directive must be placed before other expressions. Move it to the top of the file to resolve this issue.
+   ,-[/home/user/v0-partners-hope-app/app/contributions/page.tsx:1:1]
+ 1 | export const dynamic = 'force-dynamic'
+ 2 | 
+ 3 | 'use client'
+   : ^^^^^^^^^^^^
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+ 6 | import ProtectedRoute from "@/components/auth/protected-route"
+   `----
+
+  x You're importing a component that needs useState. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  | Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  | 
+  | 
+   ,-[/home/user/v0-partners-hope-app/app/contributions/page.tsx:2:1]
+ 2 | 
+ 3 | 'use client'
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+   :          ^^^^^^^^
+ 6 | import ProtectedRoute from "@/components/auth/protected-route"
+ 7 | import { useAuth } from "@/contexts/auth-context"
+ 8 | import { Button } from "@/components/ui/button"
+   `----
+
+  x You're importing a component that needs useEffect. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  | Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  | 
+  | 
+   ,-[/home/user/v0-partners-hope-app/app/contributions/page.tsx:2:1]
+ 2 | 
+ 3 | 'use client'
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+   :                    ^^^^^^^^^
+ 6 | import ProtectedRoute from "@/components/auth/protected-route"
+ 7 | import { useAuth } from "@/contexts/auth-context"
+ 8 | import { Button } from "@/components/ui/button"
+   `----
+
+Import trace for requested module:
+./app/contributions/page.tsx
+
+
+[info] 
+> Build failed because of webpack errors
+
+[debug] [2025-10-24T21:14:17.348Z] Error: ENOENT: no such file or directory, open '/home/user/v0-partners-hope-app/.next/export-marker.json'
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-10-24T21:14:29.527Z] ----------------------------------------------------------------------
+[debug] [2025-10-24T21:14:29.529Z] Command:       /nix/store/ixbb20farqh1f4fqbmsn6b1ixn8mc8ij-nodejs-20.18.1/bin/node /home/user/.global_modules/bin/firebase deploy
+[debug] [2025-10-24T21:14:29.530Z] CLI Version:   14.22.0
+[debug] [2025-10-24T21:14:29.530Z] Platform:      linux
+[debug] [2025-10-24T21:14:29.530Z] Node Version:  v20.18.1
+[debug] [2025-10-24T21:14:29.530Z] Time:          Fri Oct 24 2025 21:14:29 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-10-24T21:14:29.530Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-10-24T21:14:29.740Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:29.740Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:29.742Z] >>> [apiv2][query] GET https://monospace-pa.googleapis.com/v1/workspaces/zeroup-partners-hub-54042322 [none]
+[debug] [2025-10-24T21:14:30.589Z] <<< [apiv2][status] GET https://monospace-pa.googleapis.com/v1/workspaces/zeroup-partners-hub-54042322 200
+[debug] [2025-10-24T21:14:30.590Z] <<< [apiv2][body] GET https://monospace-pa.googleapis.com/v1/workspaces/zeroup-partners-hub-54042322 {"workspaceId":"zeroup-partners-hub-54042322","name":"ZeroUp Partners Hub","workspaceRedirectUrl":"firebase-zeroup-partners-hub-1759323094616.cluster-64pjnskmlbaxowh5lzq6i7v4ra.cloudworkstations.dev","status":"WORKSPACE_STATUS_RUNNING","lastAccessDatetime":"2025-10-24T20:28:05.749711Z","failureReason":"Starting your workstation timed out since your container took over 897 seconds to start.","workspaceTemplate":"WORKSPACE_TEMPLATE_FLUTTER","owner":"SELF","serviceAccountEmail":"msp-1440283495949092068@monospace-3.iam.gserviceaccount.com","gitRepoUrl":"https://github.com/magnusimam/v0-partners-hope-app.git","enableNix":true,"ownerEmail":"zeroupacademy@gmail.com","workstationAccessToken":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vd29ya3N0YXRpb25zIiwiYXVkIjoiZmlyZWJhc2UtemVyb3VwLXBhcnRuZXJzLWh1Yi0xNzU5MzIzMDk0NjE2LmNsdXN0ZXItNjRwam5za21sYmF4b3doNWx6cTZpN3Y0cmEuY2xvdWR3b3Jrc3RhdGlvbnMuZGV2IiwiaWF0IjoxNzYxMzQwNDcwLCJleHAiOjE3NjE0MjY4NzB9.fH3uszDqMOmvwV1VBJ3jsDS9bXxN87debvW6beMVFHiKmOmL_HclWu9Cg3fbwVFD9PnAnUqip-YL1JudqHjATh0BAKZJWtAqu_dke_k4kD9tel2ZmyrkK77lcBlo8Kz_WavI4v8Ga_EG773IeWmOIrPFcmP-B0xuMls_SSa9imfF2FVPvXaCpkgm8Hq0bwrZfzLklkUlQ2fg3pAm3IFKQQ1cW4ryxBkmIJmHwKInSTlCUagqJoLglznoHOyjW1wS2pxw-Z7rSIkH_EzsUn_LMoHGaTakN1J49O4r4zfv53NR5Tsctv3OlKRBZen1qHaSpzrR-vNfrM7Vdd0v2RAq4w","firebaseProjectId":"zeroup-partners-hub-5404-34b69"}
+[debug] [2025-10-24T21:14:30.590Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T21:14:30.591Z] > authorizing via signed-in user (zeroupacademy@gmail.com)
+[debug] [2025-10-24T21:14:30.591Z] [iam] checking project zeroup-partners-hub-5404-34b69 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2025-10-24T21:14:30.591Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:30.591Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:30.592Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions [none]
+[debug] [2025-10-24T21:14:30.592Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions x-goog-quota-user=projects/zeroup-partners-hub-5404-34b69
+[debug] [2025-10-24T21:14:30.592Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-10-24T21:14:31.182Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions 200
+[debug] [2025-10-24T21:14:31.182Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-10-24T21:14:31.183Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:31.183Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:31.183Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69 [none]
+[debug] [2025-10-24T21:14:31.344Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69 200
+[debug] [2025-10-24T21:14:31.344Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69 {"projectId":"zeroup-partners-hub-5404-34b69","projectNumber":"71869767739","displayName":"Firebase app","name":"projects/zeroup-partners-hub-5404-34b69","resources":{"hostingSite":"zeroup-partners-hub-5404-34b69"},"state":"ACTIVE","etag":"1_fd7f4d67-3e55-466c-b12a-2ee1564c1b80"}
+[debug] [2025-10-24T21:14:32.674Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:32.674Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:32.675Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites pageToken=&pageSize=10
+[debug] [2025-10-24T21:14:33.478Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites 200
+[debug] [2025-10-24T21:14:33.478Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites {"sites":[{"name":"projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69","defaultUrl":"https://zeroup-partners-hub-5404-34b69.web.app","appId":"1:71869767739:web:0c7ffdfc110b4bceb5bc1e","type":"DEFAULT_SITE"}]}
+[debug] [2025-10-24T21:14:33.479Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:33.479Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:33.479Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:71869767739:web:0c7ffdfc110b4bceb5bc1e/config [none]
+[debug] [2025-10-24T21:14:33.923Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:71869767739:web:0c7ffdfc110b4bceb5bc1e/config 200
+[debug] [2025-10-24T21:14:33.923Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:71869767739:web:0c7ffdfc110b4bceb5bc1e/config {"projectId":"zeroup-partners-hub-5404-34b69","appId":"1:71869767739:web:0c7ffdfc110b4bceb5bc1e","storageBucket":"zeroup-partners-hub-5404-34b69.firebasestorage.app","apiKey":"AIzaSyAcpEr3RseZdfekkRJcMZ69y_QSusI21gs","authDomain":"zeroup-partners-hub-5404-34b69.firebaseapp.com","messagingSenderId":"71869767739","projectNumber":"71869767739","version":"2"}
+[debug] [2025-10-24T21:14:57.250Z] ----------------------------------------------------------------------
+[debug] [2025-10-24T21:14:57.251Z] Command:       /nix/store/ixbb20farqh1f4fqbmsn6b1ixn8mc8ij-nodejs-20.18.1/bin/node /home/user/.global_modules/bin/firebase deploy
+[debug] [2025-10-24T21:14:57.252Z] CLI Version:   14.22.0
+[debug] [2025-10-24T21:14:57.252Z] Platform:      linux
+[debug] [2025-10-24T21:14:57.252Z] Node Version:  v20.18.1
+[debug] [2025-10-24T21:14:57.252Z] Time:          Fri Oct 24 2025 21:14:57 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-10-24T21:14:57.252Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-10-24T21:14:57.447Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:57.447Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:57.449Z] >>> [apiv2][query] GET https://monospace-pa.googleapis.com/v1/workspaces/zeroup-partners-hub-54042322 [none]
+[debug] [2025-10-24T21:14:58.137Z] <<< [apiv2][status] GET https://monospace-pa.googleapis.com/v1/workspaces/zeroup-partners-hub-54042322 200
+[debug] [2025-10-24T21:14:58.138Z] <<< [apiv2][body] GET https://monospace-pa.googleapis.com/v1/workspaces/zeroup-partners-hub-54042322 {"workspaceId":"zeroup-partners-hub-54042322","name":"ZeroUp Partners Hub","workspaceRedirectUrl":"firebase-zeroup-partners-hub-1759323094616.cluster-64pjnskmlbaxowh5lzq6i7v4ra.cloudworkstations.dev","status":"WORKSPACE_STATUS_RUNNING","lastAccessDatetime":"2025-10-24T20:28:05.749711Z","failureReason":"Starting your workstation timed out since your container took over 897 seconds to start.","workspaceTemplate":"WORKSPACE_TEMPLATE_FLUTTER","owner":"SELF","serviceAccountEmail":"msp-1440283495949092068@monospace-3.iam.gserviceaccount.com","gitRepoUrl":"https://github.com/magnusimam/v0-partners-hope-app.git","enableNix":true,"ownerEmail":"zeroupacademy@gmail.com","workstationAccessToken":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vd29ya3N0YXRpb25zIiwiYXVkIjoiZmlyZWJhc2UtemVyb3VwLXBhcnRuZXJzLWh1Yi0xNzU5MzIzMDk0NjE2LmNsdXN0ZXItNjRwam5za21sYmF4b3doNWx6cTZpN3Y0cmEuY2xvdWR3b3Jrc3RhdGlvbnMuZGV2IiwiaWF0IjoxNzYxMzQwNDk3LCJleHAiOjE3NjE0MjY4OTd9.B0G0vEggc2TPQhdxiin--1-04sE7CdEX_rkV1kVqxETCWgg2QpyVjUIiupPP3aek1GBdgwwZqA7JyVHptEZOYpoYH0xbYmsodJajng6kVLdDFzgKRluLW0SkY0cujZWjscsLK67gU2SpWoY5iMuUeBdXaaq1oiY08HvsVLVpAzzwxOShMVHUjfP4i_gS_d_gZn8qaWjtkr9F6qY8RWjP46peiGKR1bLXqR982NxuNbCGjIfn4oMzVY2g5FG4oc7QeOwRUdm3CNqBnPcWn24z1FS4W86mpwhvTzHVrJrQ1eyVUMB0RJV8tsWGuE3zRjX_FLlKY5YFeCqscG51Z2bIBg","firebaseProjectId":"zeroup-partners-hub-5404-34b69"}
+[debug] [2025-10-24T21:14:58.139Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-24T21:14:58.139Z] > authorizing via signed-in user (zeroupacademy@gmail.com)
+[debug] [2025-10-24T21:14:58.139Z] [iam] checking project zeroup-partners-hub-5404-34b69 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2025-10-24T21:14:58.140Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:58.140Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:58.140Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions [none]
+[debug] [2025-10-24T21:14:58.140Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions x-goog-quota-user=projects/zeroup-partners-hub-5404-34b69
+[debug] [2025-10-24T21:14:58.140Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-10-24T21:14:58.733Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions 200
+[debug] [2025-10-24T21:14:58.733Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/zeroup-partners-hub-5404-34b69:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-10-24T21:14:58.734Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:58.734Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:14:58.734Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69 [none]
+[debug] [2025-10-24T21:14:58.928Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69 200
+[debug] [2025-10-24T21:14:58.928Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69 {"projectId":"zeroup-partners-hub-5404-34b69","projectNumber":"71869767739","displayName":"Firebase app","name":"projects/zeroup-partners-hub-5404-34b69","resources":{"hostingSite":"zeroup-partners-hub-5404-34b69"},"state":"ACTIVE","etag":"1_fd7f4d67-3e55-466c-b12a-2ee1564c1b80"}
+[debug] [2025-10-24T21:15:00.331Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:15:00.332Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:15:00.332Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites pageToken=&pageSize=10
+[debug] [2025-10-24T21:15:01.100Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites 200
+[debug] [2025-10-24T21:15:01.100Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites {"sites":[{"name":"projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69","defaultUrl":"https://zeroup-partners-hub-5404-34b69.web.app","appId":"1:71869767739:web:0c7ffdfc110b4bceb5bc1e","type":"DEFAULT_SITE"}]}
+[debug] [2025-10-24T21:15:01.101Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:15:01.101Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:15:01.101Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:71869767739:web:0c7ffdfc110b4bceb5bc1e/config [none]
+[debug] [2025-10-24T21:15:01.507Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:71869767739:web:0c7ffdfc110b4bceb5bc1e/config 200
+[debug] [2025-10-24T21:15:01.507Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/-/webApps/1:71869767739:web:0c7ffdfc110b4bceb5bc1e/config {"projectId":"zeroup-partners-hub-5404-34b69","appId":"1:71869767739:web:0c7ffdfc110b4bceb5bc1e","storageBucket":"zeroup-partners-hub-5404-34b69.firebasestorage.app","apiKey":"AIzaSyAcpEr3RseZdfekkRJcMZ69y_QSusI21gs","authDomain":"zeroup-partners-hub-5404-34b69.firebaseapp.com","messagingSenderId":"71869767739","projectNumber":"71869767739","version":"2"}
+[info] 
+   Thank you for trying our early preview of Next.js support on Firebase Hosting.
+   During the preview, support is best-effort and breaking changes can be expected. Proceed with caution.
+
+   Documentation: https://firebase.google.com/docs/hosting/frameworks/nextjs
+   File a bug: https://github.com/firebase/firebase-tools/issues/new?template=bug_report.md
+   Submit a feature request: https://github.com/firebase/firebase-tools/issues/new?template=feature_request.md
+
+   We'd love to learn from you. Express your interest in helping us shape the future of Firebase Hosting: https://goo.gle/41enW5X
+
+[debug] [2025-10-24T21:15:04.781Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:15:04.781Z] Checked if tokens are valid: true, expires at: 1761343268042
+[debug] [2025-10-24T21:15:04.781Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69 [none]
+[debug] [2025-10-24T21:15:04.959Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69 200
+[debug] [2025-10-24T21:15:04.959Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69 {"name":"projects/zeroup-partners-hub-5404-34b69/sites/zeroup-partners-hub-5404-34b69","defaultUrl":"https://zeroup-partners-hub-5404-34b69.web.app","appId":"1:71869767739:web:0c7ffdfc110b4bceb5bc1e","type":"DEFAULT_SITE"}
+[info]   ▲ Next.js 14.2.16
+
+[info] 
+
+[info]    Creating an optimized production build ...
+
+[info] Failed to compile.
+
+./app/admin/projects/page.tsx
+Error: 
+  x The "use client" directive must be placed before other expressions. Move it to the top of the file to resolve this issue.
+   ,-[/home/user/v0-partners-hope-app/app/admin/projects/page.tsx:1:1]
+ 1 | export const dynamic = 'force-dynamic'
+ 2 | 
+ 3 | 'use client'
+   : ^^^^^^^^^^^^
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+ 6 | import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore"
+   `----
+
+  x You're importing a component that needs useState. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  | Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  | 
+  | 
+   ,-[/home/user/v0-partners-hope-app/app/admin/projects/page.tsx:2:1]
+ 2 | 
+ 3 | 'use client'
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+   :          ^^^^^^^^
+ 6 | import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore"
+ 7 | import { db } from "@/lib/firebase/client"
+ 8 | import ProtectedRoute from "@/components/auth/protected-route"
+   `----
+
+  x You're importing a component that needs useEffect. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  | Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  | 
+  | 
+   ,-[/home/user/v0-partners-hope-app/app/admin/projects/page.tsx:2:1]
+ 2 | 
+ 3 | 'use client'
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+   :                    ^^^^^^^^^
+ 6 | import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore"
+ 7 | import { db } from "@/lib/firebase/client"
+ 8 | import ProtectedRoute from "@/components/auth/protected-route"
+   `----
+
+Import trace for requested module:
+./app/admin/projects/page.tsx
+
+./app/contributions/page.tsx
+Error: 
+  x The "use client" directive must be placed before other expressions. Move it to the top of the file to resolve this issue.
+   ,-[/home/user/v0-partners-hope-app/app/contributions/page.tsx:1:1]
+ 1 | export const dynamic = 'force-dynamic'
+ 2 | 
+ 3 | 'use client'
+   : ^^^^^^^^^^^^
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+ 6 | import ProtectedRoute from "@/components/auth/protected-route"
+   `----
+
+  x You're importing a component that needs useState. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  | Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  | 
+  | 
+   ,-[/home/user/v0-partners-hope-app/app/contributions/page.tsx:2:1]
+ 2 | 
+ 3 | 'use client'
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+   :          ^^^^^^^^
+ 6 | import ProtectedRoute from "@/components/auth/protected-route"
+ 7 | import { useAuth } from "@/contexts/auth-context"
+ 8 | import { Button } from "@/components/ui/button"
+   `----
+
+  x You're importing a component that needs useEffect. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  | Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  | 
+  | 
+   ,-[/home/user/v0-partners-hope-app/app/contributions/page.tsx:2:1]
+ 2 | 
+ 3 | 'use client'
+ 4 | 
+ 5 | import { useState, useEffect } from "react"
+   :                    ^^^^^^^^^
+ 6 | import ProtectedRoute from "@/components/auth/protected-route"
+ 7 | import { useAuth } from "@/contexts/auth-context"
+ 8 | import { Button } from "@/components/ui/button"
+   `----
+
+Import trace for requested module:
+./app/contributions/page.tsx
+
+
+[info] 
+> Build failed because of webpack errors
+
+[debug] [2025-10-24T21:15:09.643Z] Error: ENOENT: no such file or directory, open '/home/user/v0-partners-hope-app/.next/export-marker.json'
+[error] 
+[error] Error: An unexpected error has occurred.
