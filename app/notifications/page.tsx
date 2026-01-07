@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { Bell, LogOut, CheckCircle, AlertCircle, Info, Trophy, Mail, Smartphone, Settings } from "lucide-react"
+import { Bell, LogOut, CheckCircle, AlertCircle, Info, Trophy, Mail, Smartphone, Settings, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { auth } from "@/lib/firebase/client"
@@ -160,6 +160,12 @@ function NotificationsContent() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <Link href="/dashboard" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
+          </Link>
+        </div>
         <div className="space-y-8">
           {/* Header */}
           <div className="space-y-2">

@@ -2,14 +2,16 @@
 
 import ProtectedRoute from "@/components/auth/protected-route"
 import { useAuth } from "@/contexts/auth-context"
-import { auth } from "@/lib/firebase/client"
+import { auth, db } from "@/lib/firebase/client"
+import { collection, query, where, onSnapshot } from "firebase/firestore"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
-import { Trophy, Medal, Award, LogOut, Search, Users, TrendingUp, Crown, Star } from "lucide-react"
+import { Trophy, Medal, Award, LogOut, Search, Users, TrendingUp, Crown, Star, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import Header from "@/components/layout/header"
 
@@ -20,88 +22,145 @@ function CommunityContent() {
     await auth.signOut()
   }
 
-  // Mock leaderboard data
-  const leaderboard = [
-    {
-      rank: 1,
-      name: "Sarah Johnson",
-      organization: "Tech for Good",
-      totalContributions: 8500,
-      impactScore: 98,
-      badges: 12,
-      avatar: "SJ",
-    },
-    {
-      rank: 2,
-      name: "Michael Chen",
-      organization: "Global Impact Corp",
-      totalContributions: 7200,
-      impactScore: 96,
-      badges: 10,
-      avatar: "MC",
-    },
-    {
-      rank: 3,
-      name: "Emily Rodriguez",
-      organization: "Change Makers Inc",
-      totalContributions: 6800,
-      impactScore: 95,
-      badges: 11,
-      avatar: "ER",
-    },
-    {
-      rank: 4,
-      name: `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || "You",
-      organization: user?.organization || "Individual Partner",
-      totalContributions: 3350,
-      impactScore: 94,
-      badges: 7,
-      avatar: user?.firstName?.charAt(0)?.toUpperCase() || "U",
-      isCurrentUser: true,
-    },
-    {
-      rank: 5,
-      name: "David Kim",
-      organization: "Innovation Hub",
-      totalContributions: 3100,
-      impactScore: 92,
-      badges: 8,
-      avatar: "DK",
-    },
-  ]
+  const [leaderboard, setLeaderboard] = useState<any[]>([])
+  const [topContributors, setTopContributors] = useState<any[]>([])
+  const [recentActivities, setRecentActivities] = useState<any[]>([])
+  const [stats, setStats] = useState({
+    totalPartners: 0,
+    activeThisMonth: 0,
+    totalRaised: 0,
+    userRank: 0
+  })
+  const [loading, setLoading] = useState(true)
 
-  const topContributors = [
-    { name: "Sarah Johnson", amount: 8500, period: "All time" },
-    { name: "Michael Chen", amount: 1200, period: "This month" },
-    { name: "Emily Rodriguez", amount: 950, period: "This week" },
-  ]
+  useEffect(() => {
+    const fetchData = () => {
+        // Real-time listener for users to build leaderboard and stats
+        const unsubUsers = onSnapshot(collection(db, "users"), (snapshot) => {
+             const users: any[] = []
+             snapshot.forEach(doc => users.push({ id: doc.id, ...doc.data() }))
+             
+             // Calculate stats
+             const totalPartners = users.length
+             
+             // For leaderboard, we ideally need aggregated contribution data. 
+             // Since we don't have a 'totalContributions' field on users updated via functions yet, 
+             // we might need to fetch payments. But for MVP let's assume we might update user doc or just use what we have.
+             // BETTER APPROACH for MVP: Fetch all payments to calculate totals.
+        })
 
-  const recentActivities = [
-    {
-      user: "Sarah Johnson",
-      action: "earned the 'Impact Champion' badge",
-      time: "2 hours ago",
-      type: "achievement",
-    },
-    {
-      user: "Michael Chen",
-      action: "contributed $500 to Education Initiative",
-      time: "5 hours ago",
-      type: "contribution",
-    },
-    {
-      user: "Emily Rodriguez",
-      action: "reached 95% impact score",
-      time: "1 day ago",
-      type: "milestone",
-    },
-    {
-      user: "David Kim",
-      action: "joined the Healthcare project",
-      time: "2 days ago",
-      type: "project",
-    },
-  ]
+        // Fetching payments to calculate everything dynamically
+        const unsubPayments = onSnapshot(query(collection(db, "payments"), where("status", "==", "approved")), (snapshot) => {
+            const payments: any[] = []
+            snapshot.forEach(doc => payments.push({ id: doc.id, ...doc.data() }))
+
+            // 1. Total Raised
+            const totalRaised = payments.reduce((sum, p) => sum + (p.amount || 0), 0)
+
+            // 2. Aggregating User Contributions
+            const userMap = new Map<string, number>()
+            const activeUsersThisMonth = new Set<string>()
+            const now = new Date()
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+
+            payments.forEach(p => {
+                const amount = p.amount || 0
+                const uid = p.userId
+                userMap.set(uid, (userMap.get(uid) || 0) + amount)
+                
+                // Date check for active users
+                let pDate = new Date()
+                 if (p.date && typeof p.date.toDate === 'function') {
+                    pDate = p.date.toDate();
+                } else if (p.createdAt && typeof p.createdAt.toDate === 'function') {
+                    pDate = p.createdAt.toDate();
+                }
+                
+                if (pDate >= startOfMonth) {
+                    activeUsersThisMonth.add(uid)
+                }
+            })
+
+            // 3. Leaderboard Construction
+            const leaderboardData = Array.from(userMap.entries()).map(([uid, total]) => {
+                // We need user details. In a real app we'd join this. 
+                // For this client-side demo, we'll try to match with the user object if possible, 
+                // or we rely on the payment doc having userFullName as saved in our contribution logic.
+                const payment = payments.find(p => p.userId === uid)
+                return {
+                    name: payment?.userFullName || "Partner",
+                    organization: "Individual Partner", // customizable if we fethed users
+                    totalContributions: total,
+                    impactScore: Math.min(100, Math.floor(total / 1000)), // dynamic calc
+                    badges: Math.floor(total / 5000), // dynamic calc
+                    avatar: (payment?.userFullName || "U").charAt(0).toUpperCase(),
+                    userId: uid,
+                    isCurrentUser: uid === user?.uid
+                }
+            }).sort((a, b) => b.totalContributions - a.totalContributions)
+              .map((item, index) => ({ ...item, rank: index + 1 }))
+            
+            setLeaderboard(leaderboardData.slice(0, 10)) // Top 10
+
+            // 4. User Rank
+            const myRankItem = leaderboardData.find(i => i.userId === user?.uid)
+            const userRank = myRankItem ? myRankItem.rank : 0
+
+            // 5. Recent Activities (Just taking latest 5 payments)
+            const sortedPayments = [...payments].sort((a,b) => {
+                 let dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date)
+                 let dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date)
+                 return dateB.getTime() - dateA.getTime()
+            })
+            
+            const activities = sortedPayments.slice(0, 5).map(p => {
+                 let pDate = p.date?.toDate ? p.date.toDate() : new Date(p.date)
+                 // Simple relative time format
+                 const diff = Math.floor((now.getTime() - pDate.getTime()) / (1000 * 60 * 60))
+                 const timeStr = diff < 1 ? "Just now" : diff < 24 ? `${diff} hours ago` : `${Math.floor(diff/24)} days ago`
+                 
+                 return {
+                    user: p.userFullName || "Partner",
+                    action: `contributed ₦${p.amount.toLocaleString()}`,
+                    time: timeStr,
+                    type: "contribution"
+                 }
+            })
+            setRecentActivities(activities)
+
+             // 6. Top Contributors (Same as leaderboard for now but maybe filtered)
+            const topCons = leaderboardData.slice(0, 3).map(i => ({
+                name: i.name,
+                amount: i.totalContributions,
+                period: "All time"
+            }))
+            setTopContributors(topCons)
+
+            // Update stats
+            setStats(prev => ({
+                ...prev,
+                totalRaised,
+                activeThisMonth: activeUsersThisMonth.size,
+                userRank
+            }))
+        })
+        
+        // Listener for total partners count
+        const unsubPartners = onSnapshot(collection(db, "users"), (snapshot) => {
+             setStats(prev => ({ ...prev, totalPartners: snapshot.size }))
+             setLoading(false)
+        })
+
+        return () => {
+            unsubPayments()
+            unsubPartners()
+        }
+    }
+
+    if (user) {
+        return fetchData()
+    }
+  }, [user])
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -126,6 +185,12 @@ function CommunityContent() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <Link href="/dashboard" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
+          </Link>
+        </div>
         <div className="space-y-8">
           {/* Header */}
           <div className="space-y-2">
@@ -143,8 +208,8 @@ function CommunityContent() {
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">2,547</div>
-                <p className="text-xs text-muted-foreground">+12% this month</p>
+                <div className="text-2xl font-bold">{loading ? "..." : stats.totalPartners.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">Growing community</p>
               </CardContent>
             </Card>
 
@@ -154,8 +219,8 @@ function CommunityContent() {
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">1,892</div>
-                <p className="text-xs text-muted-foreground">74% of all partners</p>
+                <div className="text-2xl font-bold">{loading ? "..." : stats.activeThisMonth.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">Partners contributing</p>
               </CardContent>
             </Card>
 
@@ -165,8 +230,8 @@ function CommunityContent() {
                 <Trophy className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$1.2M</div>
-                <p className="text-xs text-muted-foreground">This year</p>
+                <div className="text-2xl font-bold">₦{loading ? "..." : stats.totalRaised.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">All time</p>
               </CardContent>
             </Card>
 
@@ -176,8 +241,8 @@ function CommunityContent() {
                 <Star className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">#4</div>
-                <p className="text-xs text-muted-foreground">Top 1% of partners</p>
+                <div className="text-2xl font-bold">#{loading ? "..." : stats.userRank > 0 ? stats.userRank : "-"}</div>
+                <p className="text-xs text-muted-foreground">Based on contributions</p>
               </CardContent>
             </Card>
           </div>
@@ -238,7 +303,7 @@ function CommunityContent() {
                             </div>
 
                             <div className="text-right space-y-1">
-                              <p className="font-bold">${partner.totalContributions.toLocaleString()}</p>
+                              <p className="font-bold">₦{partner.totalContributions.toLocaleString()}</p>
                               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <span>Score: {partner.impactScore}</span>
                                 <Badge variant="outline" className="text-xs">
@@ -268,7 +333,7 @@ function CommunityContent() {
                               <p className="font-medium">{contributor.name}</p>
                               <p className="text-sm text-muted-foreground">{contributor.period}</p>
                             </div>
-                            <p className="font-bold">${contributor.amount.toLocaleString()}</p>
+                            <p className="font-bold">₦{contributor.amount.toLocaleString()}</p>
                           </div>
                         ))}
                       </div>

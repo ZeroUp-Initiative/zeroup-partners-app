@@ -11,6 +11,7 @@ interface UserProfile {
   organization?: string;
   role?: string;
   totalContributions?: number;
+  createdAt?: any;
 }
 
 interface AuthState {

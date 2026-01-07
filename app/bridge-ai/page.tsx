@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
-import { Brain, LogOut, Cpu, Database, Network, Zap, Users, Code, Lightbulb, Rocket, Target } from "lucide-react"
+import { Brain, LogOut, Cpu, Database, Network, Zap, Users, Code, Lightbulb, Rocket, Target, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { auth } from "@/lib/firebase/client"
 import {
@@ -182,6 +182,12 @@ function BridgeAIContent() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <Link href="/dashboard" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
+          </Link>
+        </div>
         <div className="space-y-8">
           {/* Header */}
           <div className="space-y-2">

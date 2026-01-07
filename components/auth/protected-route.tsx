@@ -3,6 +3,7 @@
 import { useAuth } from "@/contexts/auth-context"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import { MobileNav } from "@/components/layout/mobile-nav"
 
 // A full-page loading spinner to prevent layout shifts and provide a good UX
 function FullPageLoader() {
@@ -33,5 +34,11 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   }
 
   // If authentication is finished and there is a user, render the protected content.
-  return <>{children}</>
+  return (
+    <div className="pb-16 md:pb-0">
+      {children}
+      <MobileNav />
+    </div>
+  )
 }
+

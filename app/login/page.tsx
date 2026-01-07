@@ -89,30 +89,40 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6">
+    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0 bg-background">
+             <div className="absolute top-0 -left-4 w-96 h-96 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+             <div className="absolute bottom-0 -right-4 w-96 h-96 bg-blue-500/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+              <div className="absolute inset-0 bg-[url('/bg-pattern.svg')] opacity-5"></div>
+        </div>
+
+      <div className="w-full max-w-md space-y-8 relative z-10 animate-slide-in-up">
          <div className="text-center space-y-2">
-          <Link href="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+          <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors mb-6 group">
+            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             Back to home
           </Link>
-           <div className="flex items-center justify-center gap-3 mb-6">
-            <div className="relative w-12 h-12">
-                <img src="/images/zeroup-partners-logo.png" alt="ZeroUp Partners" className="object-contain" />
+           <div className="flex flex-col items-center justify-center gap-4 mb-4">
+            <div className="relative w-14 h-14 rounded-xl overflow-hidden shadow-2xl shadow-primary/20">
+                 <div className="absolute inset-0 bg-primary/20 backdrop-blur-sm" />
+                 <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary to-primary/60">
+                    <span className="text-primary-foreground font-bold text-2xl">Z</span>
+                 </div>
             </div>
-            <div className="text-left">
-              <h1 className="text-lg font-bold text-foreground">ZeroUp Initiative</h1>
-              <p className="text-sm text-muted-foreground">Partners Hub</p>
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-foreground tracking-tight">ZeroUp Initiative</h1>
+              <p className="text-sm text-muted-foreground font-medium">Partners Hub</p>
             </div>
           </div>
         </div>
 
-        <Card className="border-0 shadow-xl">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Welcome back</CardTitle>
-            <CardDescription>Sign in to your partner account to continue your impact.</CardDescription>
+        <Card className="border border-white/10 shadow-2xl bg-white/50 dark:bg-black/50 backdrop-blur-md">
+          <CardHeader className="text-center space-y-1 pb-2">
+            <CardTitle className="text-2xl font-bold tracking-tight">Welcome back</CardTitle>
+            <CardDescription className="text-base">Sign in to your partner account</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <form onSubmit={handleLogin} className="space-y-4">
               {error.message && (
                 <Alert variant="destructive">
@@ -132,6 +142,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   disabled={isLoading}
+                   className="bg-background/50 border-input/50 focus:bg-background transition-colors"
                 />
               </div>
 
@@ -146,12 +157,13 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={isLoading}
+                    className="bg-background/50 border-input/50 focus:bg-background transition-colors pr-10"
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground"
                     onClick={() => setShowPassword(!showPassword)}
                     disabled={isLoading}
                   >
@@ -161,20 +173,20 @@ export default function LoginPage() {
               </div>
 
               <div className="text-right">
-                <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                <Link href="/forgot-password" className="text-sm text-primary hover:text-primary/80 transition-colors font-medium">
                   Forgot password?
                 </Link>
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full text-base font-medium h-11 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all" disabled={isLoading}>
                 {isLoading ? "Signing in..." : "Sign in"}
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
+            <div className="mt-8 text-center">
               <p className="text-sm text-muted-foreground">
-                Don\'t have an account?{" "}
-                <Link href="/signup" className="text-primary hover:underline font-medium">
+                Don't have an account?{" "}
+                <Link href="/signup" className="text-primary hover:text-primary/80 transition-colors font-bold underline-offset-4 hover:underline">
                   Sign up
                 </Link>
               </p>

@@ -118,6 +118,11 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Configure Font Family */
+  --font-sans: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui,
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji";
 }
 
 @layer base {
@@ -125,21 +130,28 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
   }
 }
 
 /* Adding custom utility classes for modern effects */
 @layer utilities {
   /* Gradient backgrounds */
+  /* Gradient backgrounds */
   .gradient-hero {
-    background: linear-gradient(135deg, #1e3a8a 0%, #8b5cf6 50%, #14b8a6 100%);
-    background-size: 400% 400%;
-    animation: gradientShift 8s ease-in-out infinite;
+    /* Light mode: Stronger contrast to separate from white background */
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .dark .gradient-hero {
+    /* Dark mode: Deep rich background */
+    background: linear-gradient(135deg, oklch(0.15 0.05 240) 0%, oklch(0.20 0.10 260) 100%);
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, var(--neon-blue), var(--neon-cyan));
+    background: linear-gradient(135deg, var(--primary), var(--accent));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -166,48 +178,31 @@
   }
 
   .neon-glow-purple {
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3), 0 0 40px rgba(139, 92, 246, 0.1);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3),
+      0 0 40px rgba(139, 92, 246, 0.1);
     border: 1px solid rgba(139, 92, 246, 0.5);
   }
 
   .neon-glow-teal {
-    box-shadow: 0 0 20px rgba(20, 184, 166, 0.3), 0 0 40px rgba(20, 184, 166, 0.1);
+    box-shadow: 0 0 20px rgba(20, 184, 166, 0.3),
+      0 0 40px rgba(20, 184, 166, 0.1);
     border: 1px solid rgba(20, 184, 166, 0.5);
   }
 
   .neon-glow-green {
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3), 0 0 40px rgba(16, 185, 129, 0.1);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3),
+      0 0 40px rgba(16, 185, 129, 0.1);
     border: 1px solid rgba(16, 185, 129, 0.5);
   }
 
-  /* Button neon effects */
-  .btn-neon {
-    position: relative;
-    overflow: hidden;
+  /* Button modern effects */
+  .btn-modern {
     transition: all 0.3s ease;
   }
 
-  .btn-neon:hover {
+  .btn-modern:hover {
     transform: translateY(-2px);
-    box-shadow: 0 0 30px rgba(0, 212, 255, 0.4), 0 10px 25px rgba(0, 0, 0, 0.2);
-  }
-
-  .btn-neon::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: radial-gradient(circle, rgba(0, 212, 255, 0.3) 0%, transparent 70%);
-    transition: all 0.6s ease;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-  }
-
-  .btn-neon:hover::before {
-    width: 300px;
-    height: 300px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
   /* Floating animation */

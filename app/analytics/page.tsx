@@ -6,8 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
-import { TrendingUp, Target, Award, Calendar, LucidePieChart, Activity } from "lucide-react"
+import { TrendingUp, Target, Award, Calendar, LucidePieChart, Activity, ArrowLeft } from "lucide-react"
+import Link from "next/link"
 import Header from "@/components/layout/header"
+import { db } from "@/lib/firebase/client"
+import { collection, query, where, onSnapshot } from "firebase/firestore"
+import { useState, useEffect } from "react"
 import {
   LineChart,
   Line,
@@ -27,27 +31,98 @@ import {
 function AnalyticsContent() {
   const { user } = useAuth()
 
-  // Mock data for charts
-  const monthlyData = [
-    { month: "Jan", contributions: 500, goal: 500, impact: 85 },
-    { month: "Feb", contributions: 500, goal: 500, impact: 88 },
-    { month: "Mar", contributions: 750, goal: 500, impact: 92 },
-    { month: "Apr", contributions: 500, goal: 500, impact: 94 },
-    { month: "May", contributions: 600, goal: 500, impact: 96 },
-    { month: "Jun", contributions: 500, goal: 500, impact: 94 },
-  ]
+  const [monthlyData, setMonthlyData] = useState<any[]>([])
+  const [impactData, setImpactData] = useState<any[]>([])
+  const [stats, setStats] = useState({
+    totalImpact: 0,
+    projectsSupported: 0,
+    consistency: "0/0",
+    impactScore: 0
+  })
+  const [loading, setLoading] = useState(true)
 
-  const impactData = [
-    { category: "Education", value: 35, color: "hsl(var(--primary))" },
-    { category: "Healthcare", value: 25, color: "hsl(var(--secondary))" },
-    { category: "Environment", value: 20, color: "hsl(var(--accent))" },
-    { category: "Technology", value: 20, color: "hsl(var(--destructive))" },
-  ]
+  useEffect(() => {
+    if (!user) return
 
+    const q = query(collection(db, "payments"), where("userId", "==", user.uid), where("status", "==", "approved"))
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+        const payments: any[] = []
+        snapshot.forEach(doc => payments.push({ id: doc.id, ...doc.data() }))
+
+        // 1. Total Impact (Sum of amount)
+        const totalImpact = payments.reduce((sum, p) => sum + (p.amount || 0), 0)
+
+        // 2. Projects Supported (Unique projectIds)
+        const uniqueProjects = new Set(payments.filter(p => p.projectId).map(p => p.projectId))
+        const projectsSupported = uniqueProjects.size
+
+        // 3. Consistency (Months active logic) - simplified
+        const monthsActive = new Set(payments.map(p => {
+             const d = p.date?.toDate ? p.date.toDate() : new Date(p.date || Date.now())
+             return `${d.getMonth()}-${d.getFullYear()}`
+        })).size
+        const currentMonth = new Date().getMonth() + 1 // roughly
+        const consistency = `${monthsActive}/${currentMonth > 6 ? 12 : 6}` // Mock target
+
+        // 4. Impact Score (Mock calc based on amount)
+        const impactScore = Math.min(100, Math.floor(totalImpact / 500) + 10)
+
+        setStats({
+            totalImpact,
+            projectsSupported,
+            consistency,
+            impactScore
+        })
+
+        // 5. Monthly Data (Last 6 months)
+        const monthMap = new Map<string, number>()
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        
+        payments.forEach(p => {
+             const d = p.date?.toDate ? p.date.toDate() : new Date(p.date || Date.now())
+             const monthName = months[d.getMonth()]
+             monthMap.set(monthName, (monthMap.get(monthName) || 0) + p.amount)
+        })
+
+        // Fill in last 6 months data for chart
+        const currentMonthIdx = new Date().getMonth()
+        const chartData = []
+        for (let i = 5; i >= 0; i--) {
+            const idx = (currentMonthIdx - i + 12) % 12
+            const m = months[idx]
+            chartData.push({
+                month: m,
+                contributions: monthMap.get(m) || 0,
+                goal: 5000, // Static goal for visualization
+                impact: 80 + Math.random() * 15 // Mock variation
+            })
+        }
+        setMonthlyData(chartData)
+
+        // 6. Impact Data (Category)
+        // Since we don't have categories, we'll split by Project vs General
+        const projectTotal = payments.filter(p => p.projectId).reduce((s, p) => s + p.amount, 0)
+        const generalTotal = totalImpact - projectTotal
+        
+        let pPercent = totalImpact > 0 ? Math.round((projectTotal / totalImpact) * 100) : 0
+        let gPercent = totalImpact > 0 ? Math.round((generalTotal / totalImpact) * 100) : 0
+        
+        setImpactData([
+            { category: "Focused Projects", value: pPercent, color: "hsl(var(--primary))" },
+            { category: "General Fund", value: gPercent, color: "hsl(var(--secondary))" }
+        ])
+        
+        setLoading(false)
+    })
+
+    return () => unsubscribe()
+  }, [user])
+
+  // Mock for yearly goals visualization since we don't have goal setting feature yet
   const yearlyGoals = [
-    { goal: "Monthly Consistency", progress: 85, target: 100 },
-    { goal: "Annual Target", progress: 65, target: 100 },
-    { goal: "Impact Score", progress: 94, target: 100 },
+    { goal: "Monthly Consistency", progress: stats.totalImpact > 0 ? 85 : 0, target: 100 },
+    { goal: "Annual Target", progress: Math.min(100, Math.round((stats.totalImpact / 100000) * 100)), target: 100 },
+    { goal: "Impact Score", progress: stats.impactScore, target: 100 },
     { goal: "Community Engagement", progress: 78, target: 100 },
   ]
 
@@ -62,6 +137,12 @@ function AnalyticsContent() {
       <Header title="Analytics" subtitle="Track your impact and performance" />
 
       <main className="container mx-auto px-4 py-8 relative z-10">
+        <div className="mb-6">
+          <Link href="/dashboard" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
+          </Link>
+        </div>
         <div className="space-y-8">
           <div className="space-y-2 animate-fade-in">
             <h2 className="text-3xl font-bold text-balance">Your Impact Analytics</h2>
@@ -77,8 +158,8 @@ function AnalyticsContent() {
                 <LucidePieChart className="h-4 w-4 text-primary group-hover:scale-110 transition-transform duration-300" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-primary animate-number-glow">$3,350</div>
-                <p className="text-xs text-muted-foreground">+18% from last quarter</p>
+                <div className="text-2xl font-bold text-primary animate-number-glow">₦{loading ? "..." : stats.totalImpact.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">+ from last month</p>
               </CardContent>
             </Card>
 
@@ -88,8 +169,8 @@ function AnalyticsContent() {
                 <Target className="h-4 w-4 text-secondary group-hover:scale-110 transition-transform duration-300" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-secondary animate-number-glow">12</div>
-                <p className="text-xs text-muted-foreground">Across 4 categories</p>
+                <div className="text-2xl font-bold text-secondary animate-number-glow">{loading ? "..." : stats.projectsSupported}</div>
+                <p className="text-xs text-muted-foreground">Specific initiatives</p>
               </CardContent>
             </Card>
 
@@ -99,8 +180,8 @@ function AnalyticsContent() {
                 <Activity className="h-4 w-4 text-accent group-hover:scale-110 transition-transform duration-300" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-accent animate-number-glow">94</div>
-                <p className="text-xs text-muted-foreground">Top 10% of partners</p>
+                <div className="text-2xl font-bold text-accent animate-number-glow">{loading ? "..." : stats.impactScore}</div>
+                <p className="text-xs text-muted-foreground">Partner Tier</p>
               </CardContent>
             </Card>
 
@@ -110,8 +191,8 @@ function AnalyticsContent() {
                 <Calendar className="h-4 w-4 text-primary group-hover:scale-110 transition-transform duration-300" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-primary animate-number-glow">6/6</div>
-                <p className="text-xs text-muted-foreground">Months contributed</p>
+                <div className="text-2xl font-bold text-primary animate-number-glow">{loading ? "..." : stats.consistency}</div>
+                <p className="text-xs text-muted-foreground">Months active</p>
               </CardContent>
             </Card>
           </div>
@@ -148,7 +229,7 @@ function AnalyticsContent() {
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="month" />
                         <YAxis />
-                        <Tooltip formatter={(value) => [`$${value}`, "Amount"]} />
+                        <Tooltip formatter={(value) => [`₦${value}`, "Amount"]} />
                         <Area
                           type="monotone"
                           dataKey="contributions"
@@ -239,7 +320,7 @@ function AnalyticsContent() {
                           </div>
                           <Progress value={item.value} className="h-2" />
                           <p className="text-xs text-muted-foreground">
-                            ${Math.round((item.value / 100) * 3350)} contributed
+                            ₦{Math.round((item.value / 100) * stats.totalImpact).toLocaleString()} contributed
                           </p>
                         </div>
                       ))}
@@ -328,7 +409,7 @@ function AnalyticsContent() {
                     communities, improving their learning outcomes by 35%.
                   </p>
                   <Badge variant="outline" className="animate-pulse">
-                    $850 contributed
+                    ₦850 contributed
                   </Badge>
                 </div>
 
@@ -342,7 +423,7 @@ function AnalyticsContent() {
                     areas, providing essential healthcare access.
                   </p>
                   <Badge variant="outline" className="animate-pulse">
-                    $650 contributed
+                    ₦650 contributed
                   </Badge>
                 </div>
               </div>

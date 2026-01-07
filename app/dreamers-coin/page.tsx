@@ -25,6 +25,7 @@ import {
   Wallet,
   ShoppingBag,
   Target,
+  ArrowLeft,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -308,6 +309,12 @@ function DreamersCoinContent() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 relative z-10">
+        <div className="mb-6">
+          <Link href="/dashboard" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
+          </Link>
+        </div>
         <motion.div className="space-y-8" variants={containerVariants} initial="hidden" animate="visible">
           <motion.div className="space-y-2 animate-slide-up" variants={itemVariants}>
             <h2 className="text-3xl font-bold text-balance bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">

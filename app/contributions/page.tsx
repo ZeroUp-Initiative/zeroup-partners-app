@@ -5,11 +5,13 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect } from "react"
 import ProtectedRoute from "@/components/auth/protected-route"
 import { useAuth } from "@/contexts/auth-context"
+import Header from "@/components/layout/header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Plus, LogOut, DollarSign, Calendar, FileText, CheckCircle, Clock, AlertCircle } from "lucide-react"
+import { LogContributionModal } from "@/components/contributions/log-contribution-modal"
+import { Plus, LogOut, DollarSign, Calendar, FileText, CheckCircle, Clock, AlertCircle, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { auth, db } from "@/lib/firebase/client"
 import { collection, query, where, onSnapshot, Timestamp, getDocs, writeBatch } from "firebase/firestore"
@@ -112,40 +114,17 @@ function ContributionsContent() {
   }
 
   return (
+
     <div className="min-h-screen bg-background">
-        <header className="border-b bg-card/50 backdrop-blur-sm">
-            <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Link href="/dashboard">
-                      <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center cursor-pointer">
-                        <span className="text-primary-foreground font-bold text-lg">Z</span>
-                      </div>
-                  </Link>
-                  <div>
-                      <h1 className="text-xl font-bold">Contributions</h1>
-                      <p className="text-sm text-muted-foreground">Track your contributions</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarFallback className="bg-primary text-primary-foreground">
-                            {user?.firstName?.charAt(0)?.toUpperCase() || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="hidden md:block">
-                        <p className="text-sm font-medium">{`${user?.firstName} ${user?.lastName}`}</p>
-                      </div>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={logout}>
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Logout
-                  </Button>
-                </div>
-            </div>
-        </header>
+        <Header title="Contributions" subtitle="Track your contributions" />
 
         <main className="container mx-auto px-4 py-8">
+            <div className="mb-6">
+                <Link href="/dashboard" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Dashboard
+                </Link>
+            </div>
         <div className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
@@ -187,12 +166,7 @@ function ContributionsContent() {
               <h2 className="text-2xl font-bold">Contribution History</h2>
               <p className="text-muted-foreground">View all your past contributions</p>
             </div>
-            <Button asChild>
-              <Link href="/contributions/new">
-                <Plus className="w-4 h-4 mr-2" />
-                Log New Contribution
-              </Link>
-            </Button>
+            <LogContributionModal />
           </div>
           
           <div className="space-y-4">

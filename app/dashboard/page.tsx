@@ -8,6 +8,7 @@ import { db } from "@/lib/firebase/client"
 import { collection, query, where, onSnapshot } from "firebase/firestore"
 import ProtectedRoute from "@/components/auth/protected-route"
 import Header from "@/components/layout/header"
+import { LogContributionModal } from "@/components/contributions/log-contribution-modal"
 
 // UI Components
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -65,7 +66,12 @@ function DashboardPage() {
               <div className="flex items-center justify-between space-y-2 mb-8">
                 <div>
                   <h2 className="text-3xl font-bold tracking-tight">
-                    Welcome back, {user?.firstName || "Partner"}!
+                    {(() => {
+                      const hour = new Date().getHours();
+                      if (hour < 12) return "Good morning";
+                      if (hour < 18) return "Good afternoon";
+                      return "Good evening";
+                    })()}, {user?.firstName || user?.displayName?.split(' ')[0] || "Partner"}!
                   </h2>
                   <p className="text-muted-foreground">
                     Track your contributions and see the impact you're making through the ZeroUp Initiative.
@@ -122,7 +128,7 @@ function DashboardPage() {
 
               {/* Grid of Action Cards */}
               <div className="grid gap-6 md:grid-cols-2">
-                <Link href="/contributions/new">
+                <LogContributionModal>
                     <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
                         <CardHeader className="flex flex-row items-center gap-4">
                             <div className="bg-primary/10 p-3 rounded-md">
@@ -134,7 +140,7 @@ function DashboardPage() {
                             </div>
                         </CardHeader>
                     </Card>
-                </Link>
+                </LogContributionModal>
                 <Link href="/projects">
                     <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
                         <CardHeader className="flex flex-row items-center gap-4">

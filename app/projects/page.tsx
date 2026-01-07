@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
+import { ArrowLeft } from "lucide-react"
 
 interface Project {
   id: string;
@@ -107,6 +108,12 @@ function ProjectsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <Link href="/dashboard" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Dashboard
+        </Link>
+      </div>
       <div className="mb-8 text-center">
         <h1 className="text-4xl font-bold">Our Social Impact Projects</h1>
         <p className="text-xl text-muted-foreground mt-2">Fund a project and make a direct impact.</p>
