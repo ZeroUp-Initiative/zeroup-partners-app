@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from "react"
-import { collection, onSnapshot, query, orderBy, doc, updateDoc, writeBatch } from "firebase/firestore"
+import { collection, onSnapshot, query, orderBy, doc, setDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase/client"
 import ProtectedRoute from "@/components/auth/protected-route"
 import { useAuth } from "@/contexts/auth-context"
@@ -13,7 +13,8 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Upload, Loader2 } from "lucide-react"
+import { uploadImage, validateImageFile } from "@/lib/image-upload"
 
 interface Project {
   id: string;
@@ -22,6 +23,7 @@ interface Project {
   fundingGoal: number;
   currentFunding: number;
   status: 'open' | 'fully-funded' | 'closed';
+  imageUrl?: string;
 }
 
 function ProjectsPage() {
@@ -29,8 +31,11 @@ function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [contributionAmount, setContributionAmount] = useState("")
+  const [receiptFile, setReceiptFile] = useState<File | null>(null)
   const [isContributing, setIsContributing] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState("")
+  const [viewingProject, setViewingProject] = useState<Project | null>(null)
 
   useEffect(() => {
     const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
@@ -53,11 +58,21 @@ function ProjectsPage() {
     setSelectedProject(project);
     setError("");
     setContributionAmount("");
+    setReceiptFile(null);
+  }
+
+  const handleViewProject = (project: Project) => {
+    setViewingProject(project);
+  }
+
+  const handleReceiptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null
+    setReceiptFile(file)
   }
 
   const handleConfirmContribution = async () => {
-    if (!selectedProject || !contributionAmount) {
-        setError("Please enter an amount.");
+    if (!selectedProject || !contributionAmount || !receiptFile) {
+        setError("Please enter an amount and upload a receipt.");
         return;
     }
     const amount = parseFloat(contributionAmount);
@@ -70,39 +85,40 @@ function ProjectsPage() {
     setError("");
 
     try {
-        const projectRef = doc(db, "projects", selectedProject.id);
-        const newFunding = selectedProject.currentFunding + amount;
-        const newStatus = newFunding >= selectedProject.fundingGoal ? 'fully-funded' : 'open';
+        // Validate and upload receipt
+        setIsUploading(true);
+        const validation = validateImageFile(receiptFile, 10);
+        if (!validation.valid) {
+            setError(validation.error || "Invalid receipt file");
+            setIsContributing(false);
+            setIsUploading(false);
+            return;
+        }
+        const receiptUrl = await uploadImage(receiptFile);
+        setIsUploading(false);
 
-        const batch = writeBatch(db);
-        batch.update(projectRef, { 
-            currentFunding: newFunding,
-            status: newStatus
-        });
-
-        // This part is a placeholder. In a real app, you would verify the user has the funds.
-        // For now, we'll create a transaction record to represent this contribution.
-        const contributionRef = doc(collection(db, "payments"));
-        batch.set(contributionRef, {
+        // Create pending transaction instead of auto-approving
+        const transactionRef = doc(collection(db, "transactions"));
+        await setDoc(transactionRef, {
             amount: amount,
             projectId: selectedProject.id,
             projectTitle: selectedProject.title,
             userId: user?.uid,
             userFullName: `${user?.firstName} ${user?.lastName}`,
-            status: 'approved', // Contributions to projects are auto-approved for now
+            status: 'pending',
+            receiptUrl: receiptUrl,
             createdAt: new Date(),
-            date: new Date(),
             description: `Contribution to project: ${selectedProject.title}`,
         });
         
-        await batch.commit();
-        
         setSelectedProject(null);
+        setReceiptFile(null);
     } catch (err) {
         console.error("Contribution failed:", err);
         setError("Failed to process contribution. Please try again.");
     } finally {
         setIsContributing(false);
+        setIsUploading(false);
     }
   }
 
@@ -124,9 +140,28 @@ function ProjectsPage() {
           const progress = (project.currentFunding / project.fundingGoal) * 100;
           return (
             <Card key={project.id} className="flex flex-col">
+              {project.imageUrl && (
+                <div className="aspect-video w-full overflow-hidden rounded-t-lg">
+                  <img 
+                    src={project.imageUrl} 
+                    alt={project.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
               <CardHeader>
-                <CardTitle>{project.title}</CardTitle>
-                <CardDescription>{project.description}</CardDescription>
+                <CardTitle 
+                  className="cursor-pointer hover:text-primary transition-colors"
+                  onClick={() => handleViewProject(project)}
+                >
+                  {project.title}
+                </CardTitle>
+                <CardDescription>
+                  {project.description.length > 150 ? 
+                    `${project.description.substring(0, 150)}...` : 
+                    project.description
+                  }
+                </CardDescription>
               </CardHeader>
               <CardContent className="flex-grow space-y-4">
                 <div>
@@ -166,6 +201,30 @@ function ProjectsPage() {
                     onChange={(e) => setContributionAmount(e.target.value)}
                   />
               </div>
+              <div className="space-y-2">
+                  <Label htmlFor="receipt">Upload Receipt</Label>
+                  <div className="border-2 border-dashed rounded-lg p-4 text-center hover:bg-muted/50 transition-colors">
+                      <input 
+                          id="receipt" 
+                          type="file" 
+                          accept=".jpg,.jpeg,.png,.gif,.webp" 
+                          onChange={handleReceiptChange} 
+                          className="hidden" 
+                          disabled={isContributing}
+                      />
+                      <label htmlFor="receipt" className="cursor-pointer block">
+                          {isUploading ? (
+                              <Loader2 className="w-6 h-6 text-primary mx-auto mb-2 animate-spin" />
+                          ) : (
+                              <Upload className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
+                          )}
+                          <p className="text-sm font-medium truncate">
+                              {receiptFile ? receiptFile.name : "Click to upload receipt"}
+                          </p>
+                          <p className="text-xs text-muted-foreground">JPG, PNG, GIF, WebP (max 10MB)</p>
+                      </label>
+                  </div>
+              </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
           </div>
           <DialogFooter>
@@ -174,6 +233,66 @@ function ProjectsPage() {
               {isContributing ? 'Processing...' : 'Confirm Contribution'}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Project Details Modal */}
+      <Dialog open={viewingProject !== null} onOpenChange={() => setViewingProject(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{viewingProject?.title}</DialogTitle>
+            <DialogDescription>Full project details</DialogDescription>
+          </DialogHeader>
+          {viewingProject && (
+            <div className="space-y-4">
+              {viewingProject.imageUrl && (
+                <div className="aspect-video w-full overflow-hidden rounded-lg">
+                  <img 
+                    src={viewingProject.imageUrl} 
+                    alt={viewingProject.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+              <div>
+                <h3 className="font-semibold mb-2">Description</h3>
+                <p className="text-muted-foreground">{viewingProject.description}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="font-semibold mb-2">Funding Progress</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span>Raised:</span>
+                      <span className="font-medium">₦{viewingProject.currentFunding.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Goal:</span>
+                      <span className="font-medium">₦{viewingProject.fundingGoal.toLocaleString()}</span>
+                    </div>
+                    <Progress value={(viewingProject.currentFunding / viewingProject.fundingGoal) * 100} />
+                    <p className="text-sm text-center text-muted-foreground">
+                      {((viewingProject.currentFunding / viewingProject.fundingGoal) * 100).toFixed(1)}% Funded
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2">Status</h3>
+                  <Badge variant={viewingProject.status === 'fully-funded' ? 'secondary' : 'default'}>
+                    {viewingProject.status.toUpperCase()}
+                  </Badge>
+                </div>
+              </div>
+              <div className="flex justify-end pt-4">
+                <Button onClick={() => {
+                  setViewingProject(null);
+                  handleContributeClick(viewingProject);
+                }} disabled={viewingProject.status !== 'open'}>
+                  {viewingProject.status === 'fully-funded' ? 'Goal Reached' : 'Contribute to This Project'}
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

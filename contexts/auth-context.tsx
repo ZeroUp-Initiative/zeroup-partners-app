@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
+import { onAuthStateChanged, User as FirebaseUser, signOut } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase/client';
 
@@ -19,17 +19,32 @@ interface AuthState {
   isLoading: boolean;
   isLoggedIn: boolean;
   error: string | null;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [authState, setAuthState] = useState<AuthState>({
-    user: null,
-    isLoading: true,
-    isLoggedIn: false,
-    error: null,
-  });
+  const [user, setUser] = useState<(FirebaseUser & Partial<UserProfile>) | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const logout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Error signing out:', error);
+      setError('Failed to sign out');
+    }
+  };
+
+  const authState: AuthState = {
+    user,
+    isLoading,
+    isLoggedIn: !!user,
+    error,
+    logout
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -38,26 +53,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const unsubscribeFirestore = onSnapshot(userDocRef, 
           (doc) => {
             const userProfile = (doc.exists() ? doc.data() : {}) as UserProfile;
-            setAuthState({
-              user: { ...firebaseUser, ...userProfile },
-              isLoading: false,
-              isLoggedIn: true,
-              error: null,
-            });
+            setUser({ ...firebaseUser, ...userProfile });
+            setIsLoading(false);
+            setError(null);
           },
           (error) => {
             console.error("Error fetching user profile:", error);
-            setAuthState(s => ({ ...s, isLoading: false, error: "Failed to load user profile." }));
+            setError("Failed to load user profile.");
+            setIsLoading(false);
           }
         );
         return unsubscribeFirestore;
       } else {
-        setAuthState({
-          user: null,
-          isLoading: false,
-          isLoggedIn: false,
-          error: null,
-        });
+        setUser(null);
+        setIsLoading(false);
+        setError(null);
       }
     });
     return () => unsubscribe();

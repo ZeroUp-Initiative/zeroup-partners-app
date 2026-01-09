@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import { db, storage } from "@/lib/firebase/client"
-import { addDoc, collection, serverTimestamp, Timestamp } from "firebase/firestore"
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage"
+import { useState, useEffect } from "react"
+import { db } from "@/lib/firebase/client"
+import { addDoc, collection, serverTimestamp, Timestamp, query, where, getDocs, orderBy } from "firebase/firestore"
+import { uploadImage, validateImageFile } from "@/lib/image-upload"
 import { useAuth } from "@/contexts/auth-context"
 
 import { Button } from "@/components/ui/button"
@@ -21,15 +21,44 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   
+  const [projects, setProjects] = useState<{id: string, title: string}[]>([])
   const [formData, setFormData] = useState({
     amount: "",
     date: new Date().toISOString().split("T")[0],
     description: "",
     proofFile: null as File | null,
+    projectId: "",
+    projectTitle: ""
   })
 
+  useEffect(() => {
+    const fetchProjects = async () => {
+        try {
+            const q = query(collection(db, "projects"), where("status", "==", "open"));
+            const querySnapshot = await getDocs(q);
+            const projectsList = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                title: doc.data().title
+            }));
+            setProjects(projectsList);
+        } catch (error) {
+            console.error("Error fetching projects:", error);
+        }
+    }
+    fetchProjects();
+  }, []);
+
   const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    if (field === "projectId") {
+        const project = projects.find(p => p.id === value);
+        setFormData(prev => ({ 
+            ...prev, 
+            projectId: value, 
+            projectTitle: project ? project.title : "" 
+        }));
+    } else {
+        setFormData((prev) => ({ ...prev, [field]: value }))
+    }
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,7 +78,7 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
     setSuccess("")
 
     try {
-      if (!formData.amount || !formData.date || !formData.description || !formData.proofFile) {
+      if (!formData.amount || !formData.date || !formData.description || !formData.proofFile || !formData.projectId) {
         setError("Please fill in all required fields.")
         setIsLoading(false)
         return
@@ -63,9 +92,17 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
       }
 
       const file = formData.proofFile
-      const storageRef = ref(storage, `proofs/${user.uid}/${user.firstName}_${user.lastName}_${Date.now()}_${file.name}`)
-      const uploadResult = await uploadBytes(storageRef, file)
-      const proofURL = await getDownloadURL(uploadResult.ref)
+      
+      // Validate the file before uploading
+      const validation = validateImageFile(file, 10)
+      if (!validation.valid) {
+        setError(validation.error || "Invalid file")
+        setIsLoading(false)
+        return
+      }
+      
+      // Upload using the ZeroUp Image Upload API (Cloudinary)
+      const proofURL = await uploadImage(file)
 
       await addDoc(collection(db, "payments"), {
         userId: user.uid,
@@ -75,6 +112,8 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
         amount: amount,
         date: Timestamp.fromDate(new Date(formData.date)),
         description: formData.description,
+        projectId: formData.projectId,
+        projectTitle: formData.projectTitle,
         proofURL: proofURL,
         status: "pending",
         createdAt: serverTimestamp(),
@@ -89,6 +128,8 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
             date: new Date().toISOString().split("T")[0],
             description: "",
             proofFile: null,
+            projectId: "",
+            projectTitle: ""
         })
         if (onSuccess) onSuccess()
       }, 1500)
@@ -137,6 +178,25 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
                     required
                     disabled={isLoading}
                 />
+                </div>
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="project">Project</Label>
+                <div className="relative">
+                    <select
+                        id="project"
+                        value={formData.projectId}
+                        onChange={(e) => handleInputChange("projectId", e.target.value)}
+                        className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        required
+                        disabled={isLoading}
+                    >
+                        <option value="" disabled>Select a project</option>
+                        {projects.map(project => (
+                            <option key={project.id} value={project.id}>{project.title}</option>
+                        ))}
+                    </select>
                 </div>
             </div>
 

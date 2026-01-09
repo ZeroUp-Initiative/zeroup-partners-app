@@ -117,7 +117,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <Card className="border border-white/10 shadow-2xl bg-white/50 dark:bg-black/50 backdrop-blur-md">
+        <Card className="border-border shadow-lg bg-white dark:border-white/10 dark:shadow-2xl dark:bg-black/50 dark:backdrop-blur-md">
           <CardHeader className="text-center space-y-1 pb-2">
             <CardTitle className="text-2xl font-bold tracking-tight">Welcome back</CardTitle>
             <CardDescription className="text-base">Sign in to your partner account</CardDescription>

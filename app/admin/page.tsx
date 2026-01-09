@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link"
+import { DollarSign, Activity, FolderOpen } from "lucide-react"
 
 function AdminDashboard() {
   const [pendingPayments, setPendingPayments] = useState<any[]>([])
@@ -19,6 +20,8 @@ function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [rejectionReason, setRejectionReason] = useState("")
   const [isRejecting, setIsRejecting] = useState<string | null>(null)
+  const [stats, setStats] = useState({ totalFunds: 0, activeProjects: 0, pendingCount: 0 })
+  const [viewingProof, setViewingProof] = useState<string | null>(null)
   const { user } = useAuth()
 
   const fetchPayments = async () => {
@@ -38,11 +41,27 @@ function AdminDashboard() {
           ...data,
           createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : null,
           date: data.date instanceof Timestamp ? data.date.toDate() : null,
-        }
+        } as any
       })
 
-      setPendingPayments(payments.filter(p => p.status === "pending"))
+      const pending = payments.filter(p => p.status === "pending");
+      const approved = payments.filter(p => p.status === "approved");
+      
+      const totalFunds = approved.reduce((sum, p) => sum + (p.amount || 0), 0);
+
+      setPendingPayments(pending)
       setProcessedPayments(payments.filter(p => p.status === "approved" || p.status === "rejected"))
+
+      // Fetch active projects count
+      const projectsQuery = query(collection(db, "projects"), where("status", "==", "open"));
+      const projectsSnapshot = await getDocs(projectsQuery);
+      
+      setStats({
+        totalFunds,
+        activeProjects: projectsSnapshot.size,
+        pendingCount: pending.length
+      });
+
     } catch (error) {
       console.error("Error fetching payments:", error)
     } finally {
@@ -60,7 +79,7 @@ function AdminDashboard() {
     try {
       const paymentRef = doc(db, "payments", paymentId)
       await updateDoc(paymentRef, { status: newStatus, reviewedAt: Timestamp.now() })
-      await fetchPayments() // Re-fetch all payments to update lists
+      await fetchPayments() 
     } catch (error) {
       console.error(`Error approving payment:`, error)
     }
@@ -79,7 +98,7 @@ function AdminDashboard() {
         rejectionReason: rejectionReason,
         reviewedAt: Timestamp.now(),
       })
-      await fetchPayments() // Re-fetch all payments
+      await fetchPayments()
     } catch (error) {
       console.error(`Error rejecting payment:`, error)
     } finally {
@@ -106,10 +125,44 @@ function AdminDashboard() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="space-y-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Review and manage all partner contributions.</p>
+        <h1 className="text-3xl font-bold">Contribution Overview</h1>
+        <p className="text-muted-foreground">Manage approvals and view financial contribution history.</p>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-3 mb-8">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Funds Raised</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">₦{stats.totalFunds.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">Across all projects</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pending Approvals</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.pendingCount}</div>
+            <p className="text-xs text-muted-foreground">Requires attention</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
+            <FolderOpen className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.activeProjects}</div>
+            <p className="text-xs text-muted-foreground">Currently open for funding</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Pending Contributions */}
@@ -136,8 +189,8 @@ function AdminDashboard() {
                   <TableCell>₦{payment.amount?.toLocaleString() || "0.00"}</TableCell>
                   <TableCell>{payment.date?.toLocaleDateString() || "N/A"}</TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={payment.proofURL || '#'} target="_blank">View</Link>
+                    <Button variant="outline" size="sm" onClick={() => setViewingProof(payment.proofURL)}>
+                      View
                     </Button>
                   </TableCell>
                   <TableCell className="text-right space-x-2">
@@ -180,8 +233,8 @@ function AdminDashboard() {
                   </TableCell>
                   <TableCell className="text-xs">{payment.rejectionReason || "-"}</TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={payment.proofURL || '#'} target="_blank">View</Link>
+                    <Button variant="outline" size="sm" onClick={() => setViewingProof(payment.proofURL)}>
+                      View
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -207,6 +260,29 @@ function AdminDashboard() {
             <Button variant="outline" onClick={() => setIsRejecting(null)}>Cancel</Button>
             <Button variant="destructive" onClick={handleRejection}>Confirm Rejection</Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Proof Dialog */}
+      <Dialog open={viewingProof !== null} onOpenChange={() => setViewingProof(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0 overflow-hidden bg-transparent border-none shadow-none">
+             <div className="relative w-full h-full min-h-[50vh] flex items-center justify-center bg-black/80 rounded-lg backdrop-blur-sm p-4">
+                <button 
+                  onClick={() => setViewingProof(null)}
+                  className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/50 text-white hover:bg-white/20 transition-colors"
+                >
+                  <span className="sr-only">Close</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+                {viewingProof && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img 
+                    src={viewingProof} 
+                    alt="Proof of Payment" 
+                    className="max-w-full max-h-[85vh] object-contain rounded-md shadow-2xl"
+                  />
+                )}
+             </div>
         </DialogContent>
       </Dialog>
 

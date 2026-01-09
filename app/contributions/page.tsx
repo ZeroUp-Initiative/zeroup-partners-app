@@ -163,8 +163,8 @@ function ContributionsContent() {
 
           <div className="flex justify-between items-center">
              <div>
-              <h2 className="text-2xl font-bold">Contribution History</h2>
-              <p className="text-muted-foreground">View all your past contributions</p>
+              <h2 className="text-2xl font-bold">Your Contributions</h2>
+              <p className="text-muted-foreground">View all your contributions and their status</p>
             </div>
             <LogContributionModal />
           </div>
