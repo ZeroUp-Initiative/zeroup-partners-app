@@ -5,6 +5,9 @@ import { onAuthStateChanged, User as FirebaseUser, signOut } from 'firebase/auth
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase/client';
 
+// Check if we're in browser environment
+const isBrowser = typeof window !== 'undefined';
+
 interface UserProfile {
   firstName: string;
   lastName: string;
@@ -30,6 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [error, setError] = useState<string | null>(null);
 
   const logout = async () => {
+    if (!isBrowser || !auth) return;
     try {
       await signOut(auth);
     } catch (error) {
@@ -47,6 +51,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
+    if (!isBrowser || !auth) {
+      setIsLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         const userDocRef = doc(db, 'users', firebaseUser.uid);

@@ -10,6 +10,9 @@ import ProtectedRoute from "@/components/auth/protected-route"
 import Header from "@/components/layout/header"
 import { LogContributionModal } from "@/components/contributions/log-contribution-modal"
 
+// Check if we're in browser environment
+const isBrowser = typeof window !== 'undefined';
+
 // UI Components
 // UI Components
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -26,93 +29,96 @@ function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      // Listener for all approved contributions
-      const paymentsQuery = query(collection(db, "payments"), where("status", "==", "approved"));
-      const unsubscribeTotal = onSnapshot(paymentsQuery, (snapshot) => {
-        let total = 0;
-        const monthlyContributions: Record<string, { amount: number, name: string }> = {};
-        const allTimeContributions: Record<string, { amount: number, name: string }> = {};
-        const now = new Date();
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
-
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          total += data.amount;
-
-          // Check for monthly top partner
-          let paymentDate = null;
-          if (data.date && typeof data.date.toDate === 'function') {
-             paymentDate = data.date.toDate();
-          } else if (data.createdAt && typeof data.createdAt.toDate === 'function') {
-             paymentDate = data.createdAt.toDate(); // Fallback to createdAt
-          }
-
-          if (paymentDate && paymentDate.getMonth() === currentMonth && paymentDate.getFullYear() === currentYear) {
-             if (data.userId) {
-                if (!monthlyContributions[data.userId]) {
-                    monthlyContributions[data.userId] = { amount: 0, name: data.userFullName || 'Unknown User' };
-                }
-                monthlyContributions[data.userId].amount += data.amount;
-                if (data.userFullName) monthlyContributions[data.userId].name = data.userFullName;
-             }
-          }
-
-          // Collect all-time contributions for other top contributors
-          if (data.userId) {
-            if (!allTimeContributions[data.userId]) {
-                allTimeContributions[data.userId] = { amount: 0, name: data.userFullName || 'Unknown User' };
-            }
-            allTimeContributions[data.userId].amount += data.amount;
-            if (data.userFullName) allTimeContributions[data.userId].name = data.userFullName;
-          }
-        });
-        setTotalContributions(total);
-
-        // Find top monthly partner
-        let max = 0;
-        let top: {id: string, amount: number, name: string} | null = null;
-        Object.entries(monthlyContributions).forEach(([id, p]) => {
-            if (p.amount > max) {
-                max = p.amount;
-                top = { id, ...p };
-            }
-        });
-        setTopPartner(top);
-
-        // Find other top contributors (all-time, excluding current top partner)
-        const sortedContributors = Object.entries(allTimeContributions)
-            .map(([id, p]) => ({ id, ...p }))
-            .sort((a, b) => b.amount - a.amount)
-            .filter(contributor => contributor.id !== top?.id) // Exclude current top partner
-            .slice(0, 5); // Get top 5 others
-        
-        setOtherTopContributors(sortedContributors);
-
-        setIsLoading(false); // Set loading to false once we have the data
-      });
-
-      // Listener for the current user's contributions
-      const myPaymentsQuery = query(
-        collection(db, "payments"), 
-        where("userId", "==", user.uid),
-        where("status", "==", "approved")
-      );
-      const unsubscribeMine = onSnapshot(myPaymentsQuery, (snapshot) => {
-        let myTotal = 0;
-        snapshot.forEach((doc) => {
-          myTotal += doc.data().amount;
-        });
-        setMyContributions(myTotal);
-      });
-
-      // Cleanup listeners on component unmount
-      return () => {
-        unsubscribeTotal();
-        unsubscribeMine();
-      };
+    if (!isBrowser || !user || !db) {
+      setIsLoading(false);
+      return;
     }
+
+    // Listener for all approved contributions
+    const paymentsQuery = query(collection(db, "payments"), where("status", "==", "approved"));
+    const unsubscribeTotal = onSnapshot(paymentsQuery, (snapshot) => {
+      let total = 0;
+      const monthlyContributions: Record<string, { amount: number, name: string }> = {};
+      const allTimeContributions: Record<string, { amount: number, name: string }> = {};
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        total += data.amount;
+
+        // Check for monthly top partner
+        let paymentDate = null;
+        if (data.date && typeof data.date.toDate === 'function') {
+           paymentDate = data.date.toDate();
+        } else if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+           paymentDate = data.createdAt.toDate(); // Fallback to createdAt
+        }
+
+        if (paymentDate && paymentDate.getMonth() === currentMonth && paymentDate.getFullYear() === currentYear) {
+           if (data.userId) {
+              if (!monthlyContributions[data.userId]) {
+                  monthlyContributions[data.userId] = { amount: 0, name: data.userFullName || 'Unknown User' };
+              }
+              monthlyContributions[data.userId].amount += data.amount;
+              if (data.userFullName) monthlyContributions[data.userId].name = data.userFullName;
+           }
+        }
+
+        // Collect all-time contributions for other top contributors
+        if (data.userId) {
+          if (!allTimeContributions[data.userId]) {
+              allTimeContributions[data.userId] = { amount: 0, name: data.userFullName || 'Unknown User' };
+          }
+          allTimeContributions[data.userId].amount += data.amount;
+          if (data.userFullName) allTimeContributions[data.userId].name = data.userFullName;
+        }
+      });
+      setTotalContributions(total);
+
+      // Find top monthly partner
+      let max = 0;
+      let top: {id: string, amount: number, name: string} | null = null;
+      Object.entries(monthlyContributions).forEach(([id, p]) => {
+          if (p.amount > max) {
+              max = p.amount;
+              top = { id, ...p };
+          }
+      });
+      setTopPartner(top);
+
+      // Find other top contributors (all-time, excluding current top partner)
+      const sortedContributors = Object.entries(allTimeContributions)
+          .map(([id, p]) => ({ id, ...p }))
+          .sort((a, b) => b.amount - a.amount)
+          .filter(contributor => contributor.id !== top?.id) // Exclude current top partner
+          .slice(0, 5); // Get top 5 others
+      
+      setOtherTopContributors(sortedContributors);
+
+      setIsLoading(false); // Set loading to false once we have the data
+    });
+
+    // Listener for the current user's contributions
+    const myPaymentsQuery = query(
+      collection(db, "payments"), 
+      where("userId", "==", user.uid),
+      where("status", "==", "approved")
+    );
+    const unsubscribeMine = onSnapshot(myPaymentsQuery, (snapshot) => {
+      let myTotal = 0;
+      snapshot.forEach((doc) => {
+        myTotal += doc.data().amount;
+      });
+      setMyContributions(myTotal);
+    });
+
+    // Cleanup listeners on component unmount
+    return () => {
+      unsubscribeTotal();
+      unsubscribeMine();
+    };
   }, [user]);
 
   return (

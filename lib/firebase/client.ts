@@ -12,28 +12,37 @@ const firebaseConfig = {
   appId: "1:71869767739:web:0c7ffdfc110b4bceb5bc1e"
 };
 
-// 1. Check if Firebase is already initialized to avoid multiple instances
-// This is crucial for Next.js Hot Module Replacement (HMR) and SSR
-const appName = "zeroup-partner-app";
-let app = getApps().find(a => a.name === appName);
-let isNew = false;
+// Check if we're in a browser environment
+const isBrowser = typeof window !== 'undefined';
 
-if (!app) {
-  app = initializeApp(firebaseConfig, appName);
-  isNew = true;
+// Initialize Firebase only in browser environment
+let app: any = null;
+let auth: any = null;
+let db: any = null;
+let storage: any = null;
+
+if (isBrowser) {
+  // Check if Firebase is already initialized to avoid multiple instances
+  const appName = "zeroup-partner-app";
+  app = getApps().find(a => a.name === appName);
+
+  if (!app) {
+    app = initializeApp(firebaseConfig, appName);
+  }
+
+  // Initialize services
+  auth = getAuth(app);
+  
+  // Use a robust initialization pattern for Firestore
+  try {
+    db = getFirestore(app);
+  } catch (e) {
+    db = initializeFirestore(app, {});
+  }
+  
+  storage = getStorage(app);
 }
 
-// 2. Export services
-export const auth = getAuth(app);
-// Use a robust initialization pattern that works for both new and existing instances
-// This is necessary because Next.js build process might reuse app instances where Firestore isn't initialized yet
-let firestore;
-try {
-  firestore = getFirestore(app);
-} catch (e) {
-  firestore = initializeFirestore(app, {});
-}
-export const db = firestore;
-export const storage = getStorage(app);
-
+// Export services with null checks
+export { auth, db, storage };
 export default app;
