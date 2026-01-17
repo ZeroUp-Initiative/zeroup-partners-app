@@ -13,10 +13,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Loader2, User, Lock, Calendar, Save, ArrowLeft, Camera, Upload, X } from "lucide-react"
+import { Loader2, User, Lock, Calendar, Save, ArrowLeft, Camera, Upload, X, Bell } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 import ProtectedRoute from "@/components/auth/protected-route"
+import { NotificationPreferencesCard } from "@/components/notifications/notification-preferences"
 
 function ProfileContent() {
   const { user, isLoading: isAuthLoading } = useAuth()
@@ -279,6 +280,7 @@ function ProfileContent() {
         <TabsList className="mb-8">
           <TabsTrigger value="general" className="gap-2"><User className="w-4 h-4" /> General</TabsTrigger>
           <TabsTrigger value="security" className="gap-2"><Lock className="w-4 h-4" /> Security</TabsTrigger>
+          <TabsTrigger value="notifications" className="gap-2"><Bell className="w-4 h-4" /> Notifications</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">
@@ -364,6 +366,10 @@ function ProfileContent() {
               </form>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="notifications">
+          <NotificationPreferencesCard />
         </TabsContent>
       </Tabs>
     </div>

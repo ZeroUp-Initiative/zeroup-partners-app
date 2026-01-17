@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button"
 import { DollarSign, Target, TrendingUp, Award, Plus, BarChart, Users, Heart, Trophy, Medal, Star, Receipt, Banknote, Copy } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { CardSkeleton, Skeleton } from "@/components/ui/skeleton"
 import toast from "react-hot-toast"
 
 function DashboardPage() {
@@ -230,53 +231,64 @@ function DashboardPage() {
               <TabsContent value="overview" className="space-y-4">
                   {/* Grid of Stat Cards */}
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                    <Card>
-                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Contributions</CardTitle>
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">{isLoading ? '...' : `₦${totalContributions.toLocaleString()}`}</div>
-                        <p className="text-xs text-muted-foreground">Live total of all partner funds</p>
-                      </CardContent>
-                    </Card>
+                    {isLoading ? (
+                      <>
+                        <CardSkeleton />
+                        <CardSkeleton />
+                        <CardSkeleton />
+                        <CardSkeleton />
+                      </>
+                    ) : (
+                      <>
+                        <Card>
+                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Total Contributions</CardTitle>
+                            <DollarSign className="h-4 w-4 text-muted-foreground" />
+                          </CardHeader>
+                          <CardContent>
+                            <div className="text-2xl font-bold">₦{totalContributions.toLocaleString()}</div>
+                            <p className="text-xs text-muted-foreground">Live total of all partner funds</p>
+                          </CardContent>
+                        </Card>
 
-                    <Card>
-                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">My Contributions</CardTitle>
-                        <Heart className="h-4 w-4 text-muted-foreground" />
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">{isLoading ? '...' : `₦${myContributions.toLocaleString()}`}</div>
-                        <p className="text-xs text-muted-foreground">Your personal impact</p>
-                      </CardContent>
-                    </Card>
+                        <Card>
+                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">My Contributions</CardTitle>
+                            <Heart className="h-4 w-4 text-muted-foreground" />
+                          </CardHeader>
+                          <CardContent>
+                            <div className="text-2xl font-bold">₦{myContributions.toLocaleString()}</div>
+                            <p className="text-xs text-muted-foreground">Your personal impact</p>
+                          </CardContent>
+                        </Card>
 
-                    <Card>
-                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Impact Score</CardTitle>
-                        <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">{isLoading ? '...' : impactScore}</div>
-                        <p className="text-xs text-muted-foreground">
-                          {impactScore >= 80 ? "Outstanding!" : impactScore >= 50 ? "Great progress!" : "Keep contributing!"}
-                        </p>
-                      </CardContent>
-                    </Card>
+                        <Card>
+                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Impact Score</CardTitle>
+                            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                          </CardHeader>
+                          <CardContent>
+                            <div className="text-2xl font-bold">{impactScore}</div>
+                            <p className="text-xs text-muted-foreground">
+                              {impactScore >= 80 ? "Outstanding!" : impactScore >= 50 ? "Great progress!" : "Keep contributing!"}
+                            </p>
+                          </CardContent>
+                        </Card>
 
-                    <Card>
-                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Badges Earned</CardTitle>
-                        <Award className="h-4 w-4 text-muted-foreground" />
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold">{isLoading ? '...' : badgesEarned}</div>
-                        <p className="text-xs text-muted-foreground">
-                          {badgesEarned === 0 ? "Start earning badges!" : `${7 - badgesEarned} more to unlock`}
-                        </p>
-                      </CardContent>
-                    </Card>
+                        <Card>
+                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Badges Earned</CardTitle>
+                            <Award className="h-4 w-4 text-muted-foreground" />
+                          </CardHeader>
+                          <CardContent>
+                            <div className="text-2xl font-bold">{badgesEarned}</div>
+                            <p className="text-xs text-muted-foreground">
+                              {badgesEarned === 0 ? "Start earning badges!" : `${7 - badgesEarned} more to unlock`}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </>
+                    )}
                   </div>
 
                   {/* Grid of Action Cards */}

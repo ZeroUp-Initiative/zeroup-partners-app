@@ -1,4 +1,5 @@
 import { db } from '@/lib/firebase/client';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { 
   collection, 
   addDoc, 
@@ -150,20 +151,48 @@ export function subscribeToUnreadCount(
 
 // Helper functions to create specific notification types
 export const NotificationHelpers = {
-  contributionApproved: (userId: string, amount: number, projectName?: string) => {
+  contributionApproved: async (userId: string, amount: number, projectName?: string) => {
     const title = 'Contribution Approved! ✅';
     const message = projectName 
       ? `Your contribution of ₦${amount.toLocaleString()} to "${projectName}" has been verified.`
       : `Your contribution of ₦${amount.toLocaleString()} has been verified.`;
-    return createNotification(userId, 'contribution_approved', title, message, '/contributions');
+    
+    // Create in-app notification
+    const notificationId = await createNotification(userId, 'contribution_approved', title, message, '/contributions');
+    
+    // Call Cloud Function to send email and push notification
+    try {
+      const functions = getFunctions();
+      const onContributionApproved = httpsCallable(functions, 'onContributionApproved');
+      await onContributionApproved({ userId, amount, projectName });
+    } catch (error) {
+      console.error('Failed to send email/push notification:', error);
+      // Don't throw - the in-app notification was still created
+    }
+    
+    return notificationId;
   },
 
-  contributionRejected: (userId: string, amount: number, reason?: string) => {
+  contributionRejected: async (userId: string, amount: number, reason?: string) => {
     const title = 'Contribution Not Approved';
     const message = reason 
       ? `Your contribution of ₦${amount.toLocaleString()} was not approved. Reason: ${reason}`
       : `Your contribution of ₦${amount.toLocaleString()} was not approved. Please contact support.`;
-    return createNotification(userId, 'contribution_rejected', title, message, '/contributions');
+    
+    // Create in-app notification
+    const notificationId = await createNotification(userId, 'contribution_rejected', title, message, '/contributions');
+    
+    // Call Cloud Function to send email and push notification
+    try {
+      const functions = getFunctions();
+      const onContributionRejected = httpsCallable(functions, 'onContributionRejected');
+      await onContributionRejected({ userId, amount, reason });
+    } catch (error) {
+      console.error('Failed to send email/push notification:', error);
+      // Don't throw - the in-app notification was still created
+    }
+    
+    return notificationId;
   },
 
   newProject: (userId: string, projectTitle: string) => {
