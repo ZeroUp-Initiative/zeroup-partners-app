@@ -258,7 +258,7 @@ function CommunityContent() {
           </div>
 
           {/* Community Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Partners</CardTitle>
@@ -307,9 +307,9 @@ function CommunityContent() {
           {/* Main Content Tabs */}
           <Tabs defaultValue="leaderboard" className="space-y-6">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
-              <TabsTrigger value="activity">Recent Activity</TabsTrigger>
-              <TabsTrigger value="recognition">Recognition</TabsTrigger>
+              <TabsTrigger value="leaderboard" className="text-xs sm:text-sm">Leaderboard</TabsTrigger>
+              <TabsTrigger value="activity" className="text-xs sm:text-sm">Activity</TabsTrigger>
+              <TabsTrigger value="recognition" className="text-xs sm:text-sm">Recognition</TabsTrigger>
             </TabsList>
 
             <TabsContent value="leaderboard" className="space-y-6">
@@ -323,9 +323,9 @@ function CommunityContent() {
                           <CardTitle>Partner Leaderboard</CardTitle>
                           <CardDescription>Top contributors making the biggest impact</CardDescription>
                         </div>
-                        <div className="relative">
+                        <div className="relative hidden sm:block">
                           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                          <Input placeholder="Search partners..." className="pl-10 w-64" />
+                          <Input placeholder="Search partners..." className="pl-10 w-full sm:w-48 md:w-64" />
                         </div>
                       </div>
                     </CardHeader>

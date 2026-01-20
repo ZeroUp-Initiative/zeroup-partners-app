@@ -181,12 +181,12 @@ function AdminUsersPage() {
   return (
     <div className="space-y-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">User Management</h1>
-        <p className="text-muted-foreground">Manage user accounts and assign roles.</p>
+        <h1 className="text-2xl sm:text-3xl font-bold">User Management</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">Manage user accounts and assign roles.</p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid gap-3 grid-cols-2 md:grid-cols-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -263,7 +263,8 @@ function AdminUsersPage() {
             </div>
           ) : (
             <>
-              <Table>
+              <div className="overflow-x-auto -mx-6 px-6">
+                <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>User</TableHead>
@@ -366,14 +367,15 @@ function AdminUsersPage() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between border-t pt-4 mt-4">
-                  <p className="text-sm text-muted-foreground">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-t pt-4 mt-4">
+                  <p className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
                     Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredUsers.length)} of {filteredUsers.length} users
                   </p>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center gap-2">
                     <Button
                       variant="outline"
                       size="sm"

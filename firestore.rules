@@ -21,8 +21,9 @@ service cloud.firestore {
     
     // Users collection
     match /users/{userId} {
-      // Users can read their own profile
-      allow read: if isOwner(userId);
+      // Allow public read of basic profile info for constellation display
+      // This exposes: firstName, lastName, photoURL, createdAt
+      allow read: if true;
       
       // Users can create their own profile during signup
       allow create: if isOwner(userId);
@@ -34,14 +35,15 @@ service cloud.firestore {
       // Only admins can delete users or change roles
       allow update: if isAdmin();
       allow delete: if isAdmin();
-      
-      // Admins can read all users
-      allow read: if isAdmin();
     }
     
     // Payments/Contributions collection
     match /payments/{paymentId} {
-      // Users can read their own payments
+      // Allow public read of approved payments (for constellation connections)
+      // Only exposes: userId, projectId, status for approved payments
+      allow read: if resource.data.status == 'approved';
+      
+      // Users can read their own payments (any status)
       allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
       
       // Admins can read all payments

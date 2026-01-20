@@ -141,12 +141,12 @@ export default function SignupPage() {
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
-              <div className="flex gap-4">
-                <div className="space-y-2 w-1/2">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="space-y-2 w-full sm:w-1/2">
                   <Label htmlFor="firstName">First Name</Label>
                   <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} required disabled={isLoading} className="bg-background/50 border-input/50 focus:bg-background transition-colors" />
                 </div>
-                <div className="space-y-2 w-1/2">
+                <div className="space-y-2 w-full sm:w-1/2">
                   <Label htmlFor="lastName">Last Name</Label>
                   <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} required disabled={isLoading} className="bg-background/50 border-input/50 focus:bg-background transition-colors" />
                 </div>

@@ -210,13 +210,13 @@ function AdminTransactionsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Manage Transactions</h1>
-          <p className="text-muted-foreground">Review and approve or decline contribution transactions.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold">Manage Transactions</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Review and approve or decline contribution transactions.</p>
         </div>
         {filteredTransactions.length > 0 && (
-          <Button variant="outline" onClick={exportToCSV}>
+          <Button variant="outline" onClick={exportToCSV} className="w-full sm:w-auto">
             <Download className="w-4 h-4 mr-2" />
             Export CSV
           </Button>
@@ -225,13 +225,14 @@ function AdminTransactionsPage() {
 
       {/* Filter Tabs */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 overflow-x-auto pb-2 md:pb-0">
           {(['all', 'pending', 'approved', 'declined'] as const).map((status) => (
             <Button
               key={status}
               variant={filter === status ? "default" : "outline"}
               onClick={() => setFilter(status)}
-              className="capitalize"
+              className="capitalize whitespace-nowrap text-sm"
+              size="sm"
             >
               {status} ({transactions.filter(t => status === 'all' ? true : t.status === status).length})
             </Button>
@@ -256,7 +257,8 @@ function AdminTransactionsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
+          <div className="overflow-x-auto -mx-6 px-6">
+            <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Date</TableHead>
@@ -320,14 +322,15 @@ function AdminTransactionsPage() {
               ))}
             </TableBody>
           </Table>
+          </div>
           
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t pt-4 mt-4">
-              <p className="text-sm text-muted-foreground">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-t pt-4 mt-4">
+              <p className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
                 Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredTransactions.length)} of {filteredTransactions.length} transactions
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"

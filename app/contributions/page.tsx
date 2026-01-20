@@ -16,6 +16,8 @@ import Link from "next/link"
 import { auth, db } from "@/lib/firebase/client"
 import { collection, query, where, onSnapshot, Timestamp, doc, updateDoc } from "firebase/firestore"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { GradientCard } from "@/components/ui/gradient-card"
+import { CurrencyCounter, AnimatedCounter } from "@/components/ui/animated-counter"
 
 interface Contribution {
   id: string;
@@ -207,60 +209,49 @@ function ContributionsContent() {
                 </Link>
             </div>
         <div className="space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Verified</CardTitle>
-                <CheckCircle className="h-4 w-4 text-green-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">₦{totalContributions.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">Across {verifiedCount} contributions</p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <GradientCard
+              variant="emerald"
+              title="Total Verified"
+              icon={<CheckCircle className="h-5 w-5" />}
+              value={<CurrencyCounter value={totalContributions} duration={2000} />}
+              subtitle={`Across ${verifiedCount} contributions`}
+            />
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
-                <Clock className="h-4 w-4 text-yellow-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">₦{pendingAmount.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">{pendingCount} {pendingCount === 1 ? 'contribution' : 'contributions'} pending</p>
-              </CardContent>
-            </Card>
+            <GradientCard
+              variant="amber"
+              title="Pending Review"
+              icon={<Clock className="h-5 w-5" />}
+              value={<CurrencyCounter value={pendingAmount} duration={2000} />}
+              subtitle={`${pendingCount} ${pendingCount === 1 ? 'contribution' : 'contributions'} pending`}
+            />
 
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">This Month</CardTitle>
-                    <Calendar className="h-4 w-4 text-blue-500" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">₦{thisMonthAmount.toLocaleString()}</div>
-                    <p className="text-xs text-muted-foreground">{thisMonthCount} verified {thisMonthCount === 1 ? 'contribution' : 'contributions'} this month</p>
-                </CardContent>
-            </Card>
+            <GradientCard
+              variant="blue"
+              title="This Month"
+              icon={<Calendar className="h-5 w-5" />}
+              value={<CurrencyCounter value={thisMonthAmount} duration={2000} />}
+              subtitle={`${thisMonthCount} verified this month`}
+            />
 
-            <Card className={declinedCount >= FLAG_THRESHOLD ? "border-red-500" : ""}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Declined</CardTitle>
-                    <AlertCircle className="h-4 w-4 text-red-500" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold text-red-500">{declinedCount}</div>
-                    <p className="text-xs text-muted-foreground">
-                      {declinedCount >= SUSPEND_THRESHOLD ? "Account suspended" : 
-                       declinedCount >= FLAG_THRESHOLD ? "Account flagged" : 
-                       "contributions declined"}
-                    </p>
-                </CardContent>
-            </Card>
+            <GradientCard
+              variant="rose"
+              title="Declined"
+              icon={<AlertCircle className="h-5 w-5" />}
+              value={<AnimatedCounter value={declinedCount} duration={1500} />}
+              subtitle={
+                declinedCount >= SUSPEND_THRESHOLD ? "Account suspended" : 
+                declinedCount >= FLAG_THRESHOLD ? "Account flagged" : 
+                "contributions declined"
+              }
+              className={declinedCount >= FLAG_THRESHOLD ? "ring-2 ring-red-500/50" : ""}
+            />
           </div>
 
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
              <div>
-              <h2 className="text-2xl font-bold">Your Contributions</h2>
-              <p className="text-muted-foreground">View all your contributions and their status</p>
+              <h2 className="text-xl sm:text-2xl font-bold">Your Contributions</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">View all your contributions and their status</p>
             </div>
             <div className="flex items-center gap-2">
               {contributions.length > 0 && (
@@ -283,15 +274,29 @@ function ContributionsContent() {
           <div className="space-y-4">
               {contributions.length > 0 ? (
                   contributions.map((contribution, index) => (
-                      <Card key={contribution.id}>
+                      <Card 
+                        key={contribution.id} 
+                        className="group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
+                        style={{ animationDelay: `${index * 50}ms` }}
+                      >
+                      {/* Status indicator bar */}
+                      <div className={`h-1 ${
+                        contribution.status === 'approved' ? 'bg-gradient-to-r from-emerald-500 to-teal-400' :
+                        contribution.status === 'pending' ? 'bg-gradient-to-r from-amber-500 to-yellow-400' :
+                        'bg-gradient-to-r from-red-500 to-rose-400'
+                      }`} />
                       <CardContent className="p-6">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between flex-wrap gap-4">
                               <div className="flex items-center gap-4">
-                                  <div className="p-2 rounded-full bg-primary/10">
+                                  <div className={`p-3 rounded-xl transition-transform duration-300 group-hover:scale-110 ${
+                                    contribution.status === 'approved' ? 'bg-gradient-to-br from-emerald-500/20 to-teal-400/20' :
+                                    contribution.status === 'pending' ? 'bg-gradient-to-br from-amber-500/20 to-yellow-400/20' :
+                                    'bg-gradient-to-br from-red-500/20 to-rose-400/20'
+                                  }`}>
                                       {getStatusIcon(contribution.status)}
                                   </div>
                                   <div>
-                                  <h3 className="font-semibold">{contribution.description}</h3>
+                                  <h3 className="font-semibold group-hover:text-primary transition-colors">{contribution.description}</h3>
                                   <p className="text-sm text-muted-foreground">
                                       {contribution.date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
                                   </p>
@@ -302,11 +307,11 @@ function ContributionsContent() {
                               </div>
                               <div className="flex items-center gap-4">
                                   <div className="text-right">
-                                    <p className="text-2xl font-bold">₦{contribution.amount.toLocaleString()}</p>
+                                    <p className="text-2xl font-bold tabular-nums">₦{contribution.amount.toLocaleString()}</p>
                                     {getStatusBadge(contribution.status)}
                                   </div>
                                   {contribution.proofURL &&
-                                    <Button variant="outline" size="sm" asChild>
+                                    <Button variant="outline" size="sm" asChild className="hover:bg-primary hover:text-primary-foreground transition-colors">
                                       <Link href={contribution.proofURL} target="_blank">
                                           <FileText className="w-4 h-4 mr-2" />
                                           View Proof
@@ -319,9 +324,16 @@ function ContributionsContent() {
                       </Card>
                   ))
               ) : (
-                  <div className="text-center py-12">
-                    <p className="text-muted-foreground">No contributions logged yet.</p>
-                  </div>
+                  <Card className="border-dashed">
+                    <CardContent className="flex flex-col items-center justify-center py-16">
+                      <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+                        <DollarSign className="w-8 h-8 text-muted-foreground/50" />
+                      </div>
+                      <p className="text-lg font-medium text-muted-foreground">No contributions logged yet</p>
+                      <p className="text-sm text-muted-foreground/70 mb-4">Start contributing to see your history here</p>
+                      <LogContributionModal />
+                    </CardContent>
+                  </Card>
               )}
           </div>
 

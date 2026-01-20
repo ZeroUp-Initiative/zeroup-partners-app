@@ -250,12 +250,12 @@ function AdminProjectsPage() {
   return (
     <div className="space-y-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Manage Projects</h1>
-        <p className="text-muted-foreground">Create and oversee funding goals for social impact projects.</p>
+        <h1 className="text-2xl sm:text-3xl font-bold">Manage Projects</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">Create and oversee funding goals for social impact projects.</p>
       </div>
 
        {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-3 mb-8">
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-3 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
