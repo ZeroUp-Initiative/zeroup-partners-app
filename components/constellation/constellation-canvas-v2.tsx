@@ -48,6 +48,7 @@ interface ConstellationCanvasProps {
     totalContributions?: number
   } | null
   isLoggedIn: boolean
+  isDark?: boolean
 }
 
 // ============================================================
@@ -137,7 +138,7 @@ function calculatePartnerTier(partner: Partner): 'primary' | 'secondary' | 'tert
 // MAIN COMPONENT
 // ============================================================
 
-export function ConstellationCanvasV2({ projects: initialProjects, partners = [], user, isLoggedIn }: ConstellationCanvasProps) {
+export function ConstellationCanvasV2({ projects: initialProjects, partners = [], user, isLoggedIn, isDark = true }: ConstellationCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null)
@@ -575,18 +576,26 @@ export function ConstellationCanvasV2({ projects: initialProjects, partners = []
   return (
     <div 
       ref={containerRef} 
-      className="relative w-full h-full overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950"
+      className={cn(
+        "relative w-full h-full overflow-hidden",
+        isDark 
+          ? "bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950" 
+          : "bg-gradient-to-b from-slate-100 via-white to-slate-100"
+      )}
     >
       {/* Particle background - slow, calm (Task 9) */}
-      <ParticleBackground />
+      {isDark && <ParticleBackground />}
 
       {/* Subtle grid overlay */}
       <div 
-        className="absolute inset-0 opacity-[0.02] pointer-events-none"
+        className={cn(
+          "absolute inset-0 pointer-events-none",
+          isDark ? "opacity-[0.02]" : "opacity-[0.05]"
+        )}
         style={{
           backgroundImage: `
-            linear-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(148, 163, 184, 0.1) 1px, transparent 1px)
+            linear-gradient(${isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(100, 116, 139, 0.2)'} 1px, transparent 1px),
+            linear-gradient(90deg, ${isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(100, 116, 139, 0.2)'} 1px, transparent 1px)
           `,
           backgroundSize: '60px 60px'
         }}
@@ -609,20 +618,22 @@ export function ConstellationCanvasV2({ projects: initialProjects, partners = []
               )} />
             </div>
             <h3 className={cn(
-              "font-semibold text-white",
+              "font-semibold",
+              isDark ? "text-white" : "text-foreground",
               isMobile ? "text-lg" : "text-xl"
             )}>
               The Ecosystem is Growing
             </h3>
             <p className={cn(
-              "text-white/50",
+              isDark ? "text-white/50" : "text-muted-foreground",
               isMobile ? "text-sm" : "text-base"
             )}>
               New partnerships and projects appear here as they begin. 
               Be among the first to join.
             </p>
             <div className={cn(
-              "flex gap-3 justify-center mt-6 text-white/30",
+              "flex gap-3 justify-center mt-6",
+              isDark ? "text-white/30" : "text-muted-foreground",
               isMobile ? "text-[10px]" : "text-xs"
             )}>
               <div className="flex items-center gap-2">
@@ -720,7 +731,8 @@ export function ConstellationCanvasV2({ projects: initialProjects, partners = []
 
       {/* Legend - responsive positioning */}
       <div className={cn(
-        "absolute flex items-center gap-4 text-white/40",
+        "absolute flex items-center gap-4",
+        isDark ? "text-white/40" : "text-muted-foreground",
         isMobile ? "bottom-4 left-4 text-[10px]" : "bottom-6 left-6 text-xs"
       )}>
         <div className="flex items-center gap-2">
@@ -732,7 +744,8 @@ export function ConstellationCanvasV2({ projects: initialProjects, partners = []
       {/* Node count indicator - responsive */}
       {!isEmpty && (
         <div className={cn(
-          "absolute text-white/30",
+          "absolute",
+          isDark ? "text-white/30" : "text-muted-foreground",
           isMobile ? "bottom-4 right-4 text-[10px]" : "bottom-6 right-6 text-xs"
         )}>
           {liveProjects.length} project{liveProjects.length !== 1 ? 's' : ''} • {livePartners.length} partner{livePartners.length !== 1 ? 's' : ''}

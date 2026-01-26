@@ -14,6 +14,10 @@ import {
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
+interface ContributionTypesSectionProps {
+  isDark?: boolean
+}
+
 const contributionTypes = [
   {
     icon: Banknote,
@@ -59,17 +63,30 @@ const contributionTypes = [
   }
 ]
 
-export function ContributionTypesSection() {
+export function ContributionTypesSection({ isDark = true }: ContributionTypesSectionProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" })
 
   return (
     <section 
       ref={sectionRef}
-      className="relative py-24 md:py-32 bg-slate-950 overflow-hidden"
+      className={`relative py-24 md:py-32 overflow-hidden ${
+        isDark ? 'bg-slate-950' : 'bg-gradient-to-b from-purple-50/30 via-white to-pink-50/30'
+      }`}
     >
       {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial from-emerald-500/5 via-transparent to-transparent blur-3xl" />
+      <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial blur-3xl ${
+        isDark ? 'from-emerald-500/5 via-transparent to-transparent' : 'from-purple-200/40 via-pink-100/20 to-transparent'
+      }`} />
+      
+      {/* Light mode decorative blobs */}
+      {!isDark && (
+        <>
+          <div className="absolute top-20 left-20 w-64 h-64 bg-purple-200/30 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-20 w-64 h-64 bg-pink-200/30 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 right-10 w-48 h-48 bg-blue-200/20 rounded-full blur-3xl" />
+        </>
+      )}
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Header */}
@@ -79,18 +96,20 @@ export function ContributionTypesSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16 md:mb-20"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 mb-6">
+          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6 ${
+            isDark ? 'bg-purple-500/10 border-purple-500/20' : 'bg-purple-50 border-purple-200'
+          }`}>
             <div className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-            <span className="text-sm text-purple-400 font-medium">Ways to Contribute</span>
+            <span className={`text-sm font-medium ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>Ways to Contribute</span>
           </div>
           
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+          <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
             More Than{' '}
             <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
               Money
             </span>
           </h2>
-          <p className="text-lg text-white/50 max-w-2xl mx-auto">
+          <p className={`text-lg max-w-2xl mx-auto ${isDark ? 'text-white/50' : 'text-slate-600'}`}>
             Impact grows when resources meet context. Your unique contribution matters.
           </p>
         </motion.div>
@@ -106,10 +125,16 @@ export function ContributionTypesSection() {
               className="group"
             >
               <div className={`
-                relative h-full p-6 md:p-8 rounded-2xl border border-white/5 
-                bg-slate-900/30 backdrop-blur-sm transition-all duration-500
-                hover:border-white/10 hover:shadow-xl ${type.hoverBg}
+                relative h-full p-6 md:p-8 rounded-2xl border 
+                backdrop-blur-sm transition-all duration-500
+                hover:shadow-xl ${type.hoverBg}
+                ${isDark 
+                  ? 'border-white/5 bg-slate-900/30 hover:border-white/10' 
+                  : 'border-slate-200 bg-white/90 shadow-lg ring-1 ring-slate-100 hover:border-purple-300 hover:shadow-purple-500/10 hover:ring-purple-200'
+                }
               `}>
+                {/* Gradient top bar for light mode */}
+                {!isDark && <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r ${type.color}`} />}
                 {/* Icon */}
                 <div className={`
                   w-14 h-14 rounded-xl mb-5 flex items-center justify-center
@@ -120,16 +145,18 @@ export function ContributionTypesSection() {
                 </div>
 
                 {/* Content */}
-                <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-emerald-400 transition-colors">
+                <h3 className={`text-xl font-semibold mb-2 transition-colors ${
+                  isDark ? 'text-white group-hover:text-emerald-400' : 'text-slate-900 group-hover:text-purple-600'
+                }`}>
                   {type.title}
                 </h3>
-                <p className="text-white/50 text-sm leading-relaxed">
+                <p className={`text-sm leading-relaxed ${isDark ? 'text-white/50' : 'text-slate-600'}`}>
                   {type.description}
                 </p>
 
                 {/* Hover indicator */}
                 <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ArrowRight className="w-5 h-5 text-white/30" />
+                  <ArrowRight className={`w-5 h-5 ${isDark ? 'text-white/30' : 'text-slate-400'}`} />
                 </div>
               </div>
             </motion.div>
@@ -143,7 +170,7 @@ export function ContributionTypesSection() {
           transition={{ duration: 0.6, delay: 0.6 }}
           className="text-center"
         >
-          <p className="text-white/40 italic mb-6">
+          <p className={`italic mb-6 ${isDark ? 'text-white/40' : 'text-slate-500'}`}>
             "Impact grows when resources meet context."
           </p>
           <Link href="/signup">

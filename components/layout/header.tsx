@@ -10,6 +10,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { EmailVerificationBanner } from "@/components/email-verification-banner"
 import { NotificationBell } from "@/components/notification-bell"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 interface HeaderProps {
   title: string;
@@ -87,6 +88,9 @@ export default function Header({ title, subtitle }: HeaderProps) {
 
             {/* User Menu - Desktop */}
             <div className="hidden md:flex items-center gap-4">
+              {/* Theme Toggle */}
+              <ThemeToggle />
+              
               {/* Notification Bell */}
               <NotificationBell />
               
@@ -153,6 +157,12 @@ export default function Header({ title, subtitle }: HeaderProps) {
             >
               Community
             </Link>
+            
+            {/* Theme Toggle in Mobile */}
+            <div className="flex items-center justify-between py-2">
+              <span className="text-sm text-muted-foreground">Theme</span>
+              <ThemeToggle />
+            </div>
             
             {/* Mobile User Info */}
             <div className="border-t border-border/40 pt-4 mt-4">

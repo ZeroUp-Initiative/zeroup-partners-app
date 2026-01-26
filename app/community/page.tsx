@@ -7,6 +7,7 @@ import { collection, query, where, onSnapshot } from "firebase/firestore"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { GradientCard } from "@/components/ui/gradient-card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -259,49 +260,37 @@ function CommunityContent() {
 
           {/* Community Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Partners</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{loading ? "..." : stats.totalPartners.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">Growing community</p>
-              </CardContent>
-            </Card>
+            <GradientCard
+              variant="blue"
+              title="Total Partners"
+              icon={<Users className="h-5 w-5" />}
+              value={loading ? "..." : stats.totalPartners.toLocaleString()}
+              subtitle="Growing community"
+            />
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active This Month</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{loading ? "..." : stats.activeThisMonth.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">Partners contributing</p>
-              </CardContent>
-            </Card>
+            <GradientCard
+              variant="emerald"
+              title="Active This Month"
+              icon={<TrendingUp className="h-5 w-5" />}
+              value={loading ? "..." : stats.activeThisMonth.toLocaleString()}
+              subtitle="Partners contributing"
+            />
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Raised</CardTitle>
-                <Trophy className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">₦{loading ? "..." : stats.totalRaised.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">All time</p>
-              </CardContent>
-            </Card>
+            <GradientCard
+              variant="amber"
+              title="Total Raised"
+              icon={<Trophy className="h-5 w-5" />}
+              value={`₦${loading ? "..." : stats.totalRaised.toLocaleString()}`}
+              subtitle="All time"
+            />
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Your Rank</CardTitle>
-                <Star className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">#{loading ? "..." : stats.userRank > 0 ? stats.userRank : "-"}</div>
-                <p className="text-xs text-muted-foreground">Based on contributions</p>
-              </CardContent>
-            </Card>
+            <GradientCard
+              variant="purple"
+              title="Your Rank"
+              icon={<Star className="h-5 w-5" />}
+              value={`#${loading ? "..." : stats.userRank > 0 ? stats.userRank : "-"}`}
+              subtitle="Based on contributions"
+            />
           </div>
 
           {/* Main Content Tabs */}
@@ -316,7 +305,8 @@ function CommunityContent() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Leaderboard */}
                 <div className="lg:col-span-2">
-                  <Card>
+                  <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/25 hover:-translate-y-1">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-400" />
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <div>
@@ -380,7 +370,8 @@ function CommunityContent() {
 
                 {/* Top Contributors Sidebar */}
                 <div className="space-y-6">
-                  <Card>
+                  <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/25 hover:-translate-y-1">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-yellow-400" />
                     <CardHeader>
                       <CardTitle>Top Contributors</CardTitle>
                       <CardDescription>Leading partners by period</CardDescription>
@@ -400,7 +391,8 @@ function CommunityContent() {
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/25 hover:-translate-y-1">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400" />
                     <CardHeader>
                       <CardTitle>Your Progress</CardTitle>
                       <CardDescription>How you're doing this month</CardDescription>
@@ -427,7 +419,8 @@ function CommunityContent() {
             </TabsContent>
 
             <TabsContent value="activity" className="space-y-6">
-              <Card>
+              <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/25 hover:-translate-y-1">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-400" />
                 <CardHeader>
                   <CardTitle>Community Activity</CardTitle>
                   <CardDescription>Recent achievements and contributions from the community</CardDescription>
@@ -465,7 +458,8 @@ function CommunityContent() {
 
             <TabsContent value="recognition" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card>
+                <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/25 hover:-translate-y-1">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-yellow-400" />
                   <CardHeader>
                     <CardTitle>Partner of the Month</CardTitle>
                     <CardDescription>Celebrating outstanding contributions for {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</CardDescription>
@@ -504,7 +498,8 @@ function CommunityContent() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/25 hover:-translate-y-1">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-400" />
                   <CardHeader>
                     <CardTitle>Recent Achievements</CardTitle>
                     <CardDescription>Community milestones and badges</CardDescription>

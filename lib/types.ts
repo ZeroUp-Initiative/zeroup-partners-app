@@ -119,53 +119,6 @@ export interface Notification {
 }
 
 // ==========================================
-// Gamification Types
-// ==========================================
-
-export interface UserCoins {
-  balance: number
-  totalEarned: number
-  level: number
-  xp: number
-  currentStreak: number
-  longestStreak: number
-  lastContributionDate?: Timestamp | Date
-  history: CoinTransaction[]
-}
-
-export interface CoinTransaction {
-  type: "earned" | "spent"
-  amount: number
-  reason: string
-  timestamp: Timestamp | Date
-}
-
-export type AchievementId = 
-  | "first_contribution"
-  | "consistent_3"
-  | "consistent_6"
-  | "big_giver"
-  | "mega_supporter"
-  | "multi_project"
-  | "early_bird"
-  | "community_star"
-
-export interface Achievement {
-  id: AchievementId
-  name: string
-  description: string
-  icon: string
-  unlockedAt?: Timestamp | Date
-}
-
-export interface UserAchievement {
-  id: string
-  odp: string
-  achievementId: AchievementId
-  unlockedAt: Timestamp | Date
-}
-
-// ==========================================
 // Analytics Types
 // ==========================================
 

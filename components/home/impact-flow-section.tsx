@@ -4,6 +4,10 @@ import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Users, Lightbulb, Heart, BarChart3, Repeat } from 'lucide-react'
 
+interface ImpactFlowSectionProps {
+  isDark?: boolean
+}
+
 const steps = [
   {
     icon: Users,
@@ -47,17 +51,29 @@ const steps = [
   }
 ]
 
-export function ImpactFlowSection() {
+export function ImpactFlowSection({ isDark = true }: ImpactFlowSectionProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" })
 
   return (
     <section 
       ref={sectionRef}
-      className="relative py-24 md:py-32 bg-slate-950 overflow-hidden"
+      className={`relative py-24 md:py-32 overflow-hidden ${
+        isDark ? 'bg-slate-950' : 'bg-gradient-to-b from-teal-50/30 via-white to-emerald-50/30'
+      }`}
     >
       {/* Background accent */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-emerald-500/5 via-transparent to-transparent blur-3xl" />
+      <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] blur-3xl ${
+        isDark ? 'bg-gradient-to-b from-emerald-500/5 via-transparent to-transparent' : 'bg-gradient-to-b from-teal-200/50 via-transparent to-transparent'
+      }`} />
+      
+      {/* Light mode decorative elements */}
+      {!isDark && (
+        <>
+          <div className="absolute top-40 left-10 w-64 h-64 bg-blue-200/30 rounded-full blur-3xl" />
+          <div className="absolute bottom-40 right-10 w-64 h-64 bg-emerald-200/30 rounded-full blur-3xl" />
+        </>
+      )}
       
       <div className="container mx-auto px-6 relative z-10">
         {/* Header */}
@@ -67,18 +83,20 @@ export function ImpactFlowSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16 md:mb-20"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/20 mb-6">
+          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6 ${
+            isDark ? 'bg-teal-500/10 border-teal-500/20' : 'bg-teal-50 border-teal-200'
+          }`}>
             <div className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
-            <span className="text-sm text-teal-400 font-medium">The Journey</span>
+            <span className={`text-sm font-medium ${isDark ? 'text-teal-400' : 'text-teal-600'}`}>The Journey</span>
           </div>
           
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+          <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
             How Impact{' '}
             <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
               Flows
             </span>
           </h2>
-          <p className="text-lg text-white/50 max-w-2xl mx-auto">
+          <p className={`text-lg max-w-2xl mx-auto ${isDark ? 'text-white/50' : 'text-slate-600'}`}>
             A living system where every contribution creates ripples of change
           </p>
         </motion.div>
@@ -86,7 +104,9 @@ export function ImpactFlowSection() {
         {/* Desktop: Horizontal flow */}
         <div className="hidden lg:block relative">
           {/* Connection line */}
-          <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-y-1/2" />
+          <div className={`absolute top-1/2 left-0 right-0 h-0.5 -translate-y-1/2 ${
+            isDark ? 'bg-gradient-to-r from-transparent via-white/10 to-transparent' : 'bg-gradient-to-r from-transparent via-slate-300 to-transparent'
+          }`} />
           
           <div className="grid grid-cols-5 gap-6">
             {steps.map((step, index) => (
@@ -102,10 +122,15 @@ export function ImpactFlowSection() {
                   relative p-6 rounded-2xl border backdrop-blur-sm
                   transition-all duration-500 hover:scale-105
                   ${step.bgColor} ${step.borderColor}
+                  ${!isDark && 'bg-white/90 shadow-lg hover:shadow-xl ring-1 ring-slate-100'}
                 `}>
+                  {/* Gradient top bar for light mode */}
+                  {!isDark && <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r ${step.color}`} />}
                   {/* Step number */}
-                  <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center">
-                    <span className="text-sm font-bold text-white/60">{index + 1}</span>
+                  <div className={`absolute -top-3 -right-3 w-8 h-8 rounded-full border flex items-center justify-center ${
+                    isDark ? 'bg-slate-900 border-white/10' : 'bg-white border-slate-200 shadow-md'
+                  }`}>
+                    <span className={`text-sm font-bold ${isDark ? 'text-white/60' : 'text-slate-500'}`}>{index + 1}</span>
                   </div>
                   
                   {/* Icon */}
@@ -117,10 +142,10 @@ export function ImpactFlowSection() {
                   </div>
                   
                   {/* Content */}
-                  <h3 className="text-lg font-semibold text-white mb-2 leading-tight">
+                  <h3 className={`text-lg font-semibold mb-2 leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     {step.title}
                   </h3>
-                  <p className="text-sm text-white/50 leading-relaxed">
+                  <p className={`text-sm leading-relaxed ${isDark ? 'text-white/50' : 'text-slate-600'}`}>
                     {step.description}
                   </p>
                 </div>
@@ -137,7 +162,7 @@ export function ImpactFlowSection() {
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                         <path 
                           d="M9 6L15 12L9 18" 
-                          stroke="rgba(255,255,255,0.3)" 
+                          stroke={isDark ? "rgba(255,255,255,0.3)" : "rgba(100,116,139,0.5)"} 
                           strokeWidth="2" 
                           strokeLinecap="round" 
                           strokeLinejoin="round"
@@ -163,7 +188,9 @@ export function ImpactFlowSection() {
             >
               {/* Vertical line connector */}
               {index < steps.length - 1 && (
-                <div className="absolute left-7 top-20 bottom-0 w-0.5 bg-gradient-to-b from-white/20 to-transparent" />
+                <div className={`absolute left-7 top-20 bottom-0 w-0.5 ${
+                  isDark ? 'bg-gradient-to-b from-white/20 to-transparent' : 'bg-gradient-to-b from-slate-300 to-transparent'
+                }`} />
               )}
               
               <div className="flex gap-4">
@@ -179,16 +206,19 @@ export function ImpactFlowSection() {
                 
                 {/* Content */}
                 <div className={`
-                  flex-1 p-4 rounded-xl border backdrop-blur-sm
+                  flex-1 p-4 rounded-xl border backdrop-blur-sm relative
                   ${step.bgColor} ${step.borderColor}
+                  ${!isDark && 'bg-white/90 shadow-md ring-1 ring-slate-100'}
                 `}>
+                  {/* Gradient top bar for light mode */}
+                  {!isDark && <div className={`absolute top-0 left-0 right-0 h-0.5 rounded-t-xl bg-gradient-to-r ${step.color}`} />}
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-medium text-white/40">Step {index + 1}</span>
+                    <span className={`text-xs font-medium ${isDark ? 'text-white/40' : 'text-slate-400'}`}>Step {index + 1}</span>
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-1">
+                  <h3 className={`text-lg font-semibold mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     {step.title}
                   </h3>
-                  <p className="text-sm text-white/50">
+                  <p className={`text-sm ${isDark ? 'text-white/50' : 'text-slate-600'}`}>
                     {step.description}
                   </p>
                 </div>

@@ -114,40 +114,28 @@
 - [ ] Community posts/discussions
 - [ ] Achievement sharing
 
-### 🪙 Dreamers Coin / Gamification
+### 🪙 Dreamers Coin / Gamification - ❌ REMOVED
 
-- [x] GamificationProvider context (scaffolded)
-- [x] Achievement unlock animation
-- [x] Level up animation
-- [x] Dreamers Coin page UI
-- [x] Gamification service with coins, XP, levels
-- [x] Achievement definitions and tracking
-- [x] Persist coin balance in Firestore
-- [ ] Implement rewards/perks system
-- [x] Coin history tracking
-- [x] Achievements system with real data
-- [x] Levels and XP system
-- [ ] Streak tracking with rewards
+*This feature has been removed from the codebase (January 25, 2026)*
 
-### 🔔 Notifications
+### 🤖 Bridge AI - ❌ REMOVED
 
-- [x] Notifications page with full functionality
-- [x] Notification bell component with real-time updates
-- [x] Backend notification system (Firestore collection)
-- [x] Contribution approved/rejected notifications
-- [ ] New project notifications
-- [x] Achievement earned notifications
-- [x] Push notifications (Firebase Cloud Messaging)
-- [x] Email notifications (transactional emails via Resend)
-- [x] Notification preferences/settings
-- [x] Contribution reminders (scheduled)
+*This feature has been removed from the codebase (January 25, 2026)*
 
-### 🤖 Bridge AI
+### 🌟 Impact Constellation Homepage
 
-- [x] Bridge AI page UI
-- [ ] Replace mock data with real data
-- [ ] AI project management in admin
-- [ ] OR mark as "Coming Soon" clearly
+- [x] Dynamic constellation hero section
+- [x] Organic spatial distribution algorithm (non-radial clusters)
+- [x] Real-time Firebase sync for projects, users, and payments
+- [x] Partner avatars with visual hierarchy (tier-based sizing)
+- [x] Partner connections shown only on hover
+- [x] Smooth breathing animation using requestAnimationFrame
+- [x] Project story panel with full details
+- [x] Layered depth system (foreground/midground/background)
+- [x] Particle background animation
+- [x] Removed fake/placeholder data (hubs, hardcoded milestones)
+- [x] Mobile responsive constellation (smaller nodes, tighter spacing)
+- [x] 8 homepage body sections (ecosystem, impact-flow, active-impact, contribution-types, testimonials, partners, transparency, invitation)
 
 ### 📚 Resources
 
@@ -161,16 +149,19 @@
 ### 🎨 UI/UX Features
 
 - [x] Dark/Light theme toggle
-- [x] Responsive design
+- [x] Responsive design (all pages mobile-friendly)
 - [x] Mobile navigation
 - [x] Loading states and spinners
 - [x] Toast notifications
 - [x] Animated backgrounds
 - [x] Page transitions
-- [ ] Skeleton loading states
+- [x] Skeleton loading states
 - [ ] Empty states with illustrations
 - [ ] Onboarding tour for new users
 - [x] PWA support (offline functionality)
+- [x] Mobile-responsive forms (stacked inputs on mobile)
+- [x] Mobile-responsive tables (horizontal scroll)
+- [x] Mobile-responsive grids (2-col on mobile, 4-col on desktop)
 
 ### 👤 User Profile
 
@@ -308,6 +299,17 @@
 | | Notification preferences | ✅ Complete | Full UI in profile page with all settings |
 | | Welcome emails | ✅ Complete | Automatic email on new user signup |
 | | Achievement emails | ✅ Complete | Email notifications for unlocked achievements |
+| Jan 25, 2026 | **Phase 6: Homepage & Mobile Responsiveness** | ✅ Complete | |
+| | Impact Constellation redesign | ✅ Complete | 12-task overhaul with organic layout, partner avatars, layered depth |
+| | Real-time Firebase sync | ✅ Complete | Projects, users, and payments sync live to constellation |
+| | Partner connections on hover | ✅ Complete | Lines only appear when hovering partner nodes |
+| | Smooth breathing animation | ✅ Complete | requestAnimationFrame for 60-second cycle |
+| | Removed fake data | ✅ Complete | Hub nodes and hardcoded milestones removed |
+| | Mobile responsiveness audit | ✅ Complete | All pages reviewed and fixed for mobile |
+| | Firestore rules update | ✅ Complete | Public read for users and approved payments |
+| Jan 25, 2026 | **Cleanup: Removed Features** | ✅ Complete | |
+| | Dreamers Coin/Gamification | ❌ Removed | Deleted pages, components, and lib files |
+| | Bridge AI | ❌ Removed | Deleted page and references |
 
 ---
 
@@ -344,4 +346,4 @@ The ZeroUp Partners App is now **production ready** with:
 
 ---
 
-*Last Updated: January 17, 2026*
+*Last Updated: January 25, 2026*

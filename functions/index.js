@@ -180,7 +180,7 @@ const emailTemplates = {
                 <p>${achievementDescription}</p>
               </div>
               <p>Keep up the amazing work! Every contribution brings you closer to new achievements.</p>
-              <a href="https://zeroup-partners-app.vercel.app/dreamers-coin" class="button">View All Achievements</a>
+              <a href="https://zeroup-partners-app.vercel.app/dashboard" class="button">View Your Dashboard</a>
             </div>
             <div class="footer">
               <p>ZeroUp Initiative - Building Dreams Together</p>
@@ -689,7 +689,7 @@ exports.sendAchievementNotification = https.onCall(async (data, context) => {
     message: achievementDescription,
     read: false,
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    link: "/dreamers-coin"
+    link: "/dashboard"
   });
   
   // Send email if enabled
@@ -712,7 +712,7 @@ exports.sendAchievementNotification = https.onCall(async (data, context) => {
         userData.fcmTokens,
         `🏆 Achievement Unlocked!`,
         `You earned: ${achievementName}`,
-        { url: "/dreamers-coin" }
+        { url: "/dashboard" }
       );
     } catch (pushError) {
       console.error("Failed to send push notification:", pushError);

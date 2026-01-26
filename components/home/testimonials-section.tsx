@@ -53,7 +53,11 @@ const typeColors: Record<string, string> = {
   youth: 'from-purple-400 to-pink-400'
 }
 
-export function TestimonialsSection() {
+interface TestimonialsSectionProps {
+  isDark?: boolean
+}
+
+export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" })
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -82,11 +86,16 @@ export function TestimonialsSection() {
   return (
     <section 
       ref={sectionRef}
-      className="relative py-24 md:py-32 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 overflow-hidden"
+      className={`relative py-24 md:py-32 overflow-hidden ${
+        isDark 
+          ? 'bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950' 
+          : 'bg-gradient-to-b from-amber-50/30 via-white to-orange-50/20'
+      }`}
     >
       {/* Background decoration */}
-      <div className="absolute top-20 left-10 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 right-10 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl" />
+      <div className={`absolute top-20 left-10 w-64 h-64 rounded-full blur-3xl ${isDark ? 'bg-emerald-500/5' : 'bg-amber-200/40'}`} />
+      <div className={`absolute bottom-20 right-10 w-64 h-64 rounded-full blur-3xl ${isDark ? 'bg-purple-500/5' : 'bg-orange-200/40'}`} />
+      {!isDark && <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-yellow-200/30 rounded-full blur-3xl" />}
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Header */}
@@ -96,12 +105,14 @@ export function TestimonialsSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16 md:mb-20"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 mb-6">
-            <Quote className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-sm text-amber-400 font-medium">Real Voices</span>
+          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6 ${
+            isDark ? 'bg-amber-500/10 border-amber-500/20' : 'bg-amber-50 border-amber-200'
+          }`}>
+            <Quote className={`w-3.5 h-3.5 ${isDark ? 'text-amber-400' : 'text-amber-600'}`} />
+            <span className={`text-sm font-medium ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>Real Voices</span>
           </div>
           
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+          <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
             Voices From the{' '}
             <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
               Ecosystem
@@ -116,7 +127,13 @@ export function TestimonialsSection() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="max-w-4xl mx-auto"
         >
-          <div className="relative bg-slate-900/50 backdrop-blur-sm rounded-3xl border border-white/5 p-8 md:p-12 lg:p-16">
+          <div className={`relative backdrop-blur-sm rounded-3xl border p-8 md:p-12 lg:p-16 ${
+            isDark 
+              ? 'bg-slate-900/50 border-white/5' 
+              : 'bg-white/90 border-amber-200 shadow-xl shadow-amber-500/10 ring-1 ring-amber-100'
+          }`}>
+            {/* Gradient top bar for light mode */}
+            {!isDark && <div className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl bg-gradient-to-r from-amber-400 to-orange-400" />}
             {/* Large quote icon */}
             <div className="absolute top-6 left-6 md:top-8 md:left-8">
               <Quote className={`w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r ${typeColors[currentTestimonial.type]} bg-clip-text text-transparent opacity-30`} fill="currentColor" />
@@ -132,7 +149,7 @@ export function TestimonialsSection() {
                 className="relative z-10"
               >
                 {/* Quote */}
-                <blockquote className="text-xl md:text-2xl lg:text-3xl text-white font-light leading-relaxed mb-8 md:mb-12">
+                <blockquote className={`text-xl md:text-2xl lg:text-3xl font-light leading-relaxed mb-8 md:mb-12 ${isDark ? 'text-white' : 'text-slate-800'}`}>
                   "{currentTestimonial.quote}"
                 </blockquote>
 
@@ -146,24 +163,26 @@ export function TestimonialsSection() {
                   </div>
                   
                   <div>
-                    <div className="font-semibold text-white text-lg">
+                    <div className={`font-semibold text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       {currentTestimonial.author}
                     </div>
-                    <div className="text-white/50 text-sm">
+                    <div className={`text-sm ${isDark ? 'text-white/50' : 'text-slate-500'}`}>
                       {currentTestimonial.role} • {currentTestimonial.location}
                     </div>
                   </div>
 
                   {/* Optional audio button */}
-                  <button className="ml-auto p-3 rounded-full bg-white/5 hover:bg-white/10 transition-colors group hidden md:flex">
-                    <Volume2 className="w-5 h-5 text-white/40 group-hover:text-white/60" />
+                  <button className={`ml-auto p-3 rounded-full transition-colors group hidden md:flex ${
+                    isDark ? 'bg-white/5 hover:bg-white/10' : 'bg-slate-100 hover:bg-slate-200'
+                  }`}>
+                    <Volume2 className={`w-5 h-5 ${isDark ? 'text-white/40 group-hover:text-white/60' : 'text-slate-400 group-hover:text-slate-600'}`} />
                   </button>
                 </div>
               </motion.div>
             </AnimatePresence>
 
             {/* Navigation */}
-            <div className="flex items-center justify-between mt-8 md:mt-12 pt-8 border-t border-white/5">
+            <div className={`flex items-center justify-between mt-8 md:mt-12 pt-8 border-t ${isDark ? 'border-white/5' : 'border-slate-200'}`}>
               {/* Dots */}
               <div className="flex gap-2">
                 {testimonials.map((_, index) => (
@@ -176,7 +195,7 @@ export function TestimonialsSection() {
                     className={`w-2 h-2 rounded-full transition-all duration-300 ${
                       index === currentIndex 
                         ? 'w-8 bg-gradient-to-r from-emerald-400 to-teal-400' 
-                        : 'bg-white/20 hover:bg-white/40'
+                        : isDark ? 'bg-white/20 hover:bg-white/40' : 'bg-slate-300 hover:bg-slate-400'
                     }`}
                   />
                 ))}
@@ -186,15 +205,19 @@ export function TestimonialsSection() {
               <div className="flex gap-2">
                 <button
                   onClick={goToPrev}
-                  className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors"
+                  className={`p-2 rounded-full transition-colors ${
+                    isDark ? 'bg-white/5 hover:bg-white/10' : 'bg-slate-100 hover:bg-slate-200'
+                  }`}
                 >
-                  <ChevronLeft className="w-5 h-5 text-white/60" />
+                  <ChevronLeft className={`w-5 h-5 ${isDark ? 'text-white/60' : 'text-slate-600'}`} />
                 </button>
                 <button
                   onClick={goToNext}
-                  className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors"
+                  className={`p-2 rounded-full transition-colors ${
+                    isDark ? 'bg-white/5 hover:bg-white/10' : 'bg-slate-100 hover:bg-slate-200'
+                  }`}
                 >
-                  <ChevronRight className="w-5 h-5 text-white/60" />
+                  <ChevronRight className={`w-5 h-5 ${isDark ? 'text-white/60' : 'text-slate-600'}`} />
                 </button>
               </div>
             </div>
@@ -210,10 +233,14 @@ export function TestimonialsSection() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={isInView ? { opacity: 1, x: 0 } : {}}
                 transition={{ delay: index * 0.1 }}
-                className="w-[300px] flex-shrink-0 bg-slate-900/50 rounded-xl border border-white/5 p-5"
+                className={`w-[300px] flex-shrink-0 rounded-xl border p-5 ${
+                  isDark ? 'bg-slate-900/50 border-white/5' : 'bg-white/90 border-amber-200 shadow-lg ring-1 ring-amber-100'
+                }`}
               >
+                {/* Gradient top bar for light mode */}
+                {!isDark && <div className="absolute top-0 left-0 right-0 h-1 rounded-t-xl bg-gradient-to-r from-amber-400 to-orange-400" />}
                 <Quote className={`w-6 h-6 mb-3 bg-gradient-to-r ${typeColors[testimonial.type]} bg-clip-text text-transparent`} fill="currentColor" />
-                <p className="text-white/80 text-sm mb-4 line-clamp-4">
+                <p className={`text-sm mb-4 line-clamp-4 ${isDark ? 'text-white/80' : 'text-slate-700'}`}>
                   "{testimonial.quote}"
                 </p>
                 <div className="flex items-center gap-3">
@@ -221,8 +248,8 @@ export function TestimonialsSection() {
                     <span className="text-xs font-bold text-white">{testimonial.author.charAt(0)}</span>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-white">{testimonial.author}</div>
-                    <div className="text-xs text-white/40">{testimonial.role}</div>
+                    <div className={`text-sm font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>{testimonial.author}</div>
+                    <div className={`text-xs ${isDark ? 'text-white/40' : 'text-slate-500'}`}>{testimonial.role}</div>
                   </div>
                 </div>
               </motion.div>

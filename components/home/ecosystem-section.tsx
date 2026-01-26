@@ -3,7 +3,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 
-export function EcosystemSection() {
+interface EcosystemSectionProps {
+  isDark?: boolean
+}
+
+export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" })
   const [animationProgress, setAnimationProgress] = useState(0)
@@ -39,15 +43,27 @@ export function EcosystemSection() {
   return (
     <section 
       ref={sectionRef}
-      className="relative py-24 md:py-32 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 overflow-hidden"
+      className={`relative py-24 md:py-32 overflow-hidden ${
+        isDark 
+          ? 'bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950' 
+          : 'bg-gradient-to-b from-emerald-50/50 via-white to-teal-50/30'
+      }`}
     >
       {/* Subtle grid background */}
-      <div className="absolute inset-0 opacity-5">
+      <div className={`absolute inset-0 ${isDark ? 'opacity-5' : 'opacity-40'}`}>
         <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+          backgroundImage: `radial-gradient(circle at 1px 1px, ${isDark ? 'white' : 'rgb(16, 185, 129)'} 1px, transparent 0)`,
           backgroundSize: '40px 40px'
         }} />
       </div>
+      
+      {/* Light mode decorative blobs */}
+      {!isDark && (
+        <>
+          <div className="absolute top-20 -left-20 w-72 h-72 bg-emerald-200/40 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 -right-20 w-72 h-72 bg-teal-200/40 rounded-full blur-3xl" />
+        </>
+      )}
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -58,12 +74,16 @@ export function EcosystemSection() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="space-y-6"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${
+              isDark 
+                ? 'bg-emerald-500/10 border-emerald-500/20' 
+                : 'bg-emerald-50 border-emerald-200'
+            }`}>
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-sm text-emerald-400 font-medium">The Vision</span>
+              <span className={`text-sm font-medium ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>The Vision</span>
             </div>
             
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+            <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
               Not a Platform.
               <br />
               <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
@@ -71,12 +91,12 @@ export function EcosystemSection() {
               </span>
             </h2>
             
-            <p className="text-lg md:text-xl text-white/60 leading-relaxed max-w-xl">
+            <p className={`text-lg md:text-xl leading-relaxed max-w-xl ${isDark ? 'text-white/60' : 'text-slate-600'}`}>
               Zero Partners is a global system where individuals and organizations co-create 
               social impact with communities — not through charity, but through{' '}
-              <span className="text-white/80">shared ownership</span>,{' '}
-              <span className="text-white/80">trust</span>, and{' '}
-              <span className="text-white/80">long-term collaboration</span>.
+              <span className={isDark ? 'text-white/80' : 'text-slate-800 font-medium'}>shared ownership</span>,{' '}
+              <span className={isDark ? 'text-white/80' : 'text-slate-800 font-medium'}>trust</span>, and{' '}
+              <span className={isDark ? 'text-white/80' : 'text-slate-800 font-medium'}>long-term collaboration</span>.
             </p>
           </motion.div>
 
@@ -87,9 +107,20 @@ export function EcosystemSection() {
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             className="relative"
           >
-            <div className="relative bg-slate-900/50 rounded-2xl border border-white/5 p-8 md:p-12 backdrop-blur-sm overflow-hidden">
+            <div className={`relative rounded-2xl border p-8 md:p-12 backdrop-blur-sm overflow-hidden transition-all duration-300 ${
+              isDark 
+                ? 'bg-slate-900/50 border-white/5' 
+                : 'bg-white/80 border-emerald-200 shadow-xl shadow-emerald-500/10 hover:shadow-emerald-500/20'
+            }`}>
+              {/* Gradient top bar for light mode */}
+              {!isDark && <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-teal-400" />}
+              
               {/* Glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5" />
+              <div className={`absolute inset-0 ${
+                isDark 
+                  ? 'bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5' 
+                  : 'bg-gradient-to-br from-emerald-50 via-transparent to-teal-50'
+              }`} />
               
               {/* SVG Diagram */}
               <svg viewBox="0 0 500 160" className="w-full h-auto relative z-10">
@@ -158,8 +189,8 @@ export function EcosystemSection() {
                         cx={node.x}
                         cy={node.y}
                         r="25"
-                        fill={nodeActive ? "url(#nodeGradient)" : "rgba(255,255,255,0.1)"}
-                        stroke={nodeActive ? "rgba(16, 185, 129, 0.5)" : "rgba(255,255,255,0.2)"}
+                        fill={nodeActive ? "url(#nodeGradient)" : (isDark ? "rgba(255,255,255,0.1)" : "rgba(100,116,139,0.1)")}
+                        stroke={nodeActive ? "rgba(16, 185, 129, 0.5)" : (isDark ? "rgba(255,255,255,0.2)" : "rgba(100,116,139,0.3)")}
                         strokeWidth="2"
                         className="transition-all duration-500"
                       />
@@ -168,7 +199,7 @@ export function EcosystemSection() {
                         cx={node.x}
                         cy={node.y}
                         r="8"
-                        fill={nodeActive ? "white" : "rgba(255,255,255,0.3)"}
+                        fill={nodeActive ? "white" : (isDark ? "rgba(255,255,255,0.3)" : "rgba(100,116,139,0.3)")}
                         className="transition-all duration-500"
                       />
                       {/* Label */}
@@ -176,7 +207,7 @@ export function EcosystemSection() {
                         x={node.x}
                         y={node.y + 50}
                         textAnchor="middle"
-                        fill={nodeActive ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.4)"}
+                        fill={nodeActive ? (isDark ? "rgba(255,255,255,0.9)" : "rgb(15,23,42)") : (isDark ? "rgba(255,255,255,0.4)" : "rgba(100,116,139,0.6)")}
                         fontSize="12"
                         fontWeight="500"
                         className="transition-all duration-500"
@@ -213,12 +244,16 @@ export function EcosystemSection() {
                         transition-all duration-500
                         ${nodeActive 
                           ? 'bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/25' 
-                          : 'bg-white/10 border border-white/20'
+                          : isDark ? 'bg-white/10 border border-white/20' : 'bg-slate-100 border border-slate-200'
                         }
                       `}>
-                        <div className={`w-3 h-3 rounded-full ${nodeActive ? 'bg-white' : 'bg-white/30'}`} />
+                        <div className={`w-3 h-3 rounded-full ${nodeActive ? 'bg-white' : isDark ? 'bg-white/30' : 'bg-slate-400'}`} />
                       </div>
-                      <span className={`font-medium transition-colors ${nodeActive ? 'text-white' : 'text-white/40'}`}>
+                      <span className={`font-medium transition-colors ${
+                        nodeActive 
+                          ? isDark ? 'text-white' : 'text-slate-900' 
+                          : isDark ? 'text-white/40' : 'text-slate-400'
+                      }`}>
                         {node.label}
                       </span>
                       {index < nodes.length - 1 && (

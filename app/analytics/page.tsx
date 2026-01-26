@@ -3,6 +3,7 @@
 import ProtectedRoute from "@/components/auth/protected-route"
 import { useAuth } from "@/contexts/auth-context"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { GradientCard } from "@/components/ui/gradient-card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
@@ -152,49 +153,41 @@ function AnalyticsContent() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="glass-card hover-tilt group border-primary/20 hover:border-primary/40 transition-all duration-500 animate-fade-in">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Impact</CardTitle>
-                <LucidePieChart className="h-4 w-4 text-primary group-hover:scale-110 transition-transform duration-300" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-primary animate-number-glow">₦{loading ? "..." : stats.totalImpact.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">+ from last month</p>
-              </CardContent>
-            </Card>
+            <GradientCard
+              variant="emerald"
+              title="Total Impact"
+              icon={<LucidePieChart className="h-5 w-5" />}
+              value={`₦${loading ? "..." : stats.totalImpact.toLocaleString()}`}
+              subtitle="+ from last month"
+              className="animate-fade-in"
+            />
 
-            <Card className="glass-card hover-tilt group border-secondary/20 hover:border-secondary/40 transition-all duration-500 animate-fade-in delay-100">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Projects Supported</CardTitle>
-                <Target className="h-4 w-4 text-secondary group-hover:scale-110 transition-transform duration-300" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-secondary animate-number-glow">{loading ? "..." : stats.projectsSupported}</div>
-                <p className="text-xs text-muted-foreground">Specific initiatives</p>
-              </CardContent>
-            </Card>
+            <GradientCard
+              variant="purple"
+              title="Projects Supported"
+              icon={<Target className="h-5 w-5" />}
+              value={loading ? "..." : stats.projectsSupported}
+              subtitle="Specific initiatives"
+              className="animate-fade-in delay-100"
+            />
 
-            <Card className="glass-card hover-tilt group border-accent/20 hover:border-accent/40 transition-all duration-500 animate-fade-in delay-200">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Impact Score</CardTitle>
-                <Activity className="h-4 w-4 text-accent group-hover:scale-110 transition-transform duration-300" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-accent animate-number-glow">{loading ? "..." : stats.impactScore}</div>
-                <p className="text-xs text-muted-foreground">Partner Tier</p>
-              </CardContent>
-            </Card>
+            <GradientCard
+              variant="cyan"
+              title="Impact Score"
+              icon={<Activity className="h-5 w-5" />}
+              value={loading ? "..." : stats.impactScore}
+              subtitle="Partner Tier"
+              className="animate-fade-in delay-200"
+            />
 
-            <Card className="glass-card hover-tilt group border-primary/20 hover:border-primary/40 transition-all duration-500 animate-fade-in delay-300">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Consistency</CardTitle>
-                <Calendar className="h-4 w-4 text-primary group-hover:scale-110 transition-transform duration-300" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-primary animate-number-glow">{loading ? "..." : stats.consistency}</div>
-                <p className="text-xs text-muted-foreground">Months active</p>
-              </CardContent>
-            </Card>
+            <GradientCard
+              variant="amber"
+              title="Consistency"
+              icon={<Calendar className="h-5 w-5" />}
+              value={loading ? "..." : stats.consistency}
+              subtitle="Months active"
+              className="animate-fade-in delay-300"
+            />
           </div>
 
           <Tabs defaultValue="trends" className="space-y-6 animate-fade-in delay-400">
@@ -218,7 +211,8 @@ function AnalyticsContent() {
 
             <TabsContent value="trends" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="glass-card hover-tilt border-primary/10 hover:border-primary/30 transition-all duration-500">
+                <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/25 hover:-translate-y-1">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400" />
                   <CardHeader>
                     <CardTitle>Monthly Contributions</CardTitle>
                     <CardDescription>Your contribution history over the past 6 months</CardDescription>
@@ -249,7 +243,8 @@ function AnalyticsContent() {
                   </CardContent>
                 </Card>
 
-                <Card className="glass-card hover-tilt border-secondary/10 hover:border-secondary/30 transition-all duration-500">
+                <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/25 hover:-translate-y-1">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-400" />
                   <CardHeader>
                     <CardTitle>Impact Score Trend</CardTitle>
                     <CardDescription>How your impact score has evolved</CardDescription>
@@ -277,7 +272,8 @@ function AnalyticsContent() {
 
             <TabsContent value="impact" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="glass-card hover-tilt border-accent/10 hover:border-accent/30 transition-all duration-500">
+                <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/25 hover:-translate-y-1">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-400" />
                   <CardHeader>
                     <CardTitle>Impact by Category</CardTitle>
                     <CardDescription>Where your contributions are making the most difference</CardDescription>
@@ -305,7 +301,8 @@ function AnalyticsContent() {
                   </CardContent>
                 </Card>
 
-                <Card className="glass-card hover-tilt border-primary/10 hover:border-primary/30 transition-all duration-500">
+                <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/25 hover:-translate-y-1">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-400" />
                   <CardHeader>
                     <CardTitle>Impact Breakdown</CardTitle>
                     <CardDescription>Detailed view of your contributions by category</CardDescription>
@@ -332,7 +329,8 @@ function AnalyticsContent() {
 
             <TabsContent value="goals" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="glass-card hover-tilt border-secondary/10 hover:border-secondary/30 transition-all duration-500">
+                <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/25 hover:-translate-y-1">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-yellow-400" />
                   <CardHeader>
                     <CardTitle>2024 Goals Progress</CardTitle>
                     <CardDescription>Track your progress towards annual objectives</CardDescription>
@@ -352,7 +350,8 @@ function AnalyticsContent() {
                   </CardContent>
                 </Card>
 
-                <Card className="glass-card hover-tilt border-accent/10 hover:border-accent/30 transition-all duration-500">
+                <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-rose-500/25 hover:-translate-y-1">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-pink-400" />
                   <CardHeader>
                     <CardTitle>Recent Achievements</CardTitle>
                     <CardDescription>Milestones and badges you've earned</CardDescription>
@@ -392,7 +391,8 @@ function AnalyticsContent() {
             </TabsContent>
           </Tabs>
 
-          <Card className="glass-card hover-tilt border-primary/10 hover:border-primary/30 transition-all duration-500 animate-fade-in delay-500">
+          <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/25 hover:-translate-y-1 animate-fade-in delay-500">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400" />
             <CardHeader>
               <CardTitle>Your Impact Stories</CardTitle>
               <CardDescription>See how your contributions are making a real difference</CardDescription>
