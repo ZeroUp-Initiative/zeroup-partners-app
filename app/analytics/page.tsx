@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from "next/dynamic"
 import ProtectedRoute from "@/components/auth/protected-route"
 import { useAuth } from "@/contexts/auth-context"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,21 +14,21 @@ import Header from "@/components/layout/header"
 import { db } from "@/lib/firebase/client"
 import { collection, query, where, onSnapshot } from "firebase/firestore"
 import { useState, useEffect } from "react"
-import {
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
-  PieChart as RechartsPieChart,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-  Pie,
-} from "recharts"
+
+// Dynamic import for recharts to reduce initial bundle size
+const LineChart = dynamic(() => import("recharts").then((mod) => mod.LineChart), { ssr: false })
+const Line = dynamic(() => import("recharts").then((mod) => mod.Line), { ssr: false })
+const AreaChart = dynamic(() => import("recharts").then((mod) => mod.AreaChart), { ssr: false })
+const Area = dynamic(() => import("recharts").then((mod) => mod.Area), { ssr: false })
+const RechartsPieChart = dynamic(() => import("recharts").then((mod) => mod.PieChart), { ssr: false })
+const Cell = dynamic(() => import("recharts").then((mod) => mod.Cell), { ssr: false })
+const XAxis = dynamic(() => import("recharts").then((mod) => mod.XAxis), { ssr: false })
+const YAxis = dynamic(() => import("recharts").then((mod) => mod.YAxis), { ssr: false })
+const CartesianGrid = dynamic(() => import("recharts").then((mod) => mod.CartesianGrid), { ssr: false })
+const Tooltip = dynamic(() => import("recharts").then((mod) => mod.Tooltip), { ssr: false })
+const ResponsiveContainer = dynamic(() => import("recharts").then((mod) => mod.ResponsiveContainer), { ssr: false })
+const Legend = dynamic(() => import("recharts").then((mod) => mod.Legend), { ssr: false })
+const Pie = dynamic(() => import("recharts").then((mod) => mod.Pie), { ssr: false })
 
 function AnalyticsContent() {
   const { user } = useAuth()

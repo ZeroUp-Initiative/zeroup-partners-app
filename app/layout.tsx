@@ -1,17 +1,32 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Plus_Jakarta_Sans } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
+import dynamic from "next/dynamic"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { AppProviders } from "@/components/app-providers"
+
+// Dynamic import for AppProviders to reduce initial bundle
+const AppProviders = dynamic(
+  () => import("@/components/app-providers").then((mod) => mod.AppProviders),
+  { ssr: false }
+)
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-plus-jakarta-sans",
   display: "swap",
+  preload: true,
 })
+
+// Separate viewport export for themeColor (Next.js 14+)
+export const viewport: Viewport = {
+  themeColor: "#6366f1",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+}
 
 export const metadata: Metadata = {
   title: "Partners Hub | ZeroUp Initiative",
@@ -21,7 +36,6 @@ export const metadata: Metadata = {
   creator: "ZeroUp Initiative",
   publisher: "ZeroUp Initiative",
   manifest: "/manifest.json",
-  themeColor: "#6366f1",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
