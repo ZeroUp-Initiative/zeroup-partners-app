@@ -386,10 +386,10 @@ function CommunityContent() {
                       <CardDescription>Leading partners by period</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-4">
+                      <div className="space-y-3 sm:space-y-4">
                         {topContributors.map((contributor, index) => (
-                          <div key={index} className="flex items-center gap-3">
-                            <Avatar className="w-8 h-8">
+                          <div key={index} className="flex items-center gap-2 sm:gap-3">
+                            <Avatar className="w-7 h-7 sm:w-8 sm:h-8 flex-shrink-0">
                               {contributor.photoURL && (
                                 <AvatarImage src={contributor.photoURL} alt={contributor.name} />
                               )}
@@ -397,11 +397,11 @@ function CommunityContent() {
                                 {contributor.name?.charAt(0).toUpperCase() || '?'}
                               </AvatarFallback>
                             </Avatar>
-                            <div className="flex-1">
-                              <p className="font-medium">{contributor.name}</p>
-                              <p className="text-sm text-muted-foreground">{contributor.period}</p>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm sm:text-base truncate">{contributor.name}</p>
+                              <p className="text-xs sm:text-sm text-muted-foreground">{contributor.period}</p>
                             </div>
-                            <p className="font-bold">₦{contributor.amount.toLocaleString()}</p>
+                            <p className="font-bold text-sm sm:text-base flex-shrink-0">₦{contributor.amount.toLocaleString()}</p>
                           </div>
                         ))}
                       </div>

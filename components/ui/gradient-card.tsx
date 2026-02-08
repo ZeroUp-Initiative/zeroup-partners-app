@@ -73,7 +73,7 @@ export function GradientCard({
   return (
     <Card 
       className={cn(
-        "relative overflow-hidden transition-all duration-300 hover:-translate-y-1",
+        "relative overflow-hidden transition-all duration-300 hover:-translate-y-1 p-0",
         glowOnHover && `hover:shadow-xl ${styles.glow}`,
         className
       )} 
@@ -94,19 +94,19 @@ export function GradientCard({
         </svg>
       </div>
 
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-5">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-4 sm:pt-5 px-3 sm:px-6">
+        <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">{title}</CardTitle>
         {icon && (
-          <div className={cn("p-2.5 rounded-xl", styles.icon)}>
+          <div className={cn("p-1.5 sm:p-2.5 rounded-xl flex-shrink-0", styles.icon)}>
             {icon}
           </div>
         )}
       </CardHeader>
       
-      <CardContent className="relative overflow-hidden">
-        <div className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight truncate">{value}</div>
+      <CardContent className="relative overflow-hidden px-3 sm:px-6 pb-4 sm:pb-6">
+        <div className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight overflow-hidden">{value}</div>
         {subtitle && (
-          <p className="text-xs text-muted-foreground mt-1 truncate">{subtitle}</p>
+          <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 truncate">{subtitle}</p>
         )}
         {trend && (
           <div className={cn(

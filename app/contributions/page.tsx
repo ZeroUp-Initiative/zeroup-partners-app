@@ -213,36 +213,36 @@ function ContributionsContent() {
             <GradientCard
               variant="emerald"
               title="Total Verified"
-              icon={<CheckCircle className="h-5 w-5" />}
+              icon={<CheckCircle className="h-4 w-4 sm:h-5 sm:w-5" />}
               value={<CurrencyCounter value={totalContributions} duration={2000} />}
-              subtitle={`Across ${verifiedCount} contributions`}
+              subtitle={`${verifiedCount} contributions`}
             />
 
             <GradientCard
               variant="amber"
               title="Pending Review"
-              icon={<Clock className="h-5 w-5" />}
+              icon={<Clock className="h-4 w-4 sm:h-5 sm:w-5" />}
               value={<CurrencyCounter value={pendingAmount} duration={2000} />}
-              subtitle={`${pendingCount} ${pendingCount === 1 ? 'contribution' : 'contributions'} pending`}
+              subtitle={`${pendingCount} pending`}
             />
 
             <GradientCard
               variant="blue"
               title="This Month"
-              icon={<Calendar className="h-5 w-5" />}
+              icon={<Calendar className="h-4 w-4 sm:h-5 sm:w-5" />}
               value={<CurrencyCounter value={thisMonthAmount} duration={2000} />}
-              subtitle={`${thisMonthCount} verified this month`}
+              subtitle={`${thisMonthCount} verified`}
             />
 
             <GradientCard
               variant="rose"
               title="Declined"
-              icon={<AlertCircle className="h-5 w-5" />}
+              icon={<AlertCircle className="h-4 w-4 sm:h-5 sm:w-5" />}
               value={<AnimatedCounter value={declinedCount} duration={1500} />}
               subtitle={
-                declinedCount >= SUSPEND_THRESHOLD ? "Account suspended" : 
-                declinedCount >= FLAG_THRESHOLD ? "Account flagged" : 
-                "contributions declined"
+                declinedCount >= SUSPEND_THRESHOLD ? "Suspended" : 
+                declinedCount >= FLAG_THRESHOLD ? "Flagged" : 
+                "declined"
               }
               className={declinedCount >= FLAG_THRESHOLD ? "ring-2 ring-red-500/50" : ""}
             />

@@ -401,45 +401,45 @@ function DashboardPage() {
                         <GradientCard
                           variant="emerald"
                           title="Total Contributions"
-                          icon={<DollarSign className="h-5 w-5" />}
+                          icon={<DollarSign className="h-4 w-4 sm:h-5 sm:w-5" />}
                           value={<CurrencyCounter value={totalContributions} duration={2000} />}
-                          subtitle="Live total of all partner funds"
+                          subtitle="All partner funds"
                           className="col-span-2 lg:col-span-1"
                         />
 
                         <GradientCard
                           variant="rose"
                           title="My Contributions"
-                          icon={<Heart className="h-5 w-5" />}
+                          icon={<Heart className="h-4 w-4 sm:h-5 sm:w-5" />}
                           value={<CurrencyCounter value={myContributions} duration={2000} />}
-                          subtitle="Your personal impact"
+                          subtitle="Your impact"
                         />
 
                         <GradientCard
                           variant="cyan"
                           title="Impact Score"
-                          icon={<TrendingUp className="h-5 w-5" />}
+                          icon={<TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />}
                           value={
                             <div className="flex items-center justify-center">
                               <ProgressRing 
                                 value={impactScore} 
                                 max={100} 
-                                size={60} 
-                                strokeWidth={5}
+                                size={50} 
+                                strokeWidth={4}
                                 gradientColors={{ start: "#06b6d4", end: "#3b82f6" }}
                                 label="pts"
                               />
                             </div>
                           }
-                          subtitle={impactScore >= 80 ? "Outstanding!" : impactScore >= 50 ? "Great progress!" : "Keep contributing!"}
+                          subtitle={impactScore >= 80 ? "Outstanding!" : impactScore >= 50 ? "Great!" : "Keep going!"}
                         />
 
                         <GradientCard
                           variant="amber"
                           title="Badges Earned"
-                          icon={<Award className="h-5 w-5" />}
+                          icon={<Award className="h-4 w-4 sm:h-5 sm:w-5" />}
                           value={<AnimatedCounter value={badgesEarned} duration={1500} />}
-                          subtitle={badgesEarned === 0 ? "Start earning badges!" : `${7 - badgesEarned} more to unlock`}
+                          subtitle={badgesEarned === 0 ? "Start earning!" : `${7 - badgesEarned} to unlock`}
                         />
                       </>
                     )}
@@ -748,7 +748,7 @@ function DashboardPage() {
                                     <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
                                 </div>
                             ) : otherTopContributors.length > 0 ? (
-                                <div className="space-y-3">
+                                <div className="space-y-3 overflow-hidden">
                                     {otherTopContributors.map((contributor, index) => {
                                         const rankColors = [
                                             "from-slate-400 to-slate-500", // 2nd
@@ -760,24 +760,24 @@ function DashboardPage() {
                                         return (
                                             <div 
                                                 key={contributor.id} 
-                                                className="group flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-muted/50 to-muted/30 hover:from-muted hover:to-muted/50 transition-all duration-300 hover:-translate-x-1"
+                                                className="group flex items-center justify-between p-2 sm:p-3 rounded-xl bg-gradient-to-r from-muted/50 to-muted/30 hover:from-muted hover:to-muted/50 transition-all duration-300 gap-2"
                                             >
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br ${rankColors[index] || "from-gray-400 to-gray-500"} text-white font-bold text-sm shadow-sm`}>
+                                                <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                                                    <div className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br ${rankColors[index] || "from-gray-400 to-gray-500"} text-white font-bold text-xs sm:text-sm shadow-sm flex-shrink-0`}>
                                                         {index + 2}
                                                     </div>
-                                                    <Avatar className="h-10 w-10 ring-2 ring-background">
+                                                    <Avatar className="h-8 w-8 sm:h-10 sm:w-10 ring-2 ring-background flex-shrink-0">
                                                         <AvatarImage src={contributor.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${contributor.name}`} />
                                                         <AvatarFallback className="bg-gradient-to-br from-purple-400 to-pink-400 text-white">{contributor.name[0]}</AvatarFallback>
                                                     </Avatar>
-                                                    <div>
-                                                        <p className="font-semibold text-sm group-hover:text-primary transition-colors">{contributor.name}</p>
-                                                        <p className="text-xs text-muted-foreground">Top Contributor</p>
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="font-semibold text-xs sm:text-sm group-hover:text-primary transition-colors truncate">{contributor.name}</p>
+                                                        <p className="text-xs text-muted-foreground hidden sm:block">Top Contributor</p>
                                                     </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <p className="font-bold text-sm">₦{contributor.amount.toLocaleString()}</p>
-                                                    <p className="text-xs text-muted-foreground">Total</p>
+                                                <div className="text-right flex-shrink-0">
+                                                    <p className="font-bold text-xs sm:text-sm">₦{contributor.amount.toLocaleString()}</p>
+                                                    <p className="text-xs text-muted-foreground hidden sm:block">Total</p>
                                                 </div>
                                             </div>
                                         );
