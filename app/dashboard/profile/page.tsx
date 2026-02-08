@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { useAuth } from "@/contexts/auth-context"
 import { db, auth } from "@/lib/firebase/client"
-import { doc, updateDoc, setDoc } from "firebase/firestore"
+import { doc, updateDoc, setDoc, collection, query, where, getDocs } from "firebase/firestore"
 import { updatePassword, EmailAuthProvider, reauthenticateWithCredential, updateProfile } from "firebase/auth"
 import { uploadImage, validateImageFile } from "@/lib/image-upload"
 import { Button } from "@/components/ui/button"
@@ -13,11 +13,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Loader2, User, Lock, Calendar, Save, ArrowLeft, Camera, Upload, X, Bell } from "lucide-react"
+import { Loader2, User, Lock, Calendar, Save, ArrowLeft, Camera, Upload, X, Bell, Award } from "lucide-react"
 import Link from "next/link"
 import toast from "react-hot-toast"
 import ProtectedRoute from "@/components/auth/protected-route"
 import { NotificationPreferencesCard } from "@/components/notifications/notification-preferences"
+import { PartnerFlierCard } from "@/components/partner-flier-card"
 
 function ProfileContent() {
   const { user, isLoading: isAuthLoading } = useAuth()
@@ -34,6 +35,8 @@ function ProfileContent() {
   const [isLoading, setIsLoading] = useState(false)
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
   const [message, setMessage] = useState({ type: "", text: "" })
+  const [totalContributions, setTotalContributions] = useState(0)
+  const [customFlierMessage, setCustomFlierMessage] = useState("")
   
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -45,6 +48,28 @@ function ProfileContent() {
       setPhotoURL(user.photoURL || "")
     }
   }, [user])
+
+  // Fetch user's total verified contributions
+  useEffect(() => {
+    if (!user?.uid || !db) return;
+
+    const fetchContributions = async () => {
+      try {
+        const paymentsQuery = query(
+          collection(db, "payments"),
+          where("userId", "==", user.uid),
+          where("status", "==", "verified")
+        );
+        const snapshot = await getDocs(paymentsQuery);
+        const total = snapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
+        setTotalContributions(total);
+      } catch (error) {
+        console.error("Error fetching contributions:", error);
+      }
+    };
+
+    fetchContributions();
+  }, [user?.uid]);
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -277,10 +302,11 @@ function ProfileContent() {
       </div>
 
       <Tabs defaultValue="general" className="w-full">
-        <TabsList className="mb-8 grid w-full grid-cols-3 sm:w-auto sm:inline-flex">
+        <TabsList className="mb-8 grid w-full grid-cols-4 sm:w-auto sm:inline-flex">
           <TabsTrigger value="general" className="gap-2 text-xs sm:text-sm"><User className="w-4 h-4" /> <span className="hidden sm:inline">General</span><span className="sm:hidden">Info</span></TabsTrigger>
           <TabsTrigger value="security" className="gap-2 text-xs sm:text-sm"><Lock className="w-4 h-4" /> Security</TabsTrigger>
           <TabsTrigger value="notifications" className="gap-2 text-xs sm:text-sm"><Bell className="w-4 h-4" /> <span className="hidden sm:inline">Notifications</span><span className="sm:hidden">Alerts</span></TabsTrigger>
+          <TabsTrigger value="flier" className="gap-2 text-xs sm:text-sm"><Award className="w-4 h-4" /> <span className="hidden sm:inline">My Flier</span><span className="sm:hidden">Flier</span></TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">
@@ -370,6 +396,75 @@ function ProfileContent() {
 
         <TabsContent value="notifications">
           <NotificationPreferencesCard />
+        </TabsContent>
+
+        <TabsContent value="flier">
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Partner Flier Preview */}
+            <div>
+              <Card className="mb-4">
+                <CardHeader>
+                  <CardTitle>Your Partner Flier</CardTitle>
+                  <CardDescription>
+                    Download and share your personalized partner recognition card on social media.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+              {totalContributions > 0 ? (
+                <PartnerFlierCard
+                  variant="regular"
+                  name={`${firstName} ${lastName}`.trim() || user?.email?.split('@')[0] || 'Partner'}
+                  amount={totalContributions}
+                  photoURL={photoURL}
+                  month={new Date().toLocaleString('default', { month: 'long' })}
+                  year={new Date().getFullYear()}
+                  customMessage={customFlierMessage || undefined}
+                  showDownload={true}
+                />
+              ) : (
+                <Card className="p-8">
+                  <div className="text-center space-y-4">
+                    <Award className="w-16 h-16 mx-auto text-muted-foreground" />
+                    <h3 className="text-lg font-semibold">No Contributions Yet</h3>
+                    <p className="text-muted-foreground">
+                      Start contributing to get your personalized partner flier that you can share on social media!
+                    </p>
+                    <Link href="/contributions">
+                      <Button>Log Your First Contribution</Button>
+                    </Link>
+                  </div>
+                </Card>
+              )}
+            </div>
+
+            {/* Customization Options */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Customize Your Flier</CardTitle>
+                <CardDescription>Add a personal message to your flier.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="customMessage">Custom Message (optional)</Label>
+                  <Input
+                    id="customMessage"
+                    placeholder="Thank you for being part of this journey..."
+                    value={customFlierMessage}
+                    onChange={(e) => setCustomFlierMessage(e.target.value)}
+                    maxLength={100}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {customFlierMessage.length}/100 characters
+                  </p>
+                </div>
+                <div className="text-sm text-muted-foreground space-y-2">
+                  <p><strong>Your Stats:</strong></p>
+                  <p>• Total Verified Contributions: ₦{totalContributions.toLocaleString()}</p>
+                  <p>• Share your flier on Instagram, Facebook, Twitter, or WhatsApp to inspire others!</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

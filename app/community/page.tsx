@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Trophy, Medal, Award, LogOut, Search, Users, TrendingUp, Crown, Star, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import Header from "@/components/layout/header"
+import { PartnerFlierModal } from "@/components/partner-flier-card"
 
 function CommunityContent() {
   const { user } = useAuth()
@@ -341,16 +342,28 @@ function CommunityContent() {
                           >
                             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                               {getRankIcon(partner.rank)}
-                              <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
-                                {partner.photoURL && (
-                                  <AvatarImage src={partner.photoURL} alt={partner.name} />
-                                )}
-                                <AvatarFallback
-                                  className={partner.isCurrentUser ? "bg-primary text-primary-foreground" : ""}
-                                >
-                                  {partner.avatar}
-                                </AvatarFallback>
-                              </Avatar>
+                              <PartnerFlierModal
+                                trigger={
+                                  <button className="cursor-pointer hover:opacity-80 transition-opacity">
+                                    <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
+                                      {partner.photoURL && (
+                                        <AvatarImage src={partner.photoURL} alt={partner.name} />
+                                      )}
+                                      <AvatarFallback
+                                        className={partner.isCurrentUser ? "bg-primary text-primary-foreground" : ""}
+                                      >
+                                        {partner.avatar}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                  </button>
+                                }
+                                partner={{
+                                  name: partner.name,
+                                  amount: partner.totalContributions,
+                                  photoURL: partner.photoURL,
+                                }}
+                                variant={partner.rank === 1 ? "top-partner" : "regular"}
+                              />
                             </div>
 
                             <div className="flex-1 min-w-0">
