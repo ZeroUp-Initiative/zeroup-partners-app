@@ -46,74 +46,72 @@ export function MobileNav() {
   ]
 
 return (
-  <div className="fixed bottom-0 left-0 right-0 z-50 flex h-16 items-center justify-around border-t border-border/40 bg-background/95 backdrop-blur-lg md:hidden px-4">
+  <div className="fixed bottom-0 left-0 right-0 z-50 flex h-16 items-center justify-between border-t border-border/40 bg-background/95 backdrop-blur-lg md:hidden px-2 w-full max-w-full overflow-hidden">
     
-    {/* Left side */}
-    <div className="flex items-center justify-center">
-      <Link
-        href="/dashboard"
-        className={cn(
-          "flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-lg transition-all duration-200 font-medium",
-          pathname === "/dashboard"
-            ? "text-primary font-bold"
-            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-        )}
-      >
-        <Home className="h-5 w-5" />
-        <span className="text-xs font-medium">Home</span>
-      </Link>
+    {/* Home */}
+    <Link
+      href="/dashboard"
+      className={cn(
+        "flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 rounded-lg transition-all duration-200 font-medium min-w-0 flex-1",
+        pathname === "/dashboard"
+          ? "text-primary font-bold"
+          : "text-muted-foreground hover:text-foreground"
+      )}
+    >
+      <Home className="h-5 w-5 flex-shrink-0" />
+      <span className="text-[10px] font-medium truncate">Home</span>
+    </Link>
 
-      <Link
-        href="/projects"
-        className={cn(
-          "flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-lg transition-all duration-200 font-medium",
-          pathname === "/projects"
-            ? "text-primary font-bold"
-            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-        )}
-      >
-        <LayoutGrid className="h-5 w-5" />
-        <span className="text-xs font-medium">Projects</span>
-      </Link>
-    </div>
+    {/* Projects */}
+    <Link
+      href="/projects"
+      className={cn(
+        "flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 rounded-lg transition-all duration-200 font-medium min-w-0 flex-1",
+        pathname === "/projects"
+          ? "text-primary font-bold"
+          : "text-muted-foreground hover:text-foreground"
+      )}
+    >
+      <LayoutGrid className="h-5 w-5 flex-shrink-0" />
+      <span className="text-[10px] font-medium truncate">Projects</span>
+    </Link>
 
     {/* Center plus */}
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center px-1 flex-shrink-0">
       <LogContributionModal>
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-transform active:scale-95">
-          <PlusCircle className="h-6 w-6" />
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-transform active:scale-95">
+          <PlusCircle className="h-5 w-5" />
         </div>
       </LogContributionModal>
     </div>
 
-    {/* Right side */}
-    <div className="flex items-center justify-center">
-      <Link
-        href="/contributions"
-        className={cn(
-          "flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-lg transition-all duration-200 font-medium",
-          pathname === "/contributions"
-            ? "text-primary font-bold"
-            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-        )}
-      >
-        <Users className="h-5 w-5" />
-        <span className="text-xs font-medium">Contributions</span>
-      </Link>
+    {/* Logs */}
+    <Link
+      href="/contributions"
+      className={cn(
+        "flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 rounded-lg transition-all duration-200 font-medium min-w-0 flex-1",
+        pathname === "/contributions"
+          ? "text-primary font-bold"
+          : "text-muted-foreground hover:text-foreground"
+      )}
+    >
+      <Users className="h-5 w-5 flex-shrink-0" />
+      <span className="text-[10px] font-medium truncate">Logs</span>
+    </Link>
 
-      <Link
-        href="/dashboard/transactions"
-        className={cn(
-          "flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-lg transition-all duration-200 font-medium",
-          pathname === "/dashboard/transactions"
-            ? "text-primary font-bold"
-            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-        )}
-      >
-        <User className="h-5 w-5" />
-        <span className="text-xs font-medium">Transactions</span>
-      </Link>
-    </div>
+    {/* History */}
+    <Link
+      href="/dashboard/transactions"
+      className={cn(
+        "flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 rounded-lg transition-all duration-200 font-medium min-w-0 flex-1",
+        pathname === "/dashboard/transactions"
+          ? "text-primary font-bold"
+          : "text-muted-foreground hover:text-foreground"
+      )}
+    >
+      <User className="h-5 w-5 flex-shrink-0" />
+      <span className="text-[10px] font-medium truncate">History</span>
+    </Link>
 
   </div>
 )

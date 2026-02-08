@@ -420,12 +420,12 @@ function DashboardPage() {
                           title="Impact Score"
                           icon={<TrendingUp className="h-5 w-5" />}
                           value={
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center justify-center">
                               <ProgressRing 
                                 value={impactScore} 
                                 max={100} 
-                                size={70} 
-                                strokeWidth={6}
+                                size={60} 
+                                strokeWidth={5}
                                 gradientColors={{ start: "#06b6d4", end: "#3b82f6" }}
                                 label="pts"
                               />

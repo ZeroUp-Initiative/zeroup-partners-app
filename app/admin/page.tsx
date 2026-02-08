@@ -171,7 +171,7 @@ function AdminDashboard() {
           <CardTitle>Pending Contributions</CardTitle>
           <CardDescription>There are {pendingPayments.length} contributions awaiting approval.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -210,7 +210,7 @@ function AdminDashboard() {
           <CardTitle>Contribution History</CardTitle>
           <CardDescription>A log of all approved and rejected contributions.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>

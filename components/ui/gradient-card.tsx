@@ -103,10 +103,10 @@ export function GradientCard({
         )}
       </CardHeader>
       
-      <CardContent className="relative">
-        <div className="text-2xl md:text-3xl font-bold tracking-tight">{value}</div>
+      <CardContent className="relative overflow-hidden">
+        <div className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight truncate">{value}</div>
         {subtitle && (
-          <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
+          <p className="text-xs text-muted-foreground mt-1 truncate">{subtitle}</p>
         )}
         {trend && (
           <div className={cn(

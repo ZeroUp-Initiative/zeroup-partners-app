@@ -285,36 +285,36 @@ function ContributionsContent() {
                         contribution.status === 'pending' ? 'bg-gradient-to-r from-amber-500 to-yellow-400' :
                         'bg-gradient-to-r from-red-500 to-rose-400'
                       }`} />
-                      <CardContent className="p-6">
-                          <div className="flex items-center justify-between flex-wrap gap-4">
-                              <div className="flex items-center gap-4">
-                                  <div className={`p-3 rounded-xl transition-transform duration-300 group-hover:scale-110 ${
+                      <CardContent className="p-4 sm:p-6">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                              <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                                  <div className={`p-2 sm:p-3 rounded-xl transition-transform duration-300 group-hover:scale-110 flex-shrink-0 ${
                                     contribution.status === 'approved' ? 'bg-gradient-to-br from-emerald-500/20 to-teal-400/20' :
                                     contribution.status === 'pending' ? 'bg-gradient-to-br from-amber-500/20 to-yellow-400/20' :
                                     'bg-gradient-to-br from-red-500/20 to-rose-400/20'
                                   }`}>
                                       {getStatusIcon(contribution.status)}
                                   </div>
-                                  <div>
-                                  <h3 className="font-semibold group-hover:text-primary transition-colors">{contribution.description}</h3>
+                                  <div className="min-w-0 flex-1">
+                                  <h3 className="font-semibold group-hover:text-primary transition-colors truncate">{contribution.description}</h3>
                                   <p className="text-sm text-muted-foreground">
                                       {contribution.date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
                                   </p>
                                   {contribution.status === "declined" && contribution.rejectionReason && (
-                                      <p className="text-sm text-red-500 mt-1"><b>Reason:</b> {contribution.rejectionReason}</p>
+                                      <p className="text-sm text-red-500 mt-1 truncate"><b>Reason:</b> {contribution.rejectionReason}</p>
                                   )}
                                   </div>
                               </div>
-                              <div className="flex items-center gap-4">
-                                  <div className="text-right">
-                                    <p className="text-2xl font-bold tabular-nums">₦{contribution.amount.toLocaleString()}</p>
+                              <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
+                                  <div className="text-left sm:text-right">
+                                    <p className="text-xl sm:text-2xl font-bold tabular-nums">₦{contribution.amount.toLocaleString()}</p>
                                     {getStatusBadge(contribution.status)}
                                   </div>
                                   {contribution.proofURL &&
-                                    <Button variant="outline" size="sm" asChild className="hover:bg-primary hover:text-primary-foreground transition-colors">
+                                    <Button variant="outline" size="sm" asChild className="hover:bg-primary hover:text-primary-foreground transition-colors flex-shrink-0">
                                       <Link href={contribution.proofURL} target="_blank">
-                                          <FileText className="w-4 h-4 mr-2" />
-                                          View Proof
+                                          <FileText className="w-4 h-4 sm:mr-2" />
+                                          <span className="hidden sm:inline">View Proof</span>
                                       </Link>
                                     </Button>
                                   }

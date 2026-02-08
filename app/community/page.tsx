@@ -333,15 +333,15 @@ function CommunityContent() {
                         {leaderboard.map((partner) => (
                           <div
                             key={partner.rank}
-                            className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${
+                            className={`flex items-center gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg transition-colors ${
                               partner.isCurrentUser
                                 ? "bg-primary/10 border border-primary/20"
                                 : "bg-muted/50 hover:bg-muted/70"
                             }`}
                           >
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                               {getRankIcon(partner.rank)}
-                              <Avatar className="w-10 h-10">
+                              <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
                                 {partner.photoURL && (
                                   <AvatarImage src={partner.photoURL} alt={partner.name} />
                                 )}
@@ -353,17 +353,17 @@ function CommunityContent() {
                               </Avatar>
                             </div>
 
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <p className="font-semibold">{partner.name}</p>
-                                {partner.isCurrentUser && <Badge variant="secondary">You</Badge>}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <p className="font-semibold truncate">{partner.name}</p>
+                                {partner.isCurrentUser && <Badge variant="secondary" className="flex-shrink-0">You</Badge>}
                               </div>
-                              <p className="text-sm text-muted-foreground">{partner.organization}</p>
+                              <p className="text-sm text-muted-foreground truncate">{partner.organization}</p>
                             </div>
 
-                            <div className="text-right space-y-1">
-                              <p className="font-bold">₦{partner.totalContributions.toLocaleString()}</p>
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <div className="text-right space-y-1 flex-shrink-0">
+                              <p className="font-bold text-sm sm:text-base">₦{partner.totalContributions.toLocaleString()}</p>
+                              <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
                                 <span>Score: {partner.impactScore}</span>
                                 <Badge variant="outline" className="text-xs">
                                   {partner.badges} badges
