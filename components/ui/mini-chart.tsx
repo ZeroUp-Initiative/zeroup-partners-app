@@ -179,6 +179,7 @@ export function MiniBarChart({
 }: MiniBarChartProps) {
   const [isVisible, setIsVisible] = useState(!animate)
   const containerRef = useRef<HTMLDivElement>(null)
+  const gradientId = `bar-gradient-${React.useId()}`
   
   useEffect(() => {
     if (!animate) return
@@ -211,8 +212,6 @@ export function MiniBarChart({
 
   const maxValue = Math.max(...data.map(d => d.value), 1)
   const barHeight = height - (showLabels ? 24 : 0) - (showValues ? 20 : 0)
-  
-  const gradientId = `bar-gradient-${React.useId()}`
 
   return (
     <div ref={containerRef} className={cn("w-full", className)}>

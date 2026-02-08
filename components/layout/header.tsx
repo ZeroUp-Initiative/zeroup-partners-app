@@ -35,13 +35,13 @@ export default function Header({ title, subtitle }: HeaderProps) {
             <Link href="/dashboard" className="flex items-center gap-3 group">
               <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-lg group-hover:shadow-primary/25 transition-all duration-300 md:w-11 md:h-11">
                 <Image
-                  src="/zeroup-partners-logo-light-mode.png"
+                  src="/images/zeroup-partners-logo-light-mode.png"
                   alt="ZeroUp Partners Logo"
                   fill
                   className="object-contain dark:hidden"
                 />
                 <Image
-                  src="/zeroup-partners-logo-dark-mode.png"
+                  src="/images/zeroup-partners-logo-dark-mode.png"
                   alt="ZeroUp Partners Logo"
                   fill
                   className="object-contain hidden dark:block"

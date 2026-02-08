@@ -14,8 +14,9 @@ const isBrowser = typeof window !== 'undefined';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { DollarSign, Target, TrendingUp, Award, Plus, BarChart, Users, Heart, Trophy, Medal, Star, Receipt, Banknote, Copy } from "lucide-react"
+import { DollarSign, Target, TrendingUp, Award, Plus, BarChart, Users, Heart, Trophy, Medal, Star, Receipt, Banknote, Copy, Crown, Sparkles, CalendarDays, ChevronDown } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { CardSkeleton, Skeleton } from "@/components/ui/skeleton"
 import { GradientCard } from "@/components/ui/gradient-card"
@@ -39,12 +40,34 @@ function DashboardPage() {
   const [otherTopContributors, setOtherTopContributors] = useState<{name: string, amount: number, id: string, photoURL?: string}[]>([]);
   const [monthlyTrend, setMonthlyTrend] = useState<MonthlyData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [usersMap, setUsersMap] = useState<Map<string, any>>(new Map());
+  const [paymentsData, setPaymentsData] = useState<any[]>([]);
+  const [monthlyTopPartners, setMonthlyTopPartners] = useState<Map<string, {name: string, amount: number, id: string, photoURL?: string, month: string, year: number}>>(new Map());
+  const [selectedMonth, setSelectedMonth] = useState<string>(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${now.getMonth()}`;
+  });
 
   const copyAccountNumber = () => {
     const accountNumber = "0219230107"
     navigator.clipboard.writeText(accountNumber)
     toast.success("Account number copied to clipboard!")
   }
+
+  // Subscribe to users data for photoURLs
+  useEffect(() => {
+    if (!isBrowser || !user || !db) return;
+
+    const unsubUsers = onSnapshot(collection(db, "users"), (snapshot) => {
+      const userMap = new Map<string, any>();
+      snapshot.forEach(doc => {
+        userMap.set(doc.id, { id: doc.id, ...doc.data() });
+      });
+      setUsersMap(userMap);
+    });
+
+    return () => unsubUsers();
+  }, [user]);
 
   useEffect(() => {
     if (!isBrowser || !user || !db) {
@@ -55,126 +78,9 @@ function DashboardPage() {
     // Listener for all approved contributions
     const paymentsQuery = query(collection(db, "payments"), where("status", "==", "approved"));
     const unsubscribeTotal = onSnapshot(paymentsQuery, (snapshot) => {
-      let total = 0;
-      const monthlyContributions: Record<string, { amount: number, name: string }> = {};
-      const allTimeContributions: Record<string, { amount: number, name: string }> = {};
-      const monthlyTrendData: Record<string, number> = {};
-      const now = new Date();
-      const currentMonth = now.getMonth();
-      const currentYear = now.getFullYear();
-
-      // Initialize last 6 months for trend
-      for (let i = 5; i >= 0; i--) {
-        const d = new Date(currentYear, currentMonth - i, 1);
-        const key = `${d.getFullYear()}-${d.getMonth()}`;
-        monthlyTrendData[key] = 0;
-      }
-
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        total += data.amount;
-
-        // Check for monthly top partner
-        let paymentDate = null;
-        if (data.date && typeof data.date.toDate === 'function') {
-           paymentDate = data.date.toDate();
-        } else if (data.createdAt && typeof data.createdAt.toDate === 'function') {
-           paymentDate = data.createdAt.toDate(); // Fallback to createdAt
-        } else if (data.date instanceof Date) {
-           paymentDate = data.date;
-        } else if (data.createdAt instanceof Date) {
-           paymentDate = data.createdAt;
-        }
-
-        if (paymentDate) {
-          const paymentMonth = paymentDate.getMonth();
-          const paymentYear = paymentDate.getFullYear();
-          
-          // Track monthly trend (last 6 months)
-          const trendKey = `${paymentYear}-${paymentMonth}`;
-          if (trendKey in monthlyTrendData) {
-            monthlyTrendData[trendKey] += data.amount;
-          }
-          
-          if (paymentMonth === currentMonth && paymentYear === currentYear) {
-             if (data.userId) {
-                if (!monthlyContributions[data.userId]) {
-                    monthlyContributions[data.userId] = { amount: 0, name: data.userFullName || 'Unknown User' };
-                }
-                monthlyContributions[data.userId].amount += data.amount;
-                if (data.userFullName) monthlyContributions[data.userId].name = data.userFullName;
-             }
-          }
-        }
-
-        // Collect all-time contributions for other top contributors
-        if (data.userId) {
-          if (!allTimeContributions[data.userId]) {
-              allTimeContributions[data.userId] = { amount: 0, name: data.userFullName || 'Unknown User' };
-          }
-          allTimeContributions[data.userId].amount += data.amount;
-          if (data.userFullName) allTimeContributions[data.userId].name = data.userFullName;
-        }
-      });
-      setTotalContributions(total);
-
-      // Find top monthly partner
-      let max = 0;
-      let top: {id: string, amount: number, name: string, photoURL?: string} | null = null;
-      Object.entries(monthlyContributions).forEach(([id, p]) => {
-          if (p.amount > max) {
-              max = p.amount;
-              // Use current user's name from auth context if this is them
-              let displayName = p.name;
-              if (id === user.uid) {
-                  if (user.firstName && user.lastName) {
-                      displayName = `${user.firstName} ${user.lastName}`;
-                  } else if (user.displayName) {
-                      displayName = user.displayName;
-                  }
-              }
-              top = { id, amount: p.amount, name: displayName, photoURL: id === user.uid ? user.photoURL : undefined };
-          }
-      });
-      setTopPartner(top);
-
-      // Find other top contributors (all-time, excluding current top partner)
-      const sortedContributors = Object.entries(allTimeContributions)
-          .map(([id, p]) => {
-              // Use current user's name from auth context if this is them
-              let displayName = p.name;
-              if (id === user.uid) {
-                  if (user.firstName && user.lastName) {
-                      displayName = `${user.firstName} ${user.lastName}`;
-                  } else if (user.displayName) {
-                      displayName = user.displayName;
-                  }
-              }
-              return { id, amount: p.amount, name: displayName, photoURL: id === user.uid ? user.photoURL : undefined };
-          })
-          .sort((a, b) => b.amount - a.amount)
-          .filter(contributor => contributor.id !== top?.id) // Exclude current top partner
-          .slice(0, 5); // Get top 5 others
-      
-      setOtherTopContributors(sortedContributors);
-
-      // Set monthly trend data - sort by date to ensure correct order
-      const trendArray: MonthlyData[] = Object.entries(monthlyTrendData)
-        .map(([key, value]) => {
-          const [year, month] = key.split('-').map(Number);
-          const date = new Date(year, month);
-          return {
-            label: date.toLocaleString('default', { month: 'short' }),
-            value,
-            sortKey: year * 12 + month // Use for sorting
-          };
-        })
-        .sort((a, b) => a.sortKey - b.sortKey) // Sort chronologically
-        .map(({ label, value }) => ({ label, value })); // Remove sortKey
-      
-      setMonthlyTrend(trendArray);
-
-      setIsLoading(false); // Set loading to false once we have the data
+      const payments: any[] = [];
+      snapshot.forEach((doc) => payments.push({ id: doc.id, ...doc.data() }));
+      setPaymentsData(payments);
     });
 
     // Listener for the current user's contributions
@@ -200,43 +106,254 @@ function DashboardPage() {
         // Track months active
         let paymentDate = null;
         if (data.date && typeof data.date.toDate === 'function') {
-          paymentDate = data.date.toDate();
+           paymentDate = data.date.toDate();
         } else if (data.createdAt && typeof data.createdAt.toDate === 'function') {
-          paymentDate = data.createdAt.toDate();
+           paymentDate = data.createdAt.toDate();
         }
         if (paymentDate) {
-          monthsActive.add(`${paymentDate.getMonth()}-${paymentDate.getFullYear()}`);
+          monthsActive.add(`${paymentDate.getFullYear()}-${paymentDate.getMonth()}`);
         }
       });
       
       setMyContributions(myTotal);
       
-      // Calculate Impact Score (0-100)
-      // Based on: contribution amount (40%), consistency (30%), projects supported (30%)
-      const contributionScore = Math.min(40, Math.floor(myTotal / 2500) * 10); // Max 40 points at ₦10,000+
-      const consistencyScore = Math.min(30, monthsActive.size * 5); // Max 30 points at 6+ months
-      const projectsScore = Math.min(30, uniqueProjects.size * 10); // Max 30 points at 3+ projects
-      const calculatedScore = contributionScore + consistencyScore + projectsScore;
-      setImpactScore(calculatedScore);
+      // Calculate impact score and badges based on actual contributions
+      const score = Math.min(100, Math.round((myTotal / 500000) * 100));
+      setImpactScore(score);
       
-      // Calculate badges based on achievements
-      let badges = 0;
-      if (myTotal >= 5000) badges++; // First ₦5,000 badge
-      if (myTotal >= 25000) badges++; // ₦25,000 badge
-      if (myTotal >= 100000) badges++; // ₦100,000 badge
-      if (monthsActive.size >= 3) badges++; // 3 months consistent badge
-      if (monthsActive.size >= 6) badges++; // 6 months consistent badge
-      if (uniqueProjects.size >= 2) badges++; // Multi-project supporter badge
-      if (snapshot.size >= 5) badges++; // 5+ contributions badge
+      // Badges: 1 per 10,000 contributed, max 10
+      const badges = Math.min(10, Math.floor(myTotal / 10000));
       setBadgesEarned(badges);
     });
 
-    // Cleanup listeners on component unmount
     return () => {
       unsubscribeTotal();
       unsubscribeMine();
     };
   }, [user]);
+
+  // Process payments data with user photos
+  useEffect(() => {
+    if (paymentsData.length === 0) {
+      setIsLoading(false);
+      return;
+    }
+
+    let total = 0;
+    const monthlyContributions: Record<string, { amount: number, name: string }> = {};
+    const allTimeContributions: Record<string, { amount: number, name: string }> = {};
+    const monthlyTrendData: Record<string, number> = {};
+    // Track contributions per month per user for historic top partners
+    const perMonthContributions: Record<string, Record<string, { amount: number, name: string, id: string }>> = {};
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // Initialize last 12 months for tracking
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(currentYear, currentMonth - i, 1);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      monthlyTrendData[key] = 0;
+      perMonthContributions[key] = {};
+    }
+
+    paymentsData.forEach((data) => {
+      total += data.amount;
+
+      // Check for monthly top partner
+      let paymentDate = null;
+      if (data.date && typeof data.date.toDate === 'function') {
+        paymentDate = data.date.toDate();
+      } else if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+        paymentDate = data.createdAt.toDate();
+      } else if (data.date instanceof Date) {
+        paymentDate = data.date;
+      } else if (data.createdAt instanceof Date) {
+        paymentDate = data.createdAt;
+      }
+
+      if (paymentDate) {
+        const paymentMonth = paymentDate.getMonth();
+        const paymentYear = paymentDate.getFullYear();
+        
+        // Track monthly trend (last 6 months)
+        const trendKey = `${paymentYear}-${paymentMonth}`;
+        if (trendKey in monthlyTrendData) {
+          monthlyTrendData[trendKey] += data.amount;
+        }
+        
+        // Track per-month contributions for all months
+        if (trendKey in perMonthContributions && data.userId) {
+          if (!perMonthContributions[trendKey][data.userId]) {
+            perMonthContributions[trendKey][data.userId] = { 
+              amount: 0, 
+              name: data.userFullName || 'Unknown User',
+              id: data.userId 
+            };
+          }
+          perMonthContributions[trendKey][data.userId].amount += data.amount;
+          if (data.userFullName) perMonthContributions[trendKey][data.userId].name = data.userFullName;
+        }
+        
+        if (paymentMonth === currentMonth && paymentYear === currentYear) {
+          if (data.userId) {
+            if (!monthlyContributions[data.userId]) {
+              monthlyContributions[data.userId] = { amount: 0, name: data.userFullName || 'Unknown User' };
+            }
+            monthlyContributions[data.userId].amount += data.amount;
+            if (data.userFullName) monthlyContributions[data.userId].name = data.userFullName;
+          }
+        }
+      }
+
+      // Collect all-time contributions for other top contributors
+      if (data.userId) {
+        if (!allTimeContributions[data.userId]) {
+          allTimeContributions[data.userId] = { amount: 0, name: data.userFullName || 'Unknown User' };
+        }
+        allTimeContributions[data.userId].amount += data.amount;
+        if (data.userFullName) allTimeContributions[data.userId].name = data.userFullName;
+      }
+    });
+    setTotalContributions(total);
+
+    // Find top monthly partner with photoURL from usersMap
+    let max = 0;
+    let top: {id: string, amount: number, name: string, photoURL?: string} | null = null;
+    Object.entries(monthlyContributions).forEach(([id, p]) => {
+      if (p.amount > max) {
+        max = p.amount;
+        const userData = usersMap.get(id);
+        
+        // Determine display name
+        let displayName = p.name;
+        if (id === user?.uid) {
+          if (user.firstName && user.lastName) {
+            displayName = `${user.firstName} ${user.lastName}`;
+          } else if (user.displayName) {
+            displayName = user.displayName;
+          }
+        } else if (userData?.firstName && userData?.lastName) {
+          displayName = `${userData.firstName} ${userData.lastName}`;
+        } else if (userData?.displayName) {
+          displayName = userData.displayName;
+        }
+        
+        // Get photoURL from usersMap for all users
+        const photoURL = id === user?.uid 
+          ? (user?.photoURL || userData?.photoURL) 
+          : userData?.photoURL;
+        
+        top = { id, amount: p.amount, name: displayName, photoURL };
+      }
+    });
+    setTopPartner(top);
+
+    // Find other top contributors (all-time, excluding current top partner) with photoURLs
+    const sortedContributors = Object.entries(allTimeContributions)
+      .map(([id, p]) => {
+        const userData = usersMap.get(id);
+        
+        // Determine display name
+        let displayName = p.name;
+        if (id === user?.uid) {
+          if (user.firstName && user.lastName) {
+            displayName = `${user.firstName} ${user.lastName}`;
+          } else if (user.displayName) {
+            displayName = user.displayName;
+          }
+        } else if (userData?.firstName && userData?.lastName) {
+          displayName = `${userData.firstName} ${userData.lastName}`;
+        } else if (userData?.displayName) {
+          displayName = userData.displayName;
+        }
+        
+        // Get photoURL from usersMap for all users
+        const photoURL = id === user?.uid 
+          ? (user?.photoURL || userData?.photoURL) 
+          : userData?.photoURL;
+        
+        return { id, amount: p.amount, name: displayName, photoURL };
+      })
+      .sort((a, b) => b.amount - a.amount)
+      .filter(contributor => contributor.id !== top?.id)
+      .slice(0, 5);
+    
+    setOtherTopContributors(sortedContributors);
+
+    // Calculate top partner for each month
+    const topPartnersMap = new Map<string, {name: string, amount: number, id: string, photoURL?: string, month: string, year: number}>();
+    
+    Object.entries(perMonthContributions).forEach(([monthKey, contributions]) => {
+      const [yearStr, monthStr] = monthKey.split('-');
+      const year = parseInt(yearStr);
+      const month = parseInt(monthStr);
+      const monthName = new Date(year, month).toLocaleString('default', { month: 'long' });
+      
+      let maxAmount = 0;
+      let topContributor: {id: string, amount: number, name: string} | null = null;
+      
+      Object.entries(contributions).forEach(([userId, data]) => {
+        if (data.amount > maxAmount) {
+          maxAmount = data.amount;
+          topContributor = { id: userId, amount: data.amount, name: data.name };
+        }
+      });
+      
+      if (topContributor) {
+        const userData = usersMap.get(topContributor.id);
+        
+        // Determine display name with proper fallbacks
+        let displayName = topContributor.name || 'Partner';
+        if (topContributor.id === user?.uid) {
+          if (user.firstName && user.lastName) {
+            displayName = `${user.firstName} ${user.lastName}`;
+          } else if (user.displayName) {
+            displayName = user.displayName;
+          }
+        } else if (userData?.firstName && userData?.lastName) {
+          displayName = `${userData.firstName} ${userData.lastName}`;
+        } else if (userData?.displayName) {
+          displayName = userData.displayName;
+        } else if (userData?.email) {
+          displayName = userData.email.split('@')[0];
+        }
+        
+        // Get photoURL
+        const photoURL = topContributor.id === user?.uid 
+          ? (user?.photoURL || userData?.photoURL) 
+          : userData?.photoURL;
+        
+        topPartnersMap.set(monthKey, {
+          id: topContributor.id,
+          name: displayName,
+          amount: topContributor.amount,
+          photoURL,
+          month: monthName,
+          year
+        });
+      }
+    });
+    
+    setMonthlyTopPartners(topPartnersMap);
+
+    // Set monthly trend data (only last 6 months for display)
+    const trendArray: MonthlyData[] = Object.entries(monthlyTrendData)
+      .map(([key, value]) => {
+        const [year, month] = key.split('-').map(Number);
+        const date = new Date(year, month);
+        return {
+          label: date.toLocaleString('default', { month: 'short' }),
+          value,
+          sortKey: year * 12 + month
+        };
+      })
+      .sort((a, b) => a.sortKey - b.sortKey)
+      .map(({ label, value }) => ({ label, value }));
+    
+    setMonthlyTrend(trendArray);
+    setIsLoading(false);
+  }, [paymentsData, usersMap, user]);
 
   return (
     <div className="min-h-screen bg-background">

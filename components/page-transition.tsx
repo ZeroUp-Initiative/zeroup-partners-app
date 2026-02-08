@@ -33,7 +33,7 @@ export function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname()
 
   return (
-    <LazyMotion features={domAnimation} strict>
+    <LazyMotion features={domAnimation}>
       <AnimatePresence mode="wait" initial={false}>
         <m.div
           key={pathname}

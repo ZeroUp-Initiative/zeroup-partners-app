@@ -4,7 +4,7 @@ import ProtectedRoute from "@/components/auth/protected-route"
 import { useAuth } from "@/contexts/auth-context"
 import { auth, db } from "@/lib/firebase/client"
 import { collection, query, where, onSnapshot } from "firebase/firestore"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { GradientCard } from "@/components/ui/gradient-card"
@@ -34,191 +34,200 @@ function CommunityContent() {
     userRank: 0
   })
   const [loading, setLoading] = useState(true)
+  const [usersMap, setUsersMap] = useState<Map<string, any>>(new Map())
+  const [paymentsData, setPaymentsData] = useState<any[]>([])
 
+  // Subscribe to users and payments data
   useEffect(() => {
-    const fetchData = () => {
-        // Real-time listener for users to build leaderboard and stats
-        const unsubUsers = onSnapshot(collection(db, "users"), (snapshot) => {
-             const users: any[] = []
-             snapshot.forEach(doc => users.push({ id: doc.id, ...doc.data() }))
-             
-             // Calculate stats
-             const totalPartners = users.length
-             
-             // For leaderboard, we ideally need aggregated contribution data. 
-             // Since we don't have a 'totalContributions' field on users updated via functions yet, 
-             // we might need to fetch payments. But for MVP let's assume we might update user doc or just use what we have.
-             // BETTER APPROACH for MVP: Fetch all payments to calculate totals.
-        })
+    if (!user) return
 
-        // Fetching payments to calculate everything dynamically
-        const unsubPayments = onSnapshot(query(collection(db, "payments"), where("status", "==", "approved")), (snapshot) => {
-            const payments: any[] = []
-            snapshot.forEach(doc => payments.push({ id: doc.id, ...doc.data() }))
+    // Real-time listener for users
+    const unsubUsers = onSnapshot(collection(db, "users"), (snapshot) => {
+      const userMap = new Map<string, any>()
+      snapshot.forEach(doc => {
+        const userData = { id: doc.id, ...doc.data() }
+        userMap.set(doc.id, userData)
+      })
+      setUsersMap(userMap)
+      setStats(prev => ({ ...prev, totalPartners: snapshot.size }))
+      setLoading(false)
+    })
 
-            // 1. Total Raised
-            const totalRaised = payments.reduce((sum, p) => sum + (p.amount || 0), 0)
+    // Real-time listener for payments
+    const unsubPayments = onSnapshot(
+      query(collection(db, "payments"), where("status", "==", "approved")), 
+      (snapshot) => {
+        const payments: any[] = []
+        snapshot.forEach(doc => payments.push({ id: doc.id, ...doc.data() }))
+        setPaymentsData(payments)
+      }
+    )
 
-            // 2. Calculate Partner of the Month
-            const monthlyContributions: Record<string, { amount: number, name: string }> = {};
-            const now = new Date();
-            const currentMonth = now.getMonth();
-            const currentYear = now.getFullYear();
-
-            payments.forEach(p => {
-                // Check for monthly top partner
-                let paymentDate = null;
-                if (p.date && typeof p.date.toDate === 'function') {
-                   paymentDate = p.date.toDate();
-                } else if (p.createdAt && typeof p.createdAt.toDate === 'function') {
-                   paymentDate = p.createdAt.toDate();
-                } else if (p.date instanceof Date) {
-                   paymentDate = p.date;
-                } else if (p.createdAt instanceof Date) {
-                   paymentDate = p.createdAt;
-                }
-
-                if (paymentDate) {
-                  const paymentMonth = paymentDate.getMonth();
-                  const paymentYear = paymentDate.getFullYear();
-                  
-                  if (paymentMonth === currentMonth && paymentYear === currentYear) {
-                     if (p.userId) {
-                        if (!monthlyContributions[p.userId]) {
-                            monthlyContributions[p.userId] = { amount: 0, name: p.userFullName || 'Unknown User' };
-                        }
-                        monthlyContributions[p.userId].amount += p.amount;
-                        if (p.userFullName) monthlyContributions[p.userId].name = p.userFullName;
-                     }
-                  }
-                }
-            });
-
-            // Find top monthly partner
-            let max = 0;
-            let top: {id: string, amount: number, name: string} | null = null;
-            Object.entries(monthlyContributions).forEach(([id, p]) => {
-                if (p.amount > max) {
-                    max = p.amount;
-                    top = { id, ...p };
-                }
-            });
-            setTopPartnerOfTheMonth(top);
-
-            // 3. Aggregating User Contributions
-            const userMap = new Map<string, number>()
-            const activeUsersThisMonth = new Set<string>()
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-
-            payments.forEach(p => {
-                const amount = p.amount || 0
-                const uid = p.userId
-                userMap.set(uid, (userMap.get(uid) || 0) + amount)
-                
-                // Date check for active users
-                let pDate = new Date()
-                 if (p.date && typeof p.date.toDate === 'function') {
-                    pDate = p.date.toDate();
-                } else if (p.createdAt && typeof p.createdAt.toDate === 'function') {
-                    pDate = p.createdAt.toDate();
-                }
-                
-                if (pDate >= startOfMonth) {
-                    activeUsersThisMonth.add(uid)
-                }
-            })
-
-            // 3. Leaderboard Construction
-            const leaderboardData = Array.from(userMap.entries()).map(([uid, total]) => {
-                // We need user details. In a real app we'd join this. 
-                // For this client-side demo, we'll try to match with the user object if possible, 
-                // or we rely on the payment doc having userFullName as saved in our contribution logic.
-                const payment = payments.find(p => p.userId === uid)
-                const isCurrentUser = uid === user?.uid
-                
-                // For current user, use their name from auth context
-                let displayName = payment?.userFullName || "Partner"
-                if (isCurrentUser && user?.firstName && user?.lastName) {
-                    displayName = `${user.firstName} ${user.lastName}`
-                } else if (isCurrentUser && user?.displayName) {
-                    displayName = user.displayName
-                }
-                
-                return {
-                    name: displayName,
-                    organization: "Individual Partner", // customizable if we fethed users
-                    totalContributions: total,
-                    impactScore: Math.min(100, Math.floor(total / 1000)), // dynamic calc
-                    badges: Math.floor(total / 5000), // dynamic calc
-                    avatar: displayName.charAt(0).toUpperCase(),
-                    userId: uid,
-                    isCurrentUser,
-                    photoURL: isCurrentUser ? user?.photoURL : null // Show current user's photo
-                }
-            }).sort((a, b) => b.totalContributions - a.totalContributions)
-              .map((item, index) => ({ ...item, rank: index + 1 }))
-            
-            setLeaderboard(leaderboardData.slice(0, 10)) // Top 10
-
-            // 4. User Rank
-            const myRankItem = leaderboardData.find(i => i.userId === user?.uid)
-            const userRank = myRankItem ? myRankItem.rank : 0
-
-            // 5. Recent Activities (Just taking latest 5 payments)
-            const sortedPayments = [...payments].sort((a,b) => {
-                 let dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date)
-                 let dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date)
-                 return dateB.getTime() - dateA.getTime()
-            })
-            
-            const activities = sortedPayments.slice(0, 5).map(p => {
-                 let pDate = p.date?.toDate ? p.date.toDate() : new Date(p.date)
-                 // Simple relative time format
-                 const diff = Math.floor((now.getTime() - pDate.getTime()) / (1000 * 60 * 60))
-                 const timeStr = diff < 1 ? "Just now" : diff < 24 ? `${diff} hours ago` : `${Math.floor(diff/24)} days ago`
-                 
-                 return {
-                    user: p.userFullName || "Partner",
-                    action: `contributed ₦${p.amount.toLocaleString()}`,
-                    time: timeStr,
-                    type: "contribution"
-                 }
-            })
-            setRecentActivities(activities)
-
-             // 6. Top Contributors (Same as leaderboard for now but maybe filtered)
-            const topCons = leaderboardData.slice(0, 3).map(i => ({
-                name: i.name,
-                amount: i.totalContributions,
-                period: "All time"
-            }))
-            setTopContributors(topCons)
-
-            // Update stats
-            setStats(prev => ({
-                ...prev,
-                totalRaised,
-                activeThisMonth: activeUsersThisMonth.size,
-                userRank
-            }))
-        })
-        
-        // Listener for total partners count
-        const unsubPartners = onSnapshot(collection(db, "users"), (snapshot) => {
-             setStats(prev => ({ ...prev, totalPartners: snapshot.size }))
-             setLoading(false)
-        })
-
-        return () => {
-            unsubPayments()
-            unsubPartners()
-        }
-    }
-
-    if (user) {
-        return fetchData()
+    return () => {
+      unsubUsers()
+      unsubPayments()
     }
   }, [user])
+
+  // Process data when payments or users change
+  useEffect(() => {
+    if (paymentsData.length === 0 && usersMap.size === 0) return
+
+    const payments = paymentsData
+    const now = new Date()
+
+    // 1. Total Raised
+    const totalRaised = payments.reduce((sum, p) => sum + (p.amount || 0), 0)
+
+    // 2. Calculate Partner of the Month
+    const monthlyContributions: Record<string, { amount: number, name: string }> = {};
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    payments.forEach(p => {
+      let paymentDate = null;
+      if (p.date && typeof p.date.toDate === 'function') {
+        paymentDate = p.date.toDate();
+      } else if (p.createdAt && typeof p.createdAt.toDate === 'function') {
+        paymentDate = p.createdAt.toDate();
+      } else if (p.date instanceof Date) {
+        paymentDate = p.date;
+      } else if (p.createdAt instanceof Date) {
+        paymentDate = p.createdAt;
+      }
+
+      if (paymentDate) {
+        const paymentMonth = paymentDate.getMonth();
+        const paymentYear = paymentDate.getFullYear();
+        
+        if (paymentMonth === currentMonth && paymentYear === currentYear) {
+          if (p.userId) {
+            if (!monthlyContributions[p.userId]) {
+              monthlyContributions[p.userId] = { amount: 0, name: p.userFullName || 'Unknown User' };
+            }
+            monthlyContributions[p.userId].amount += p.amount;
+            if (p.userFullName) monthlyContributions[p.userId].name = p.userFullName;
+          }
+        }
+      }
+    });
+
+    // Find top monthly partner
+    let max = 0;
+    let top: {id: string, amount: number, name: string} | null = null;
+    Object.entries(monthlyContributions).forEach(([id, p]) => {
+      if (p.amount > max) {
+        max = p.amount;
+        top = { id, ...p };
+      }
+    });
+    setTopPartnerOfTheMonth(top);
+
+    // 3. Aggregating User Contributions
+    const contributionMap = new Map<string, number>()
+    const activeUsersThisMonth = new Set<string>()
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+
+    payments.forEach(p => {
+      const amount = p.amount || 0
+      const uid = p.userId
+      contributionMap.set(uid, (contributionMap.get(uid) || 0) + amount)
+      
+      let pDate = new Date()
+      if (p.date && typeof p.date.toDate === 'function') {
+        pDate = p.date.toDate();
+      } else if (p.createdAt && typeof p.createdAt.toDate === 'function') {
+        pDate = p.createdAt.toDate();
+      }
+      
+      if (pDate >= startOfMonth) {
+        activeUsersThisMonth.add(uid)
+      }
+    })
+
+    // 4. Leaderboard Construction - now with photoURL from usersMap!
+    const leaderboardData = Array.from(contributionMap.entries()).map(([uid, total]) => {
+      const payment = payments.find(p => p.userId === uid)
+      const isCurrentUser = uid === user?.uid
+      const userData = usersMap.get(uid) // Get user data including photoURL
+      
+      // Determine display name with priority: current user auth > Firestore user > payment record
+      let displayName = "Partner"
+      if (isCurrentUser && user?.firstName && user?.lastName) {
+        displayName = `${user.firstName} ${user.lastName}`
+      } else if (isCurrentUser && user?.displayName) {
+        displayName = user.displayName
+      } else if (userData?.firstName && userData?.lastName) {
+        displayName = `${userData.firstName} ${userData.lastName}`
+      } else if (userData?.displayName) {
+        displayName = userData.displayName
+      } else if (payment?.userFullName) {
+        displayName = payment.userFullName
+      }
+      
+      // Get photoURL from usersMap for all users, not just current user
+      const photoURL = isCurrentUser 
+        ? (user?.photoURL || userData?.photoURL) 
+        : userData?.photoURL
+      
+      return {
+        name: displayName,
+        organization: userData?.organization || "Individual Partner",
+        totalContributions: total,
+        impactScore: Math.min(100, Math.floor(total / 1000)),
+        badges: Math.floor(total / 5000),
+        avatar: displayName.charAt(0).toUpperCase(),
+        userId: uid,
+        isCurrentUser,
+        photoURL: photoURL || null
+      }
+    }).sort((a, b) => b.totalContributions - a.totalContributions)
+      .map((item, index) => ({ ...item, rank: index + 1 }))
+    
+    setLeaderboard(leaderboardData.slice(0, 10))
+
+    // 5. User Rank
+    const myRankItem = leaderboardData.find(i => i.userId === user?.uid)
+    const userRank = myRankItem ? myRankItem.rank : 0
+
+    // 6. Recent Activities
+    const sortedPayments = [...payments].sort((a,b) => {
+      let dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date)
+      let dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date)
+      return dateB.getTime() - dateA.getTime()
+    })
+    
+    const activities = sortedPayments.slice(0, 5).map(p => {
+      let pDate = p.date?.toDate ? p.date.toDate() : new Date(p.date)
+      const diff = Math.floor((now.getTime() - pDate.getTime()) / (1000 * 60 * 60))
+      const timeStr = diff < 1 ? "Just now" : diff < 24 ? `${diff} hours ago` : `${Math.floor(diff/24)} days ago`
+      
+      return {
+        user: p.userFullName || "Partner",
+        action: `contributed ₦${p.amount.toLocaleString()}`,
+        time: timeStr,
+        type: "contribution"
+      }
+    })
+    setRecentActivities(activities)
+
+    // 7. Top Contributors
+    const topCons = leaderboardData.slice(0, 3).map(i => ({
+      name: i.name,
+      amount: i.totalContributions,
+      period: "All time",
+      photoURL: i.photoURL
+    }))
+    setTopContributors(topCons)
+
+    // Update stats
+    setStats(prev => ({
+      ...prev,
+      totalRaised,
+      activeThisMonth: activeUsersThisMonth.size,
+      userRank
+    }))
+  }, [paymentsData, usersMap, user])
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -379,8 +388,16 @@ function CommunityContent() {
                     <CardContent>
                       <div className="space-y-4">
                         {topContributors.map((contributor, index) => (
-                          <div key={index} className="flex items-center justify-between">
-                            <div>
+                          <div key={index} className="flex items-center gap-3">
+                            <Avatar className="w-8 h-8">
+                              {contributor.photoURL && (
+                                <AvatarImage src={contributor.photoURL} alt={contributor.name} />
+                              )}
+                              <AvatarFallback className="text-xs">
+                                {contributor.name?.charAt(0).toUpperCase() || '?'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
                               <p className="font-medium">{contributor.name}</p>
                               <p className="text-sm text-muted-foreground">{contributor.period}</p>
                             </div>
