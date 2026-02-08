@@ -349,6 +349,7 @@ function DashboardPage() {
         };
       })
       .sort((a, b) => a.sortKey - b.sortKey)
+      .slice(-6) // Only last 6 months
       .map(({ label, value }) => ({ label, value }));
     
     setMonthlyTrend(trendArray);
@@ -578,72 +579,152 @@ function DashboardPage() {
 
               <TabsContent value="recognition" className="space-y-6">
                   <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-                    {/* Partner of the Month - Premium Design */}
-                    <Card className="col-span-1 relative overflow-hidden border-0 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-100 dark:from-amber-950/40 dark:via-orange-950/30 dark:to-yellow-950/20">
-                        {/* Decorative elements */}
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-yellow-400/20 to-orange-400/20 rounded-full blur-3xl" />
-                        <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-amber-400/20 to-yellow-400/20 rounded-full blur-2xl" />
+                    {/* Partner of the Month - Premium Flier Design */}
+                    <Card className="col-span-1 relative overflow-hidden border-0 shadow-2xl">
+                        {/* Background gradient with premium look */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500" />
+                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-yellow-400/40 via-transparent to-transparent" />
+                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-red-600/30 via-transparent to-transparent" />
                         
-                        <CardHeader className="relative">
-                            <div className="flex items-center gap-3">
-                                <div className="p-3 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-orange-500/30">
-                                    <Trophy className="h-7 w-7 text-white" />
+                        {/* Decorative sparkles/patterns */}
+                        <div className="absolute top-4 right-4 text-white/20">
+                          <Sparkles className="w-16 h-16" />
+                        </div>
+                        <div className="absolute bottom-4 left-4 text-white/20">
+                          <Sparkles className="w-12 h-12" />
+                        </div>
+                        <div className="absolute top-1/4 left-8 w-2 h-2 bg-white/30 rounded-full" />
+                        <div className="absolute top-1/3 right-12 w-3 h-3 bg-white/20 rounded-full" />
+                        <div className="absolute bottom-1/4 right-8 w-2 h-2 bg-white/25 rounded-full" />
+                        
+                        {/* ZeroUp branding watermark */}
+                        <div className="absolute bottom-3 right-4 text-white/30 text-xs font-semibold tracking-widest">
+                          ZEROUP PARTNERS
+                        </div>
+                        
+                        <CardHeader className="relative pb-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className="p-3 rounded-2xl bg-white/20 backdrop-blur-sm shadow-lg">
+                                    <Crown className="h-8 w-8 text-white drop-shadow-lg" />
                                 </div>
                                 <div>
-                                    <CardTitle className="text-2xl bg-gradient-to-r from-amber-600 to-orange-600 dark:from-amber-400 dark:to-orange-400 bg-clip-text text-transparent">
+                                    <CardTitle className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
                                         Partner of the Month
                                     </CardTitle>
-                                    <CardDescription>
-                                        {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}
-                                    </CardDescription>
                                 </div>
+                              </div>
+                              {/* Month Selector */}
+                              <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                                <SelectTrigger className="w-[140px] bg-white/20 border-white/30 text-white backdrop-blur-sm hover:bg-white/30 transition-colors">
+                                  <CalendarDays className="w-4 h-4 mr-2 opacity-80" />
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {Array.from(monthlyTopPartners.keys()).sort((a, b) => {
+                                    const [yearA, monthA] = a.split('-').map(Number);
+                                    const [yearB, monthB] = b.split('-').map(Number);
+                                    return (yearB * 12 + monthB) - (yearA * 12 + monthA);
+                                  }).map((key) => {
+                                    const [year, month] = key.split('-').map(Number);
+                                    const date = new Date(year, month);
+                                    return (
+                                      <SelectItem key={key} value={key}>
+                                        {date.toLocaleString('default', { month: 'short', year: 'numeric' })}
+                                      </SelectItem>
+                                    );
+                                  })}
+                                  {monthlyTopPartners.size === 0 && (
+                                    <SelectItem value={selectedMonth} disabled>
+                                      {new Date().toLocaleString('default', { month: 'short', year: 'numeric' })}
+                                    </SelectItem>
+                                  )}
+                                </SelectContent>
+                              </Select>
                             </div>
                         </CardHeader>
-                        <CardContent className="flex flex-col items-center justify-center py-8 space-y-5 relative">
-                            {topPartner ? (
-                                <>
-                                    <div className="relative">
-                                        {/* Glow effect behind avatar */}
-                                        <div className="absolute inset-0 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full blur-xl opacity-40 scale-110" />
-                                        <Avatar className="h-28 w-28 border-4 border-white dark:border-gray-800 shadow-2xl relative ring-4 ring-amber-400/30">
-                                            <AvatarImage src={topPartner.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${topPartner.name}`} />
-                                            <AvatarFallback className="text-2xl font-bold bg-gradient-to-br from-amber-400 to-orange-500 text-white">{topPartner.name[0]}</AvatarFallback>
+                        <CardContent className="flex flex-col items-center justify-center py-8 space-y-6 relative">
+                            {(() => {
+                              const partner = monthlyTopPartners.get(selectedMonth);
+                              if (partner) {
+                                return (
+                                  <>
+                                    {/* Month/Year Banner */}
+                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                                      <div className="px-6 py-1.5 bg-white/90 dark:bg-gray-900/90 rounded-full shadow-xl backdrop-blur-sm">
+                                        <span className="text-sm font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                                          {partner.month} {partner.year}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="relative mt-4">
+                                        {/* Premium glow effect */}
+                                        <div className="absolute inset-0 bg-white rounded-full blur-2xl opacity-40 scale-125" />
+                                        <div className="absolute inset-0 bg-gradient-to-br from-yellow-300 to-orange-400 rounded-full blur-xl opacity-50 scale-110" />
+                                        <Avatar className="h-32 w-32 md:h-36 md:w-36 border-[6px] border-white shadow-2xl relative">
+                                            <AvatarImage src={partner.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${partner.name}&backgroundColor=f59e0b`} />
+                                            <AvatarFallback className="text-4xl font-bold bg-gradient-to-br from-amber-400 to-orange-500 text-white">
+                                              {partner.name?.charAt(0)?.toUpperCase() || '?'}
+                                            </AvatarFallback>
                                         </Avatar>
-                                        <div className="absolute -bottom-1 -right-1 bg-gradient-to-br from-amber-400 to-orange-500 text-white p-2.5 rounded-full shadow-lg ring-4 ring-white dark:ring-gray-900">
-                                            <Medal className="h-5 w-5" />
+                                        {/* Crown badge */}
+                                        <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                                          <div className="bg-gradient-to-br from-yellow-400 to-amber-500 text-white p-2 rounded-full shadow-xl animate-bounce">
+                                            <Crown className="h-6 w-6" />
+                                          </div>
+                                        </div>
+                                        {/* Medal badge */}
+                                        <div className="absolute -bottom-2 -right-2 bg-white text-amber-500 p-3 rounded-full shadow-xl ring-4 ring-amber-400">
+                                            <Medal className="h-6 w-6" />
                                         </div>
                                     </div>
-                                    <div className="text-center space-y-2">
-                                        <h3 className="text-2xl font-bold">{topPartner.name}</h3>
-                                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 dark:bg-black/20 backdrop-blur-sm">
-                                            <span className="text-muted-foreground">Total:</span>
-                                            <span className="text-xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 dark:from-amber-400 dark:to-orange-400 bg-clip-text text-transparent">
-                                                <CurrencyCounter value={topPartner.amount} duration={2000} />
+                                    
+                                    <div className="text-center space-y-3">
+                                        <h3 className="text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg tracking-tight">
+                                          {partner.name || 'Anonymous Partner'}
+                                        </h3>
+                                        <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-xl">
+                                            <span className="text-gray-500 text-sm font-medium">Contributed</span>
+                                            <span className="text-2xl md:text-3xl font-black bg-gradient-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent">
+                                                ₦{partner.amount.toLocaleString()}
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="flex gap-1">
+                                    
+                                    {/* Star rating */}
+                                    <div className="flex gap-1.5">
                                         {[1,2,3,4,5].map(i => (
                                             <Star 
                                                 key={i} 
-                                                className="h-6 w-6 fill-amber-400 text-amber-400 drop-shadow-sm" 
-                                                style={{ animationDelay: `${i * 0.1}s` }}
+                                                className="h-7 w-7 fill-yellow-300 text-yellow-300 drop-shadow-lg" 
                                             />
                                         ))}
                                     </div>
-                                    <p className="text-sm text-center text-muted-foreground max-w-xs italic">
-                                        "Thank you for your incredible generosity and commitment to the mission!"
+                                    
+                                    <p className="text-base text-center text-white/90 max-w-sm font-medium italic drop-shadow">
+                                        "Thank you for your incredible generosity and commitment to transforming lives!"
                                     </p>
-                                </>
-                            ) : (
-                                <div className="text-center py-8">
-                                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-200 to-orange-200 dark:from-amber-900/30 dark:to-orange-900/30 flex items-center justify-center">
-                                        <Trophy className="h-10 w-10 text-amber-400/50" />
+                                    
+                                    {/* Trophy icon at bottom */}
+                                    <div className="flex items-center gap-2 text-white/80">
+                                      <Trophy className="h-5 w-5" />
+                                      <span className="text-sm font-semibold tracking-wide">TOP CONTRIBUTOR</span>
+                                      <Trophy className="h-5 w-5" />
                                     </div>
-                                    <p className="text-lg text-muted-foreground">No contributions yet this month.</p>
-                                    <p className="text-sm text-muted-foreground">Be the first to appear here!</p>
+                                  </>
+                                );
+                              }
+                              return (
+                                <div className="text-center py-8">
+                                    <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                                        <Trophy className="h-12 w-12 text-white/60" />
+                                    </div>
+                                    <p className="text-xl font-semibold text-white/90">No contributions yet</p>
+                                    <p className="text-sm text-white/70 mt-1">Be the first to appear here!</p>
                                 </div>
-                            )}
+                              );
+                            })()}
                         </CardContent>
                     </Card>
                     
