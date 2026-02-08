@@ -562,11 +562,11 @@ function DashboardPage() {
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600 dark:text-gray-400 font-medium">Bank:</span>
-                                    <span className="font-semibold">GT Bank</span>
+                                    <span className="font-semibold text-gray-900 dark:text-gray-100">GT Bank</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600 dark:text-gray-400 font-medium">Account Name:</span>
-                                    <span className="font-semibold">PACSDA</span>
+                                    <span className="font-semibold text-gray-900 dark:text-gray-100">PACSDA</span>
                                 </div>
                             </div>
                             <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
