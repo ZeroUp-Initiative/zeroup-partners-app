@@ -388,7 +388,7 @@ function DashboardPage() {
 
               <TabsContent value="overview" className="space-y-6">
                   {/* Bento Grid of Stat Cards */}
-                  <div className="grid gap-4 md:gap-6 grid-cols-2 lg:grid-cols-4">
+                  <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                     {isLoading ? (
                       <>
                         <CardSkeleton />
@@ -479,7 +479,7 @@ function DashboardPage() {
                   </Card>
 
                   {/* Grid of Action Cards */}
-                  <div className="grid gap-4 md:gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                     <LogContributionModal>
                         <Card className="group hover:shadow-lg hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer border-transparent hover:border-emerald-500/30">
                             <CardHeader className="flex flex-row items-center gap-4">
@@ -603,20 +603,20 @@ function DashboardPage() {
                         </div>
                         
                         <CardHeader className="relative pb-2">
-                            <div className="flex items-center justify-between">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                               <div className="flex items-center gap-3">
-                                <div className="p-3 rounded-2xl bg-white/20 backdrop-blur-sm shadow-lg">
-                                    <Crown className="h-8 w-8 text-white drop-shadow-lg" />
+                                <div className="p-2 sm:p-3 rounded-2xl bg-white/20 backdrop-blur-sm shadow-lg">
+                                    <Crown className="h-6 w-6 sm:h-8 sm:w-8 text-white drop-shadow-lg" />
                                 </div>
                                 <div>
-                                    <CardTitle className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
+                                    <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
                                         Partner of the Month
                                     </CardTitle>
                                 </div>
                               </div>
                               {/* Month Selector */}
                               <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                                <SelectTrigger className="w-[140px] bg-white/20 border-white/30 text-white backdrop-blur-sm hover:bg-white/30 transition-colors">
+                                <SelectTrigger className="w-full sm:w-[140px] bg-white/20 border-white/30 text-white backdrop-blur-sm hover:bg-white/30 transition-colors">
                                   <CalendarDays className="w-4 h-4 mr-2 opacity-80" />
                                   <SelectValue />
                                 </SelectTrigger>
@@ -681,12 +681,12 @@ function DashboardPage() {
                                     </div>
                                     
                                     <div className="text-center space-y-3">
-                                        <h3 className="text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg tracking-tight">
+                                        <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg tracking-tight">
                                           {partner.name || 'Anonymous Partner'}
                                         </h3>
-                                        <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-xl">
+                                        <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-xl">
                                             <span className="text-gray-500 text-sm font-medium">Contributed</span>
-                                            <span className="text-2xl md:text-3xl font-black bg-gradient-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent">
+                                            <span className="text-xl sm:text-2xl md:text-3xl font-black bg-gradient-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent">
                                                 ₦{partner.amount.toLocaleString()}
                                             </span>
                                         </div>

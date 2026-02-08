@@ -277,10 +277,10 @@ function ProfileContent() {
       </div>
 
       <Tabs defaultValue="general" className="w-full">
-        <TabsList className="mb-8">
-          <TabsTrigger value="general" className="gap-2"><User className="w-4 h-4" /> General</TabsTrigger>
-          <TabsTrigger value="security" className="gap-2"><Lock className="w-4 h-4" /> Security</TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-2"><Bell className="w-4 h-4" /> Notifications</TabsTrigger>
+        <TabsList className="mb-8 grid w-full grid-cols-3 sm:w-auto sm:inline-flex">
+          <TabsTrigger value="general" className="gap-2 text-xs sm:text-sm"><User className="w-4 h-4" /> <span className="hidden sm:inline">General</span><span className="sm:hidden">Info</span></TabsTrigger>
+          <TabsTrigger value="security" className="gap-2 text-xs sm:text-sm"><Lock className="w-4 h-4" /> Security</TabsTrigger>
+          <TabsTrigger value="notifications" className="gap-2 text-xs sm:text-sm"><Bell className="w-4 h-4" /> <span className="hidden sm:inline">Notifications</span><span className="sm:hidden">Alerts</span></TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">

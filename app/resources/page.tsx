@@ -283,11 +283,11 @@ function ResourcesContent() {
 
           {/* Main Content Tabs */}
           <Tabs defaultValue="reports" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="reports">Reports</TabsTrigger>
-              <TabsTrigger value="videos">Videos</TabsTrigger>
-              <TabsTrigger value="guides">Guides</TabsTrigger>
-              <TabsTrigger value="updates">Updates</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+              <TabsTrigger value="reports" className="text-xs sm:text-sm">Reports</TabsTrigger>
+              <TabsTrigger value="videos" className="text-xs sm:text-sm">Videos</TabsTrigger>
+              <TabsTrigger value="guides" className="text-xs sm:text-sm">Guides</TabsTrigger>
+              <TabsTrigger value="updates" className="text-xs sm:text-sm">Updates</TabsTrigger>
             </TabsList>
 
             <TabsContent value="reports" className="space-y-6">

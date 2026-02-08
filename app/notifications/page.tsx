@@ -105,9 +105,9 @@ function NotificationsPage() {
 
         <div className="max-w-2xl mx-auto space-y-6">
           {/* Header with actions */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
-              <h2 className="text-2xl font-bold">All Notifications</h2>
+              <h2 className="text-xl sm:text-2xl font-bold">All Notifications</h2>
               {unreadCount > 0 && (
                 <Badge variant="secondary">{unreadCount} unread</Badge>
               )}

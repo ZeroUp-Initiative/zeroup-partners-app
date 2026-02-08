@@ -147,7 +147,7 @@ function AnalyticsContent() {
         </div>
         <div className="space-y-8">
           <div className="space-y-2 animate-fade-in">
-            <h2 className="text-3xl font-bold text-balance">Your Impact Analytics</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-balance">Your Impact Analytics</h2>
             <p className="text-muted-foreground">
               Comprehensive insights into your contributions and their real-world impact.
             </p>
@@ -192,20 +192,20 @@ function AnalyticsContent() {
           </div>
 
           <Tabs defaultValue="trends" className="space-y-6 animate-fade-in delay-400">
-            <TabsList className="glass-card">
+            <TabsList className="glass-card grid w-full grid-cols-3">
               <TabsTrigger
                 value="trends"
-                className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+                className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
               >
                 Contribution Trends
               </TabsTrigger>
               <TabsTrigger
                 value="impact"
-                className="data-[state=active]:bg-secondary/20 data-[state=active]:text-secondary"
+                className="text-xs sm:text-sm data-[state=active]:bg-secondary/20 data-[state=active]:text-secondary"
               >
                 Impact Distribution
               </TabsTrigger>
-              <TabsTrigger value="goals" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">
+              <TabsTrigger value="goals" className="text-xs sm:text-sm data-[state=active]:bg-accent/20 data-[state=active]:text-accent">
                 Goal Progress
               </TabsTrigger>
             </TabsList>
