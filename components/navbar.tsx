@@ -87,7 +87,7 @@ export function Navbar({ isDark, isLoggedIn, user }: NavbarProps) {
 
           {/* Right Actions */}
           <div className="hidden md:flex items-center gap-2 ml-auto">
-            {/* <ThemeToggle /> */}
+            <ThemeToggle />
 
             {isLoggedIn ? (
               <Link href="/dashboard/profile">
@@ -131,7 +131,7 @@ export function Navbar({ isDark, isLoggedIn, user }: NavbarProps) {
 
           {/* Mobile */}
           <div className="md:hidden flex items-center gap-2 ml-auto">
-            {/* <ThemeToggle /> */}
+            <ThemeToggle />
 
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
