@@ -38,7 +38,6 @@ interface Partner {
 
 interface ConstellationCanvasProps {
   projects: Project[]
-  partners?: Partner[]
   user?: {
     uid: string
     displayName?: string | null
@@ -138,7 +137,7 @@ function calculatePartnerTier(partner: Partner): 'primary' | 'secondary' | 'tert
 // MAIN COMPONENT
 // ============================================================
 
-export function ConstellationCanvasV2({ projects: initialProjects, partners = [], user, isLoggedIn, isDark = true }: ConstellationCanvasProps) {
+export function ConstellationCanvasV2({ projects: initialProjects, user, isLoggedIn, isDark = true }: ConstellationCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null)

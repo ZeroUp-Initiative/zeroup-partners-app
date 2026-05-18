@@ -1,4 +1,4 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore, initializeFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
@@ -42,7 +42,6 @@ if (isBrowser) {
   
   storage = getStorage(app);
 }
-
 // Export services with null checks
 export { auth, db, storage };
 export default app;
