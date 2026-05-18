@@ -421,8 +421,8 @@ function CommunityContent() {
                     </CardContent>
                   </Card>
 
-                  <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/25 hover:-translate-y-1">
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400" />
+                  <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-[#8d44d1]/25 hover:-translate-y-1">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8d44d1] to-[#8d44d1]" />
                     <CardHeader>
                       <CardTitle>Your Progress</CardTitle>
                       <CardDescription>How you're doing this month</CardDescription>

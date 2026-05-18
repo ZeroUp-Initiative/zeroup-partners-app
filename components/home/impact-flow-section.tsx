@@ -2,7 +2,7 @@
 
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { Users, Lightbulb, Heart, BarChart3, Repeat } from 'lucide-react'
+import { HandCoins, Users, Repeat2 } from 'lucide-react'
 
 interface ImpactFlowSectionProps {
   isDark?: boolean
@@ -10,72 +10,51 @@ interface ImpactFlowSectionProps {
 
 const steps = [
   {
+    icon: HandCoins,
+    step: '01',
+    title: 'Partners Bring Resources',
+    description:
+      'Individuals and organizations join not as donors but as collaborators — bringing funding, skills, expertise, networks, and time to where it matters most.',
+  },
+  {
     icon: Users,
-    title: 'Partners Join the Ecosystem',
-    description: 'Individuals and organizations enter as collaborators, not donors.',
-    color: 'from-blue-400 to-blue-600',
-    bgColor: 'bg-blue-500/10',
-    borderColor: 'border-blue-500/20'
+    step: '02',
+    title: 'Communities Define & Lead',
+    description:
+      'Communities identify their own needs and lead execution. Partners co-design alongside them — not above them. Local leaders drive every project from the ground up.',
   },
   {
-    icon: Lightbulb,
-    title: 'Projects Are Co-Designed',
-    description: 'Communities define needs. Partners provide resources and expertise.',
-    color: 'from-amber-400 to-orange-500',
-    bgColor: 'bg-amber-500/10',
-    borderColor: 'border-amber-500/20'
+    icon: Repeat2,
+    step: '03',
+    title: 'Impact Loops Back',
+    description:
+      'Every outcome is tracked and shared openly. When communities succeed, they become partners themselves — creating a regenerative loop, not a dependency.',
   },
-  {
-    icon: Heart,
-    title: 'Communities Lead Implementation',
-    description: 'Local leaders drive execution with partner support.',
-    color: 'from-rose-400 to-pink-500',
-    bgColor: 'bg-rose-500/10',
-    borderColor: 'border-rose-500/20'
-  },
-  {
-    icon: BarChart3,
-    title: 'Impact Is Tracked & Shared',
-    description: 'Real progress, real stories, complete transparency.',
-    color: 'from-emerald-400 to-teal-500',
-    bgColor: 'bg-emerald-500/10',
-    borderColor: 'border-emerald-500/20'
-  },
-  {
-    icon: Repeat,
-    title: 'Systems Strengthen Over Time',
-    description: 'Success compounds. Communities become partners.',
-    color: 'from-purple-400 to-violet-500',
-    bgColor: 'bg-purple-500/10',
-    borderColor: 'border-purple-500/20'
-  }
 ]
 
 export function ImpactFlowSection({ isDark = true }: ImpactFlowSectionProps) {
   const sectionRef = useRef<HTMLElement>(null)
-  const isInView = useInView(sectionRef, { once: true, margin: "-100px" })
+  const isInView = useInView(sectionRef, { once: true, margin: '-100px' })
 
   return (
-    <section 
+    <section
       ref={sectionRef}
-      className={`relative py-24 md:py-32 overflow-hidden ${
-        isDark ? 'bg-slate-950' : 'bg-gradient-to-b from-teal-50/30 via-white to-emerald-50/30'
-      }`}
+      className="relative py-24 md:py-32 overflow-hidden"
+      style={isDark ? { backgroundColor: '#130927' } : undefined}
     >
-      {/* Background accent */}
-      <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] blur-3xl ${
-        isDark ? 'bg-gradient-to-b from-emerald-500/5 via-transparent to-transparent' : 'bg-gradient-to-b from-teal-200/50 via-transparent to-transparent'
-      }`} />
-      
-      {/* Light mode decorative elements */}
       {!isDark && (
-        <>
-          <div className="absolute top-40 left-10 w-64 h-64 bg-blue-200/30 rounded-full blur-3xl" />
-          <div className="absolute bottom-40 right-10 w-64 h-64 bg-emerald-200/30 rounded-full blur-3xl" />
-        </>
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-50 via-white to-slate-50" />
       )}
-      
-      <div className="container mx-auto px-6 relative z-10">
+
+      {/* Subtle top glow */}
+      <div
+        className={`absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[280px] blur-3xl pointer-events-none ${
+          isDark ? 'bg-[#8d44d1]/8' : 'bg-[#d4aaff]/25'
+        }`}
+      />
+
+      <div className="mx-auto max-w-7xl px-4 md:px-6 relative z-10">
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -83,149 +62,92 @@ export function ImpactFlowSection({ isDark = true }: ImpactFlowSectionProps) {
           transition={{ duration: 0.6 }}
           className="text-center mb-16 md:mb-20"
         >
-          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6 ${
-            isDark ? 'bg-teal-500/10 border-teal-500/20' : 'bg-teal-50 border-teal-200'
-          }`}>
-            <div className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
-            <span className={`text-sm font-medium ${isDark ? 'text-teal-400' : 'text-teal-600'}`}>The Journey</span>
+          <div
+            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6 ${
+              isDark
+                ? 'bg-[#8d44d1]/10 border-[#8d44d1]/20'
+                : 'bg-[#f5ecff] border-[#d4aaff]'
+            }`}
+          >
+            <div className="w-1.5 h-1.5 rounded-full bg-[#8d44d1] animate-pulse" />
+            <span className={`text-sm font-medium ${isDark ? 'text-[#a05cd4]' : 'text-[#5e269a]'}`}>
+              How It Works
+            </span>
           </div>
-          
-          <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            How Impact{' '}
-            <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-              Flows
+
+          <h2
+            className={`text-4xl md:text-5xl font-bold mb-4 ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}
+          >
+            Not charity.{' '}
+            <span className="bg-gradient-to-r from-[#a05cd4] to-[#8d44d1] bg-clip-text text-transparent">
+              Shared ownership.
             </span>
           </h2>
-          <p className={`text-lg max-w-2xl mx-auto ${isDark ? 'text-white/50' : 'text-slate-600'}`}>
-            A living system where every contribution creates ripples of change
+          <p className={`text-lg max-w-2xl mx-auto ${isDark ? 'text-white/50' : 'text-slate-500'}`}>
+            A regenerative loop where every contribution strengthens the whole system over time.
           </p>
         </motion.div>
 
-        {/* Desktop: Horizontal flow */}
-        <div className="hidden lg:block relative">
-          {/* Connection line */}
-          <div className={`absolute top-1/2 left-0 right-0 h-0.5 -translate-y-1/2 ${
-            isDark ? 'bg-gradient-to-r from-transparent via-white/10 to-transparent' : 'bg-gradient-to-r from-transparent via-slate-300 to-transparent'
-          }`} />
-          
-          <div className="grid grid-cols-5 gap-6">
-            {steps.map((step, index) => (
-              <motion.div
-                key={step.title}
-                initial={{ opacity: 0, y: 30 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: index * 0.15 }}
-                className="relative group"
-              >
-                {/* Card */}
-                <div className={`
-                  relative p-6 rounded-2xl border backdrop-blur-sm
-                  transition-all duration-500 hover:scale-105
-                  ${step.bgColor} ${step.borderColor}
-                  ${!isDark && 'bg-white/90 shadow-lg hover:shadow-xl ring-1 ring-slate-100'}
-                `}>
-                  {/* Gradient top bar for light mode */}
-                  {!isDark && <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r ${step.color}`} />}
-                  {/* Step number */}
-                  <div className={`absolute -top-3 -right-3 w-8 h-8 rounded-full border flex items-center justify-center ${
-                    isDark ? 'bg-slate-900 border-white/10' : 'bg-white border-slate-200 shadow-md'
-                  }`}>
-                    <span className={`text-sm font-bold ${isDark ? 'text-white/60' : 'text-slate-500'}`}>{index + 1}</span>
-                  </div>
-                  
-                  {/* Icon */}
-                  <div className={`
-                    w-14 h-14 rounded-xl mb-4 flex items-center justify-center
-                    bg-gradient-to-br ${step.color} shadow-lg
-                  `}>
-                    <step.icon className="w-7 h-7 text-white" />
-                  </div>
-                  
-                  {/* Content */}
-                  <h3 className={`text-lg font-semibold mb-2 leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {step.title}
-                  </h3>
-                  <p className={`text-sm leading-relaxed ${isDark ? 'text-white/50' : 'text-slate-600'}`}>
-                    {step.description}
-                  </p>
-                </div>
-
-                {/* Arrow connector (except last) */}
-                {index < steps.length - 1 && (
-                  <div className="absolute top-1/2 -right-6 transform -translate-y-1/2 z-10">
-                    <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={isInView ? { opacity: 1, x: 0 } : {}}
-                      transition={{ duration: 0.4, delay: index * 0.15 + 0.3 }}
-                      className="w-6 h-6 flex items-center justify-center"
-                    >
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path 
-                          d="M9 6L15 12L9 18" 
-                          stroke={isDark ? "rgba(255,255,255,0.3)" : "rgba(100,116,139,0.5)"} 
-                          strokeWidth="2" 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </motion.div>
-                  </div>
-                )}
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Mobile & Tablet: Vertical flow */}
-        <div className="lg:hidden space-y-6">
+        {/* Cards grid — same on all screen sizes, stacks on mobile */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           {steps.map((step, index) => (
             <motion.div
-              key={step.title}
-              initial={{ opacity: 0, x: -30 }}
-              animate={isInView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="relative"
+              key={step.step}
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.5, delay: index * 0.15 }}
+              className="group"
             >
-              {/* Vertical line connector */}
-              {index < steps.length - 1 && (
-                <div className={`absolute left-7 top-20 bottom-0 w-0.5 ${
-                  isDark ? 'bg-gradient-to-b from-white/20 to-transparent' : 'bg-gradient-to-b from-slate-300 to-transparent'
-                }`} />
-              )}
-              
-              <div className="flex gap-4">
+              {/* Single card */}
+              <div
+                className={`flex flex-col h-full p-6 rounded-2xl border transition-all duration-300 group-hover:border-[#8d44d1]/30 ${
+                  isDark
+                    ? 'bg-[#1e1040]/50 border-white/5 hover:bg-[#1e1040]/80'
+                    : 'bg-white border-slate-200 shadow-sm hover:shadow-md'
+                }`}
+              >
                 {/* Icon */}
-                <div className="flex-shrink-0">
-                  <div className={`
-                    w-14 h-14 rounded-xl flex items-center justify-center
-                    bg-gradient-to-br ${step.color} shadow-lg shadow-black/20
-                  `}>
-                    <step.icon className="w-7 h-7 text-white" />
-                  </div>
+                <div
+                  className={`w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#8d44d1] to-[#7030b0] shadow-md mb-5 ${
+                    isDark ? 'shadow-[#8d44d1]/25' : 'shadow-[#8d44d1]/15'
+                  }`}
+                >
+                  <step.icon className="w-5 h-5 text-white" />
                 </div>
-                
-                {/* Content */}
-                <div className={`
-                  flex-1 p-4 rounded-xl border backdrop-blur-sm relative
-                  ${step.bgColor} ${step.borderColor}
-                  ${!isDark && 'bg-white/90 shadow-md ring-1 ring-slate-100'}
-                `}>
-                  {/* Gradient top bar for light mode */}
-                  {!isDark && <div className={`absolute top-0 left-0 right-0 h-0.5 rounded-t-xl bg-gradient-to-r ${step.color}`} />}
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`text-xs font-medium ${isDark ? 'text-white/40' : 'text-slate-400'}`}>Step {index + 1}</span>
-                  </div>
-                  <h3 className={`text-lg font-semibold mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {step.title}
-                  </h3>
-                  <p className={`text-sm ${isDark ? 'text-white/50' : 'text-slate-600'}`}>
-                    {step.description}
-                  </p>
+
+                {/* Title + description */}
+                <h3
+                  className={`text-lg font-semibold mb-3 leading-snug ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}
+                >
+                  {step.title}
+                </h3>
+                <p
+                  className={`text-sm leading-relaxed flex-1 ${
+                    isDark ? 'text-white/45' : 'text-slate-500'
+                  }`}
+                >
+                  {step.description}
+                </p>
+
+                {/* Step number — bottom of card */}
+                <div className="mt-6 pt-4 border-t border-dashed border-current/10">
+                  <span
+                    className={`text-3xl font-black leading-none select-none ${
+                      isDark ? 'text-white/10' : 'text-slate-900/10'
+                    }`}
+                  >
+                    {step.step}
+                  </span>
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
+
       </div>
     </section>
   )

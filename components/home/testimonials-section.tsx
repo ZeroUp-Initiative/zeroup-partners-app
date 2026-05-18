@@ -48,7 +48,7 @@ const testimonials = [
 ]
 
 const typeColors: Record<string, string> = {
-  community: 'from-emerald-400 to-teal-400',
+  community: 'from-[#a05cd4] to-[#8d44d1]',
   partner: 'from-blue-400 to-indigo-400',
   youth: 'from-purple-400 to-pink-400'
 }
@@ -88,16 +88,16 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
       ref={sectionRef}
       className={`relative py-24 md:py-32 overflow-hidden ${
         isDark 
-          ? 'bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950' 
+          ? 'bg-gradient-to-b from-[#130927] via-[#1a0d35] to-[#130927]' 
           : 'bg-gradient-to-b from-amber-50/30 via-white to-orange-50/20'
       }`}
     >
       {/* Background decoration */}
-      <div className={`absolute top-20 left-10 w-64 h-64 rounded-full blur-3xl ${isDark ? 'bg-emerald-500/5' : 'bg-amber-200/40'}`} />
+      <div className={`absolute top-20 left-10 w-64 h-64 rounded-full blur-3xl ${isDark ? 'bg-[#8d44d1]/5' : 'bg-amber-200/40'}`} />
       <div className={`absolute bottom-20 right-10 w-64 h-64 rounded-full blur-3xl ${isDark ? 'bg-purple-500/5' : 'bg-orange-200/40'}`} />
       {!isDark && <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-yellow-200/30 rounded-full blur-3xl" />}
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="mx-auto max-w-7xl px-4 md:px-6 relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -106,15 +106,15 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
           className="text-center mb-16 md:mb-20"
         >
           <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6 ${
-            isDark ? 'bg-amber-500/10 border-amber-500/20' : 'bg-amber-50 border-amber-200'
+            isDark ? 'bg-[#833dc6]/10 border-[#833dc6]/20' : 'bg-[#833dc6]/10 border-[#833dc6]/20'
           }`}>
-            <Quote className={`w-3.5 h-3.5 ${isDark ? 'text-amber-400' : 'text-amber-600'}`} />
-            <span className={`text-sm font-medium ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>Real Voices</span>
+            <Quote className={`w-3.5 h-3.5 text-[#833dc6]`} />
+            <span className={`text-sm font-medium ${isDark ? 'text-[#833dc6]' : 'text-[#833dc6]'}`}>Real Voices</span>
           </div>
           
           <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
             Voices From the{' '}
-            <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+            <span className="text-[#833dc6]">
               Ecosystem
             </span>
           </h2>
@@ -129,7 +129,7 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
         >
           <div className={`relative backdrop-blur-sm rounded-3xl border p-8 md:p-12 lg:p-16 ${
             isDark 
-              ? 'bg-slate-900/50 border-white/5' 
+              ? 'bg-[#1e1040]/50 border-white/5' 
               : 'bg-white/90 border-amber-200 shadow-xl shadow-amber-500/10 ring-1 ring-amber-100'
           }`}>
             {/* Gradient top bar for light mode */}
@@ -194,7 +194,7 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
                     }}
                     className={`w-2 h-2 rounded-full transition-all duration-300 ${
                       index === currentIndex 
-                        ? 'w-8 bg-gradient-to-r from-emerald-400 to-teal-400' 
+                        ? 'w-8 bg-gradient-to-r from-[#a05cd4] to-[#8d44d1]' 
                         : isDark ? 'bg-white/20 hover:bg-white/40' : 'bg-slate-300 hover:bg-slate-400'
                     }`}
                   />
@@ -225,7 +225,7 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
         </motion.div>
 
         {/* Mobile: Scrollable cards */}
-        <div className="md:hidden mt-8 -mx-6 px-6 overflow-x-auto scrollbar-hide">
+        <div className="md:hidden mt-8 -mx-4 px-4 overflow-x-auto scrollbar-hide">
           <div className="flex gap-4 pb-4" style={{ width: 'max-content' }}>
             {testimonials.map((testimonial, index) => (
               <motion.div
@@ -234,7 +234,7 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
                 animate={isInView ? { opacity: 1, x: 0 } : {}}
                 transition={{ delay: index * 0.1 }}
                 className={`w-[300px] flex-shrink-0 rounded-xl border p-5 ${
-                  isDark ? 'bg-slate-900/50 border-white/5' : 'bg-white/90 border-amber-200 shadow-lg ring-1 ring-amber-100'
+                  isDark ? 'bg-[#1e1040]/50 border-white/5' : 'bg-white/90 border-amber-200 shadow-lg ring-1 ring-amber-100'
                 }`}
               >
                 {/* Gradient top bar for light mode */}

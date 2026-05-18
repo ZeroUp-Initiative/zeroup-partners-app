@@ -15,7 +15,7 @@ const principles = [
     icon: FileText,
     title: 'Open Impact Reporting',
     description: 'Every project, every outcome — transparent and accessible to all stakeholders.',
-    color: 'from-emerald-400 to-teal-400'
+    color: 'from-[#a05cd4] to-[#8d44d1]'
   },
   {
     icon: Route,
@@ -50,8 +50,8 @@ export function TransparencySection({ isDark = true }: TransparencySectionProps)
       ref={sectionRef}
       className={`relative py-24 md:py-32 overflow-hidden ${
         isDark 
-          ? 'bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950' 
-          : 'bg-gradient-to-b from-emerald-50/40 via-white to-teal-50/30'
+          ? 'bg-gradient-to-b from-[#130927] via-[#1a0d35] to-[#130927]' 
+          : 'bg-gradient-to-b from-[#f5ecff]/40 via-white to-[#f5ecff]/30'
       }`}
     >
       {/* Background nodes pattern */}
@@ -59,7 +59,7 @@ export function TransparencySection({ isDark = true }: TransparencySectionProps)
         <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
           <defs>
             <pattern id="trustGrid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-              <circle cx="10" cy="10" r="1" fill="currentColor" className="text-emerald-500" />
+              <circle cx="10" cy="10" r="1" fill="currentColor" className="text-[#8d44d1]" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#trustGrid)" />
@@ -69,13 +69,13 @@ export function TransparencySection({ isDark = true }: TransparencySectionProps)
       {/* Light mode decorative blobs */}
       {!isDark && (
         <>
-          <div className="absolute top-20 left-10 w-64 h-64 bg-emerald-200/40 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-64 h-64 bg-teal-200/40 rounded-full blur-3xl" />
+          <div className="absolute top-20 left-10 w-64 h-64 bg-[#d4aaff]/40 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-64 h-64 bg-[#d4aaff]/40 rounded-full blur-3xl" />
           <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-green-100/30 rounded-full blur-3xl" />
         </>
       )}
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="mx-auto max-w-7xl px-4 md:px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Left: Content */}
           <motion.div
@@ -84,15 +84,15 @@ export function TransparencySection({ isDark = true }: TransparencySectionProps)
             transition={{ duration: 0.8 }}
           >
             <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6 ${
-              isDark ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-emerald-50 border-emerald-200'
+              isDark ? 'bg-[#8d44d1]/10 border-[#8d44d1]/20' : 'bg-[#f5ecff] border-[#d4aaff]'
             }`}>
-              <Shield className={`w-3.5 h-3.5 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`} />
-              <span className={`text-sm font-medium ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>Our Promise</span>
+              <Shield className={`w-3.5 h-3.5 ${isDark ? 'text-[#a05cd4]' : 'text-[#7030b0]'}`} />
+              <span className={`text-sm font-medium ${isDark ? 'text-[#a05cd4]' : 'text-[#7030b0]'}`}>Our Promise</span>
             </div>
             
             <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
               Built on{' '}
-              <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#a05cd4] to-[#8d44d1] bg-clip-text text-transparent">
                 Transparency
               </span>
             </h2>
@@ -111,10 +111,10 @@ export function TransparencySection({ isDark = true }: TransparencySectionProps)
                   animate={isInView ? { opacity: 1, scale: 1 } : {}}
                   transition={{ delay: 0.3 + index * 0.1 }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-full border ${
-                    isDark ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-emerald-50 border-emerald-200'
+                    isDark ? 'bg-[#8d44d1]/10 border-[#8d44d1]/20' : 'bg-[#f5ecff] border-[#d4aaff]'
                   }`}
                 >
-                  <Check className={`w-4 h-4 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                  <Check className={`w-4 h-4 ${isDark ? 'text-[#a05cd4]' : 'text-[#7030b0]'}`} />
                   <span className={`text-sm ${isDark ? 'text-white/80' : 'text-slate-700'}`}>{item}</span>
                 </motion.div>
               ))}
@@ -138,8 +138,8 @@ export function TransparencySection({ isDark = true }: TransparencySectionProps)
               >
                 <div className={`h-full p-6 rounded-2xl border transition-all duration-300 ${
                   isDark 
-                    ? 'bg-slate-900/50 border-white/5 hover:border-white/10 hover:bg-slate-900/70' 
-                    : 'bg-white/90 border-emerald-200 shadow-lg ring-1 ring-emerald-100 hover:border-emerald-300 hover:shadow-emerald-500/15 hover:ring-emerald-200'
+                    ? 'bg-[#1e1040]/50 border-white/5 hover:border-white/10 hover:bg-[#1e1040]/70' 
+                    : 'bg-white/90 border-[#d4aaff] shadow-lg ring-1 ring-[#ede9fe] hover:border-[#c084f5] hover:shadow-[#8d44d1]/15 hover:ring-[#d4aaff]'
                 }`}>
                   {/* Gradient top bar for light mode */}
                   {!isDark && <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r ${principle.color}`} />}

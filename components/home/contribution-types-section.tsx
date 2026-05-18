@@ -23,8 +23,8 @@ const contributionTypes = [
     icon: Banknote,
     title: 'Funding',
     description: 'Direct financial support for project phases',
-    color: 'from-emerald-400 to-emerald-600',
-    hoverBg: 'group-hover:bg-emerald-500/10'
+    color: 'from-[#a05cd4] to-[#7030b0]',
+    hoverBg: 'group-hover:bg-[#8d44d1]/10'
   },
   {
     icon: Wrench,
@@ -71,12 +71,12 @@ export function ContributionTypesSection({ isDark = true }: ContributionTypesSec
     <section 
       ref={sectionRef}
       className={`relative py-24 md:py-32 overflow-hidden ${
-        isDark ? 'bg-slate-950' : 'bg-gradient-to-b from-purple-50/30 via-white to-pink-50/30'
+        isDark ? 'bg-[#130927]' : 'bg-gradient-to-b from-purple-50/30 via-white to-pink-50/30'
       }`}
     >
       {/* Background glow */}
       <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-radial blur-3xl ${
-        isDark ? 'from-emerald-500/5 via-transparent to-transparent' : 'from-purple-200/40 via-pink-100/20 to-transparent'
+        isDark ? 'from-[#8d44d1]/5 via-transparent to-transparent' : 'from-purple-200/40 via-pink-100/20 to-transparent'
       }`} />
       
       {/* Light mode decorative blobs */}
@@ -88,7 +88,7 @@ export function ContributionTypesSection({ isDark = true }: ContributionTypesSec
         </>
       )}
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="mx-auto max-w-7xl px-4 md:px-6 relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -105,7 +105,7 @@ export function ContributionTypesSection({ isDark = true }: ContributionTypesSec
           
           <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
             More Than{' '}
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="text-[#833dc6]">
               Money
             </span>
           </h2>
@@ -127,9 +127,9 @@ export function ContributionTypesSection({ isDark = true }: ContributionTypesSec
               <div className={`
                 relative h-full p-6 md:p-8 rounded-2xl border 
                 backdrop-blur-sm transition-all duration-500
-                hover:shadow-xl ${type.hoverBg}
+                hover:shadow-xl hover:bg-[#833dc6]/20
                 ${isDark 
-                  ? 'border-white/5 bg-slate-900/30 hover:border-white/10' 
+                  ? 'border-white/5 bg-[#1e1040]/30 hover:border-white/10' 
                   : 'border-slate-200 bg-white/90 shadow-lg ring-1 ring-slate-100 hover:border-purple-300 hover:shadow-purple-500/10 hover:ring-purple-200'
                 }
               `}>
@@ -146,7 +146,7 @@ export function ContributionTypesSection({ isDark = true }: ContributionTypesSec
 
                 {/* Content */}
                 <h3 className={`text-xl font-semibold mb-2 transition-colors ${
-                  isDark ? 'text-white group-hover:text-emerald-400' : 'text-slate-900 group-hover:text-purple-600'
+                  isDark ? 'text-white group-hover:text-[#a05cd4]' : 'text-slate-900 group-hover:text-purple-600'
                 }`}>
                   {type.title}
                 </h3>
@@ -176,7 +176,7 @@ export function ContributionTypesSection({ isDark = true }: ContributionTypesSec
           <Link href="/signup">
             <Button 
               size="lg"
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg shadow-purple-500/20"
+              className="bg-[#833dc6] text-white shadow-lg shadow-purple-500/20"
             >
               Find Your Way to Contribute
               <ArrowRight className="w-5 h-5 ml-2" />

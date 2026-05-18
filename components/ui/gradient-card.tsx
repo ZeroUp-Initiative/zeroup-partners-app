@@ -21,9 +21,9 @@ interface GradientCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const gradientStyles: Record<GradientVariant, { bar: string; icon: string; glow: string }> = {
   emerald: {
-    bar: "from-emerald-500 to-teal-400",
-    icon: "bg-gradient-to-br from-emerald-500/20 to-teal-400/20 text-emerald-600 dark:text-emerald-400",
-    glow: "hover:shadow-emerald-500/25"
+    bar: "from-[#8d44d1] to-[#8d44d1]",
+    icon: "bg-gradient-to-br from-[#8d44d1]/20 to-[#8d44d1]/20 text-[#7030b0] dark:text-[#a05cd4]",
+    glow: "hover:shadow-[#8d44d1]/25"
   },
   blue: {
     bar: "from-blue-500 to-cyan-400",
@@ -111,7 +111,7 @@ export function GradientCard({
         {trend && (
           <div className={cn(
             "flex items-center gap-1 text-xs font-medium mt-2",
-            trend.value >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+            trend.value >= 0 ? "text-[#7030b0] dark:text-[#a05cd4]" : "text-rose-600 dark:text-rose-400"
           )}>
             <span>{trend.value >= 0 ? "↑" : "↓"} {Math.abs(trend.value)}%</span>
             <span className="text-muted-foreground">{trend.label}</span>

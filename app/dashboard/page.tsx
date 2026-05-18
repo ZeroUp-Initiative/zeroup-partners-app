@@ -519,13 +519,13 @@ function DashboardPage() {
                   {/* Grid of Action Cards */}
                   <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                     <LogContributionModal>
-                        <Card className="group hover:shadow-lg hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer border-transparent hover:border-emerald-500/30">
+                        <Card className="group hover:shadow-lg hover:shadow-[#8d44d1]/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer border-transparent hover:border-[#8d44d1]/30">
                             <CardHeader className="flex flex-row items-center gap-4">
-                                <div className="bg-gradient-to-br from-emerald-500/20 to-teal-400/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                                    <Plus className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                                <div className="bg-gradient-to-br from-[#8d44d1]/20 to-[#8d44d1]/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                                    <Plus className="h-6 w-6 text-[#7030b0] dark:text-[#a05cd4]" />
                                 </div>
                                 <div>
-                                    <CardTitle className="group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Log a New Contribution</CardTitle>
+                                    <CardTitle className="group-hover:text-[#7030b0] dark:group-hover:text-[#a05cd4] transition-colors">Log a New Contribution</CardTitle>
                                     <CardDescription>Submit your monthly support.</CardDescription>
                                 </div>
                             </CardHeader>
@@ -812,7 +812,7 @@ function DashboardPage() {
                                             "from-amber-600 to-amber-700", // 3rd
                                             "from-purple-500 to-purple-600", // 4th
                                             "from-blue-500 to-blue-600", // 5th
-                                            "from-teal-500 to-teal-600", // 6th
+                                            "from-[#7030b0] to-[#5e269a]", // 6th
                                         ];
                                         return (
                                             <div 
