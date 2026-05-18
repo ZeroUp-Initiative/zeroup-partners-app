@@ -89,7 +89,7 @@ export default function RootLayout({
         <meta name="msapplication-tap-highlight" content="no" />
       </head>
       <body className={`font-sans ${plusJakartaSans.variable} antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange={false}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange={false}>
           <AppProviders>
             <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
           </AppProviders>
