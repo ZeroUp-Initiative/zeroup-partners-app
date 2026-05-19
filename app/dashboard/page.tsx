@@ -25,6 +25,7 @@ import { CurrencyCounter, AnimatedCounter } from "@/components/ui/animated-count
 import { ProgressRing } from "@/components/ui/progress-ring"
 import { MiniBarChart } from "@/components/ui/mini-chart"
 import { PartnerFlierModal } from "@/components/partner-flier-card"
+import { SubmitProjectModal } from "@/components/projects/submit-project-modal"
 import toast from "react-hot-toast"
 
 interface MonthlyData {
@@ -50,6 +51,7 @@ function DashboardPage() {
     return `${now.getFullYear()}-${now.getMonth()}`;
   });
   const [isDownloadingFlier, setIsDownloadingFlier] = useState(false);
+  const [isSubmitProjectOpen, setIsSubmitProjectOpen] = useState(false);
   const partnerFlierRef = useRef<HTMLDivElement>(null);
 
   const copyAccountNumber = () => {
@@ -557,6 +559,17 @@ function DashboardPage() {
                             </CardHeader>
                         </Card>
                     </Link>
+                    <Card className="group hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer" onClick={() => setIsSubmitProjectOpen(true)}>
+                        <CardHeader className="flex flex-row items-center gap-4">
+                            <div className="bg-gradient-to-br from-[#8d44d1]/15 to-[#7030b0]/15 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                                <Target className="h-6 w-6 text-[#7030b0] dark:text-[#a05cd4]" />
+                            </div>
+                            <div>
+                                <CardTitle className="group-hover:text-[#7030b0] dark:group-hover:text-[#a05cd4] transition-colors">Submit a Project</CardTitle>
+                                <CardDescription>Propose a project for community funding.</CardDescription>
+                            </div>
+                        </CardHeader>
+                    </Card>
                     
                     {/* Bank Account Details Card */}
                     <Card className="lg:col-span-2 relative overflow-hidden">
@@ -855,6 +868,8 @@ function DashboardPage() {
             </Tabs>
           </div>
       </main>
+
+      <SubmitProjectModal open={isSubmitProjectOpen} onOpenChange={setIsSubmitProjectOpen} />
     </div>
   )
 }

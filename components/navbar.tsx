@@ -13,6 +13,7 @@ interface NavbarProps {
   user?: {
     firstName?: string;
     displayName?: string | null;
+    role?: string;
   } | null;
 }
 
@@ -81,6 +82,19 @@ export function Navbar({ isDark, isLoggedIn, user }: NavbarProps) {
             {isLoggedIn && (
               <Link href="/dashboard" className={navLinkClass}>
                 Dashboard
+              </Link>
+            )}
+
+            {isLoggedIn && user?.role === 'admin' && (
+              <Link
+                href="/admin"
+                className={`text-sm font-semibold px-3 py-1.5 rounded-md transition-colors ${
+                  isDark
+                    ? "text-[#a05cd4] hover:text-white hover:bg-[#8d44d1]/20"
+                    : "text-[#7030b0] hover:text-[#5e1a94] hover:bg-[#f5ecff]"
+                }`}
+              >
+                Admin
               </Link>
             )}
           </nav>
@@ -209,6 +223,20 @@ export function Navbar({ isDark, isLoggedIn, user }: NavbarProps) {
                   >
                     Profile
                   </Link>
+
+                  {user?.role === 'admin' && (
+                    <Link
+                      href="/admin"
+                      className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                        isDark
+                          ? "text-[#a05cd4] hover:text-white hover:bg-[#8d44d1]/20"
+                          : "text-[#7030b0] hover:text-[#5e1a94] hover:bg-[#f5ecff]"
+                      }`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Admin Panel
+                    </Link>
+                  )}
                 </>
               ) : (
                 <>

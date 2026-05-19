@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link"
-import { DollarSign, Activity, FolderOpen } from "lucide-react"
+import { DollarSign, Activity, FolderOpen, ChevronLeft, ChevronRight } from "lucide-react"
 
 function AdminDashboard() {
   const [pendingPayments, setPendingPayments] = useState<any[]>([])
@@ -22,6 +22,8 @@ function AdminDashboard() {
   const [isRejecting, setIsRejecting] = useState<string | null>(null)
   const [stats, setStats] = useState({ totalFunds: 0, activeProjects: 0, pendingCount: 0 })
   const [viewingProof, setViewingProof] = useState<string | null>(null)
+  const [historyPage, setHistoryPage] = useState(1)
+  const HISTORY_PAGE_SIZE = 10
   const { user } = useAuth()
 
   const fetchPayments = async () => {
@@ -205,44 +207,115 @@ function AdminDashboard() {
       </Card>
 
       {/* Contribution History */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Contribution History</CardTitle>
-          <CardDescription>A log of all approved and rejected contributions.</CardDescription>
-        </CardHeader>
-        <CardContent className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Reason</TableHead>
-                <TableHead>Proof</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {processedPayments.map(payment => (
-                <TableRow key={payment.id}>
-                  <TableCell className="font-medium">{payment.userFullName || "N/A"}</TableCell>
-                  <TableCell>₦{payment.amount?.toLocaleString() || "0.00"}</TableCell>
-                  <TableCell>{payment.date?.toLocaleDateString() || "N/A"}</TableCell>
-                  <TableCell>
-                    <Badge variant={payment.status === 'approved' ? 'secondary' : 'destructive'}>{payment.status}</Badge>
-                  </TableCell>
-                  <TableCell className="text-xs">{payment.rejectionReason || "-"}</TableCell>
-                  <TableCell>
-                    <Button variant="outline" size="sm" onClick={() => setViewingProof(payment.proofURL)}>
-                      View
+      {(() => {
+        const historyTotalPages = Math.ceil(processedPayments.length / HISTORY_PAGE_SIZE)
+        const historyStart = (historyPage - 1) * HISTORY_PAGE_SIZE
+        const pagedHistory = processedPayments.slice(historyStart, historyStart + HISTORY_PAGE_SIZE)
+        return (
+          <Card>
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div>
+                <CardTitle>Contribution History</CardTitle>
+                <CardDescription>
+                  {processedPayments.length} processed contribution{processedPayments.length !== 1 ? 's' : ''}
+                </CardDescription>
+              </div>
+              {historyTotalPages > 1 && (
+                <p className="text-sm text-muted-foreground">
+                  Page {historyPage} of {historyTotalPages}
+                </p>
+              )}
+            </CardHeader>
+            <CardContent className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Reason</TableHead>
+                    <TableHead>Proof</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pagedHistory.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        No processed contributions yet.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    pagedHistory.map(payment => (
+                      <TableRow key={payment.id}>
+                        <TableCell className="font-medium">{payment.userFullName || "N/A"}</TableCell>
+                        <TableCell>₦{payment.amount?.toLocaleString() || "0.00"}</TableCell>
+                        <TableCell>{payment.date?.toLocaleDateString() || "N/A"}</TableCell>
+                        <TableCell>
+                          <Badge variant={payment.status === 'approved' ? 'secondary' : 'destructive'}>
+                            {payment.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-xs max-w-[160px] truncate">{payment.rejectionReason || "-"}</TableCell>
+                        <TableCell>
+                          <Button variant="outline" size="sm" onClick={() => setViewingProof(payment.proofURL)}>
+                            View
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+
+              {historyTotalPages > 1 && (
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t pt-4 mt-4">
+                  <p className="text-sm text-muted-foreground">
+                    Showing {historyStart + 1}–{Math.min(historyStart + HISTORY_PAGE_SIZE, processedPayments.length)} of {processedPayments.length}
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="outline" size="sm"
+                      onClick={() => setHistoryPage(p => Math.max(1, p - 1))}
+                      disabled={historyPage === 1}
+                      className="h-8 w-8 p-0"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
                     </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                    {Array.from({ length: historyTotalPages }, (_, i) => i + 1).map(page => {
+                      const isEdge = page === 1 || page === historyTotalPages
+                      const isNear = Math.abs(page - historyPage) <= 1
+                      if (!isEdge && !isNear) {
+                        if (page === 2 || page === historyTotalPages - 1) return <span key={page} className="px-1 text-muted-foreground text-sm">…</span>
+                        return null
+                      }
+                      return (
+                        <Button
+                          key={page}
+                          variant={historyPage === page ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setHistoryPage(page)}
+                          className={`h-8 w-8 p-0 ${historyPage === page ? 'bg-[#8d44d1] hover:bg-[#7030b0] border-[#8d44d1]' : ''}`}
+                        >
+                          {page}
+                        </Button>
+                      )
+                    })}
+                    <Button
+                      variant="outline" size="sm"
+                      onClick={() => setHistoryPage(p => Math.min(historyTotalPages, p + 1))}
+                      disabled={historyPage === historyTotalPages}
+                      className="h-8 w-8 p-0"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )
+      })()}
       
       {/* Rejection Dialog */}
       <Dialog open={isRejecting !== null} onOpenChange={() => setIsRejecting(null)}>

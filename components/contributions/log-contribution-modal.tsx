@@ -135,6 +135,24 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
         createdAt: serverTimestamp(),
       })
 
+      // Send confirmation email (fire-and-forget)
+      if (user.email) {
+        fetch('/api/email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: user.email,
+            type: 'contribution_submitted',
+            data: {
+              name: user.firstName || 'Partner',
+              amount: amount,
+              description: formData.description,
+              date: new Date(formData.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+            },
+          }),
+        }).catch(() => {})
+      }
+
       setSuccess("Contribution logged successfully!")
       setTimeout(() => {
         setOpen(false)

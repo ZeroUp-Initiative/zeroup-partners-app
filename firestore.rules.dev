@@ -1,0 +1,68 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // DEVELOPMENT RULES - More permissive for testing
+    // WARNING: Do NOT use in production
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+    }
+    
+    // Users collection - DEV: Allow more operations for testing
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    
+    // Payments collection - DEV: Allow all authenticated operations
+    match /payments/{paymentId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    
+    // Projects collection - DEV: Allow all operations
+    match /projects/{projectId} {
+      allow read, create, update, delete: if isAuthenticated();
+    }
+    
+    // Notifications - DEV: Allow all operations
+    match /notifications/{notificationId} {
+      allow read, create, update, delete: if isAuthenticated();
+    }
+    
+    // Gamification
+    match /userCoins/{userId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    // Achievements
+    match /achievements/{achievementId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    // User achievements
+    match /userAchievements/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    // Notification preferences
+    match /notificationPreferences/{userId} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+}

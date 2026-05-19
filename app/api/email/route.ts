@@ -1,0 +1,187 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { sendMail } from '@/lib/mailer'
+
+const FROM = process.env.EMAIL_FROM ?? 'ZeroUp Partners <onboarding@zeroup.dev>'
+
+const BASE_URL = 'https://zeroup-partners-app.vercel.app'
+
+const sharedStyles = `
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background: #f4f4f5; }
+  .wrapper { padding: 32px 16px; }
+  .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .header { background: linear-gradient(135deg, #8d44d1, #7030b0); color: white; padding: 36px 32px; text-align: center; }
+  .header h1 { margin: 0; font-size: 24px; font-weight: 700; }
+  .header p { margin: 8px 0 0; opacity: 0.85; font-size: 15px; }
+  .body { padding: 32px; }
+  .body p { margin: 0 0 16px; color: #444; }
+  .highlight { background: #f5ecff; border-left: 4px solid #8d44d1; border-radius: 4px; padding: 16px; margin: 20px 0; }
+  .highlight strong { color: #7030b0; display: block; margin-bottom: 4px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .btn { display: inline-block; background: linear-gradient(135deg, #8d44d1, #7030b0); color: #ffffff !important; text-decoration: none; padding: 13px 28px; border-radius: 8px; font-weight: 600; font-size: 15px; margin-top: 8px; }
+  .footer { text-align: center; padding: 24px 32px; color: #888; font-size: 13px; border-top: 1px solid #f0f0f0; }
+`
+
+type EmailData = Record<string, string | undefined>
+
+const templates: Record<string, (data: EmailData) => { subject: string; html: string }> = {
+  custom: ({ name, subject: _subject, body }) => ({
+    subject: _subject ?? 'A message from ZeroUp Partners',
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header"><h1>ZeroUp Partners</h1></div>
+        <div class="body">
+          <p>Hi ${name ?? 'Partner'},</p>
+          ${(body ?? '').split('\n').map((line: string) => `<p>${line}</p>`).join('')}
+          <a href="${BASE_URL}/dashboard" class="btn">Go to Dashboard</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  project_submitted: ({ name, title }) => ({
+    subject: `📋 Project Received: "${title}"`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header">
+          <h1>📋 Submission Received!</h1>
+          <p>Thank you for submitting your project.</p>
+        </div>
+        <div class="body">
+          <p>Hi ${name},</p>
+          <p>We've received your project submission and it's now pending review by our team.</p>
+          <div class="highlight">
+            <strong>Project</strong>
+            ${title}
+          </div>
+          <p>Our team will review your submission within <strong>3–5 business days</strong>. You'll receive an email as soon as a decision is made.</p>
+          <p>In the meantime, feel free to explore the platform and contribute to existing projects.</p>
+          <a href="${BASE_URL}/projects" class="btn">View Live Projects</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  project_approved: ({ name, title, notes }) => ({
+    subject: `🎉 Your Project Has Been Approved — "${title}"`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header">
+          <h1>🎉 Project Approved!</h1>
+          <p>Your project is now live on the platform.</p>
+        </div>
+        <div class="body">
+          <p>Hi ${name},</p>
+          <p>Congratulations! Your project has been reviewed and <strong>approved</strong>. It's now publicly visible and open for contributions.</p>
+          <div class="highlight">
+            <strong>Project</strong>
+            ${title}
+          </div>
+          ${notes ? `<div class="highlight"><strong>Note from our team</strong>${notes}</div>` : ''}
+          <p>Partners can now discover and contribute to your project. Share the link to spread the word!</p>
+          <a href="${BASE_URL}/projects" class="btn">View Your Project</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  contribution_submitted: ({ name, amount, description, date }) => ({
+    subject: `📬 Contribution Received — ₦${Number(amount).toLocaleString()}`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header">
+          <h1>📬 Contribution Received!</h1>
+          <p>We've received your contribution and it's under review.</p>
+        </div>
+        <div class="body">
+          <p>Hi ${name},</p>
+          <p>Thank you! Your contribution has been logged and is now pending verification by our team. You'll receive another email once it's approved.</p>
+          <div class="highlight">
+            <strong>Amount</strong>
+            ₦${Number(amount).toLocaleString()}
+          </div>
+          ${description ? `<div class="highlight"><strong>Description</strong>${description}</div>` : ''}
+          ${date ? `<div class="highlight"><strong>Date</strong>${date}</div>` : ''}
+          <p>If you have any questions about your contribution, please don't hesitate to reach out.</p>
+          <a href="${BASE_URL}/contributions" class="btn">View My Contributions</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  welcome: ({ name }) => ({
+    subject: '🎉 Welcome to ZeroUp Partners!',
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header">
+          <h1>Welcome to ZeroUp Partners! 🌟</h1>
+          <p>We're thrilled to have you on board.</p>
+        </div>
+        <div class="body">
+          <p>Hi ${name},</p>
+          <p>Thank you for joining the ZeroUp Initiative! You're now part of a community of change-makers making a real difference.</p>
+          <div class="highlight"><strong>What you can do</strong>Log contributions, track your impact, earn Dreamers Coins, and unlock achievements.</div>
+          <p>Ready to make your first contribution?</p>
+          <a href="${BASE_URL}/dashboard" class="btn">Go to Dashboard</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  project_rejected: ({ name, title, notes }) => ({
+    subject: `Update on Your Project Submission — "${title}"`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header" style="background: linear-gradient(135deg, #64748b, #475569);">
+          <h1>Project Submission Update</h1>
+          <p>We've reviewed your project submission.</p>
+        </div>
+        <div class="body">
+          <p>Hi ${name},</p>
+          <p>Thank you for submitting your project. After careful review, we were unable to approve it at this time.</p>
+          <div class="highlight">
+            <strong>Project</strong>
+            ${title}
+          </div>
+          ${notes ? `<div class="highlight"><strong>Feedback from our team</strong>${notes}</div>` : `<p>If you'd like more information about this decision, please reach out to our team directly.</p>`}
+          <p>You're welcome to address any concerns and resubmit your project in the future. We encourage you to keep making an impact!</p>
+          <a href="${BASE_URL}/dashboard" class="btn">Go to Dashboard</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const { to, type, data } = await req.json()
+
+    if (!to || !type || !templates[type]) {
+      return NextResponse.json({ error: 'Invalid request: missing to, type, or unrecognised template' }, { status: 400 })
+    }
+
+    const template = templates[type](data ?? {})
+
+    const result = await sendMail({
+      from: FROM,
+      to,
+      subject: template.subject,
+      html: template.html,
+    })
+
+    return NextResponse.json({ success: true, messageId: result.messageId || null })
+  } catch (error) {
+    console.error('Email send error:', error)
+    return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
+  }
+}
