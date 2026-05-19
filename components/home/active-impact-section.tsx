@@ -76,8 +76,8 @@ export function ActiveImpactSection({ projects, isDark = true }: ActiveImpactSec
       {/* Light mode decorative blobs */}
       {!isDark && (
         <>
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#d4aaff]/30 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#d4aaff]/30 rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#8d44d1]/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#8d44d1]/5 rounded-full blur-3xl" />
         </>
       )}
 
@@ -91,7 +91,7 @@ export function ActiveImpactSection({ projects, isDark = true }: ActiveImpactSec
         >
           <div>
             <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6 ${
-              isDark ? 'bg-[#8d44d1]/10 border-[#8d44d1]/20' : 'bg-[#f5ecff] border-[#d4aaff]'
+              isDark ? 'bg-[#8d44d1]/10 border-[#8d44d1]/20' : 'bg-[#f5ecff] border-slate-200'
             }`}>
               <Sparkles className={`w-3.5 h-3.5 ${isDark ? 'text-[#a05cd4]' : 'text-[#7030b0]'}`} />
               <span className={`text-sm font-medium ${isDark ? 'text-[#a05cd4]' : 'text-[#7030b0]'}`}>Live Projects</span>
@@ -139,7 +139,7 @@ export function ActiveImpactSection({ projects, isDark = true }: ActiveImpactSec
                   <div className={`relative h-full backdrop-blur-sm rounded-2xl border overflow-hidden transition-all duration-500 hover:shadow-xl ${
                     isDark 
                       ? 'bg-[#1e1040]/50 border-white/5 hover:border-[#8d44d1]/30 hover:shadow-[#8d44d1]/5' 
-                      : 'bg-white/90 border-[#d4aaff] shadow-lg ring-1 ring-[#ede9fe] hover:border-[#a05cd4] hover:shadow-[#8d44d1]/20 hover:ring-[#d4aaff]'
+                      : 'bg-white/90 border-slate-200 shadow-lg hover:border-slate-300 hover:shadow-md '
                   }`}>
                     {/* Gradient top bar for light mode */}
                     {!isDark && <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#a05cd4] to-[#8d44d1] z-10" />}

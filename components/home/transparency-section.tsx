@@ -69,9 +69,9 @@ export function TransparencySection({ isDark = true }: TransparencySectionProps)
       {/* Light mode decorative blobs */}
       {!isDark && (
         <>
-          <div className="absolute top-20 left-10 w-64 h-64 bg-[#d4aaff]/40 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-64 h-64 bg-[#d4aaff]/40 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-green-100/30 rounded-full blur-3xl" />
+          <div className="absolute top-20 left-10 w-64 h-64 bg-[#8d44d1]/6 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-64 h-64 bg-[#8d44d1]/6 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-slate-50/10 rounded-full blur-3xl" />
         </>
       )}
 
@@ -84,7 +84,7 @@ export function TransparencySection({ isDark = true }: TransparencySectionProps)
             transition={{ duration: 0.8 }}
           >
             <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6 ${
-              isDark ? 'bg-[#8d44d1]/10 border-[#8d44d1]/20' : 'bg-[#f5ecff] border-[#d4aaff]'
+              isDark ? 'bg-[#8d44d1]/10 border-[#8d44d1]/20' : 'bg-[#f5ecff] border-slate-200'
             }`}>
               <Shield className={`w-3.5 h-3.5 ${isDark ? 'text-[#a05cd4]' : 'text-[#7030b0]'}`} />
               <span className={`text-sm font-medium ${isDark ? 'text-[#a05cd4]' : 'text-[#7030b0]'}`}>Our Promise</span>
@@ -111,7 +111,7 @@ export function TransparencySection({ isDark = true }: TransparencySectionProps)
                   animate={isInView ? { opacity: 1, scale: 1 } : {}}
                   transition={{ delay: 0.3 + index * 0.1 }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-full border ${
-                    isDark ? 'bg-[#8d44d1]/10 border-[#8d44d1]/20' : 'bg-[#f5ecff] border-[#d4aaff]'
+                    isDark ? 'bg-[#8d44d1]/10 border-[#8d44d1]/20' : 'bg-[#f5ecff] border-slate-200'
                   }`}
                 >
                   <Check className={`w-4 h-4 ${isDark ? 'text-[#a05cd4]' : 'text-[#7030b0]'}`} />
@@ -139,7 +139,7 @@ export function TransparencySection({ isDark = true }: TransparencySectionProps)
                 <div className={`h-full p-6 rounded-2xl border transition-all duration-300 ${
                   isDark 
                     ? 'bg-[#1e1040]/50 border-white/5 hover:border-white/10 hover:bg-[#1e1040]/70' 
-                    : 'bg-white/90 border-[#d4aaff] shadow-lg ring-1 ring-[#ede9fe] hover:border-[#c084f5] hover:shadow-[#8d44d1]/15 hover:ring-[#d4aaff]'
+                    : 'bg-white/90 border-slate-200 shadow-lg hover:border-slate-300 hover:shadow-md '
                 }`}>
                   {/* Gradient top bar for light mode */}
                   {!isDark && <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r ${principle.color}`} />}

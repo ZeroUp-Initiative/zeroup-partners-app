@@ -82,8 +82,8 @@ export function ContributionTypesSection({ isDark = true }: ContributionTypesSec
       {/* Light mode decorative blobs */}
       {!isDark && (
         <>
-          <div className="absolute top-20 left-20 w-64 h-64 bg-purple-200/30 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-20 w-64 h-64 bg-pink-200/30 rounded-full blur-3xl" />
+          <div className="absolute top-20 left-20 w-64 h-64 bg-purple-100/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-20 w-64 h-64 bg-rose-50/10 rounded-full blur-3xl" />
           <div className="absolute top-1/2 right-10 w-48 h-48 bg-blue-200/20 rounded-full blur-3xl" />
         </>
       )}
@@ -130,7 +130,7 @@ export function ContributionTypesSection({ isDark = true }: ContributionTypesSec
                 hover:shadow-xl hover:bg-[#833dc6]/20
                 ${isDark 
                   ? 'border-white/5 bg-[#1e1040]/30 hover:border-white/10' 
-                  : 'border-slate-200 bg-white/90 shadow-lg ring-1 ring-slate-100 hover:border-purple-300 hover:shadow-purple-500/10 hover:ring-purple-200'
+                  : 'border-slate-200 bg-white/90 shadow-lg hover:border-purple-300 hover:shadow-purple-500/10 hover:ring-purple-200'
                 }
               `}>
                 {/* Gradient top bar for light mode */}
@@ -176,7 +176,7 @@ export function ContributionTypesSection({ isDark = true }: ContributionTypesSec
           <Link href="/signup">
             <Button 
               size="lg"
-              className="bg-[#833dc6] text-white shadow-lg shadow-purple-500/20"
+              className="bg-[#833dc6] text-white shadow-lg"
             >
               Find Your Way to Contribute
               <ArrowRight className="w-5 h-5 ml-2" />

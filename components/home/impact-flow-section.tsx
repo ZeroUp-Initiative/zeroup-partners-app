@@ -49,7 +49,7 @@ export function ImpactFlowSection({ isDark = true }: ImpactFlowSectionProps) {
       {/* Subtle top glow */}
       <div
         className={`absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[280px] blur-3xl pointer-events-none ${
-          isDark ? 'bg-[#8d44d1]/8' : 'bg-[#d4aaff]/25'
+          isDark ? 'bg-[#8d44d1]/8' : 'bg-[#8d44d1]/5'
         }`}
       />
 
@@ -66,7 +66,7 @@ export function ImpactFlowSection({ isDark = true }: ImpactFlowSectionProps) {
             className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6 ${
               isDark
                 ? 'bg-[#8d44d1]/10 border-[#8d44d1]/20'
-                : 'bg-[#f5ecff] border-[#d4aaff]'
+                : 'bg-[#f5ecff] border-slate-200'
             }`}
           >
             <div className="w-1.5 h-1.5 rounded-full bg-[#8d44d1] animate-pulse" />

@@ -485,7 +485,7 @@ function DashboardPage() {
 
                   {/* Contribution Trend Chart */}
                   <Card className="relative overflow-hidden">
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-purple-600" />
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8d44d1] to-[#7030b0]" />
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -519,7 +519,7 @@ function DashboardPage() {
                   {/* Grid of Action Cards */}
                   <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                     <LogContributionModal>
-                        <Card className="group hover:shadow-lg hover:shadow-[#8d44d1]/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer border-transparent hover:border-[#8d44d1]/30">
+                        <Card className="group hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
                             <CardHeader className="flex flex-row items-center gap-4">
                                 <div className="bg-gradient-to-br from-[#8d44d1]/20 to-[#8d44d1]/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
                                     <Plus className="h-6 w-6 text-[#7030b0] dark:text-[#a05cd4]" />
@@ -532,7 +532,7 @@ function DashboardPage() {
                         </Card>
                     </LogContributionModal>
                     <Link href="/projects">
-                        <Card className="group hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer border-transparent hover:border-purple-500/30">
+                        <Card className="group hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
                             <CardHeader className="flex flex-row items-center gap-4">
                                 <div className="bg-gradient-to-br from-purple-500/20 to-pink-400/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
                                     <BarChart className="h-6 w-6 text-purple-600 dark:text-purple-400" />
@@ -545,7 +545,7 @@ function DashboardPage() {
                         </Card>
                     </Link>
                     <Link href="/dashboard/transactions">
-                        <Card className="group hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer border-transparent hover:border-blue-500/30">
+                        <Card className="group hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
                             <CardHeader className="flex flex-row items-center gap-4">
                                 <div className="bg-gradient-to-br from-blue-500/20 to-cyan-400/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
                                     <Receipt className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -559,39 +559,29 @@ function DashboardPage() {
                     </Link>
                     
                     {/* Bank Account Details Card */}
-                    <Card className="lg:col-span-2 relative overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200/50 dark:border-blue-800/50">
-                        {/* Decorative pattern */}
-                        <div className="absolute inset-0 opacity-5">
-                          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                              <pattern id="bank-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-                                <circle cx="20" cy="20" r="1.5" fill="currentColor" />
-                              </pattern>
-                            </defs>
-                            <rect width="100%" height="100%" fill="url(#bank-pattern)" />
-                          </svg>
-                        </div>
-                        <CardHeader className="flex flex-row items-center gap-4 relative">
-                            <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-3 rounded-xl shadow-lg shadow-blue-500/25">
-                                <Banknote className="h-6 w-6 text-white" />
+                    <Card className="lg:col-span-2 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8d44d1] to-[#7030b0]" />
+                        <CardHeader className="flex flex-row items-center gap-4">
+                            <div className="bg-gradient-to-br from-[#8d44d1]/15 to-[#7030b0]/15 p-3 rounded-xl">
+                                <Banknote className="h-6 w-6 text-[#7030b0] dark:text-[#a05cd4]" />
                             </div>
                             <div>
-                                <CardTitle className="text-blue-700 dark:text-blue-300">Bank Transfer Details</CardTitle>
+                                <CardTitle>Bank Transfer Details</CardTitle>
                                 <CardDescription>Quick access to account information.</CardDescription>
                             </div>
                         </CardHeader>
-                        <CardContent className="space-y-3 relative">
-                            <div className="space-y-3 text-sm bg-white/50 dark:bg-black/20 rounded-xl p-4 backdrop-blur-sm">
+                        <CardContent className="space-y-3">
+                            <div className="space-y-3 text-sm bg-muted/40 rounded-xl p-4">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Account Number:</span>
+                                    <span className="text-muted-foreground font-medium">Account Number:</span>
                                     <div className="flex items-center gap-2">
-                                        <span className="font-mono font-bold text-lg text-blue-600 dark:text-blue-400">0219230107</span>
+                                        <span className="font-mono font-bold text-base">0219230107</span>
                                         <Button
                                             type="button"
                                             variant="outline"
                                             size="sm"
                                             onClick={copyAccountNumber}
-                                            className="h-8 px-2 hover:bg-blue-100 dark:hover:bg-blue-900 border-blue-200 dark:border-blue-800"
+                                            className="h-8 px-2"
                                         >
                                             <Copy className="w-3.5 h-3.5 mr-1" />
                                             Copy
@@ -599,17 +589,17 @@ function DashboardPage() {
                                     </div>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Bank:</span>
-                                    <span className="font-semibold text-gray-900 dark:text-gray-100">GT Bank</span>
+                                    <span className="text-muted-foreground font-medium">Bank:</span>
+                                    <span className="font-semibold">GT Bank</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400 font-medium">Account Name:</span>
-                                    <span className="font-semibold text-gray-900 dark:text-gray-100">PACSDA</span>
+                                    <span className="text-muted-foreground font-medium">Account Name:</span>
+                                    <span className="font-semibold">PACSDA</span>
                                 </div>
                             </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                                (Pan African Centre for Social Development and Accountability)
-                            </div>
+                            <p className="text-xs text-muted-foreground text-center">
+                                Pan African Centre for Social Development and Accountability
+                            </p>
                         </CardContent>
                     </Card>
                   </div>
@@ -787,7 +777,7 @@ function DashboardPage() {
                     
                     {/* Leaderboard - Modern Design */}
                     <Card className="relative overflow-hidden">
-                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500" />
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8d44d1] to-[#7030b0]" />
                         <CardHeader>
                             <div className="flex items-center gap-3">
                                 <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20">

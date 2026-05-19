@@ -27,17 +27,9 @@ export function InvitationSection({ isDark = true }: InvitationSectionProps) {
         <div className={`absolute inset-0 ${
           isDark 
             ? 'bg-[radial-gradient(ellipse_at_center,_rgba(141,68,209,0.08)_0%,_transparent_60%)]' 
-            : 'bg-[radial-gradient(ellipse_at_center,_rgba(141,68,209,0.20)_0%,_transparent_70%)]'
+            : 'bg-[radial-gradient(ellipse_at_center,_rgba(141,68,209,0.06)_0%,_transparent_70%)]'
         }`} />
         
-        {/* Light mode decorative blobs */}
-        {!isDark && (
-          <>
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#d4aaff]/40 rounded-full blur-3xl" />
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#d4aaff]/40 rounded-full blur-3xl" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-100/30 rounded-full blur-3xl" />
-          </>
-        )}
         
         {/* Animated particles/stars */}
         <div className="absolute inset-0">
@@ -107,7 +99,7 @@ export function InvitationSection({ isDark = true }: InvitationSectionProps) {
             className={`w-20 h-20 mx-auto mb-8 rounded-full flex items-center justify-center ${
               isDark 
                 ? 'bg-gradient-to-br from-[#8d44d1]/20 to-[#7030b0]/20' 
-                : 'bg-gradient-to-br from-[#ede9fe] to-[#ede9fe] shadow-lg shadow-[#8d44d1]/20 ring-2 ring-[#d4aaff]'
+                : 'bg-gradient-to-br from-[#ede9fe] to-[#ede9fe] shadow-lg shadow-[#8d44d1]/20'
             }`}
           >
             <Sparkles className="w-10 h-10 text-[#a05cd4]" />
@@ -137,7 +129,7 @@ export function InvitationSection({ isDark = true }: InvitationSectionProps) {
             <Link href="/signup">
               <Button 
                 size="lg"
-                className="w-full rounded-full sm:w-auto bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white text-lg px-8 py-6 shadow-xl shadow-[#8d44d1]/25 transition-all hover:shadow-[#8d44d1]/40 hover:scale-105"
+                className="w-full rounded-full sm:w-auto bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white text-lg px-8 py-6 shadow-xl transition-all hover:shadow-md hover:scale-105"
               >
                 Become a Zero Partner
                 <ArrowRight className="w-5 h-5 ml-2" />

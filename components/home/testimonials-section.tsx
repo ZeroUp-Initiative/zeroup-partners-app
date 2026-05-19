@@ -93,9 +93,9 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
       }`}
     >
       {/* Background decoration */}
-      <div className={`absolute top-20 left-10 w-64 h-64 rounded-full blur-3xl ${isDark ? 'bg-[#8d44d1]/5' : 'bg-amber-200/40'}`} />
-      <div className={`absolute bottom-20 right-10 w-64 h-64 rounded-full blur-3xl ${isDark ? 'bg-purple-500/5' : 'bg-orange-200/40'}`} />
-      {!isDark && <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-yellow-200/30 rounded-full blur-3xl" />}
+      <div className={`absolute top-20 left-10 w-64 h-64 rounded-full blur-3xl ${isDark ? 'bg-[#8d44d1]/5' : 'bg-amber-50/15'}`} />
+      <div className={`absolute bottom-20 right-10 w-64 h-64 rounded-full blur-3xl ${isDark ? 'bg-purple-500/5' : 'bg-orange-50/10'}`} />
+      {!isDark && <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-amber-50/8 rounded-full blur-3xl" />}
 
       <div className="mx-auto max-w-7xl px-4 md:px-6 relative z-10">
         {/* Header */}
@@ -130,7 +130,7 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
           <div className={`relative backdrop-blur-sm rounded-3xl border p-8 md:p-12 lg:p-16 ${
             isDark 
               ? 'bg-[#1e1040]/50 border-white/5' 
-              : 'bg-white/90 border-amber-200 shadow-xl shadow-amber-500/10 ring-1 ring-amber-100'
+              : 'bg-white/90 border-amber-200 shadow-xl'
           }`}>
             {/* Gradient top bar for light mode */}
             {!isDark && <div className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl bg-gradient-to-r from-amber-400 to-orange-400" />}
@@ -234,7 +234,7 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
                 animate={isInView ? { opacity: 1, x: 0 } : {}}
                 transition={{ delay: index * 0.1 }}
                 className={`w-[300px] flex-shrink-0 rounded-xl border p-5 ${
-                  isDark ? 'bg-[#1e1040]/50 border-white/5' : 'bg-white/90 border-amber-200 shadow-lg ring-1 ring-amber-100'
+                  isDark ? 'bg-[#1e1040]/50 border-white/5' : 'bg-white/90 border-amber-200 shadow-lg'
                 }`}
               >
                 {/* Gradient top bar for light mode */}

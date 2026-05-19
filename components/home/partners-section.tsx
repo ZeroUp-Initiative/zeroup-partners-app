@@ -32,8 +32,8 @@ export function PartnersSection({ isDark = true }: PartnersSectionProps) {
       {/* Light mode decorative blobs */}
       {!isDark && (
         <>
-          <div className="absolute top-20 right-20 w-72 h-72 bg-blue-200/30 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 left-20 w-72 h-72 bg-indigo-200/30 rounded-full blur-3xl" />
+          <div className="absolute top-20 right-20 w-72 h-72 bg-slate-200/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 left-20 w-72 h-72 bg-slate-200/15 rounded-full blur-3xl" />
         </>
       )}
       <div className="mx-auto max-w-7xl px-4 md:px-6 relative z-10">
@@ -81,7 +81,7 @@ export function PartnersSection({ isDark = true }: PartnersSectionProps) {
                   ? 'bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border-blue-500/30' 
                   : isDark 
                     ? 'bg-[#1e1040]/30 border-white/5 hover:border-white/10' 
-                    : 'bg-white/90 border-blue-200 shadow-lg ring-1 ring-blue-100 hover:border-blue-300 hover:shadow-blue-500/10'
+                    : 'bg-white/90 border-blue-200 shadow-lg hover:border-blue-300 hover:shadow-blue-500/10'
                 }
               `}>
                 {/* Gradient top bar for light mode when not hovered */}

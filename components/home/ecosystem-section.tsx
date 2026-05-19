@@ -60,8 +60,8 @@ export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
       {/* Light mode decorative blobs */}
       {!isDark && (
         <>
-          <div className="absolute top-20 -left-20 w-72 h-72 bg-[#d4aaff]/40 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 -right-20 w-72 h-72 bg-[#d4aaff]/40 rounded-full blur-3xl" />
+          <div className="absolute top-20 -left-20 w-72 h-72 bg-[#8d44d1]/6 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 -right-20 w-72 h-72 bg-[#8d44d1]/6 rounded-full blur-3xl" />
         </>
       )}
 
@@ -77,7 +77,7 @@ export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
             <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${
               isDark 
                 ? 'bg-[#8d44d1]/10 border-[#8d44d1]/20' 
-                : 'bg-[#f5ecff] border-[#d4aaff]'
+                : 'bg-[#f5ecff] border-slate-200'
             }`}>
               <div className="w-1.5 h-1.5 rounded-full bg-[#a05cd4] animate-pulse" />
               <span className={`text-sm font-medium ${isDark ? 'text-[#a05cd4]' : 'text-[#7030b0]'}`}>The Vision</span>
@@ -110,7 +110,7 @@ export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
             <div className={`relative rounded-2xl border p-8 md:p-12 backdrop-blur-sm overflow-hidden transition-all duration-300 ${
               isDark 
                 ? 'bg-[#1e1040]/50 border-white/5' 
-                : 'bg-white/80 border-[#d4aaff] shadow-xl shadow-[#8d44d1]/10 hover:shadow-[#8d44d1]/20'
+                : 'bg-white/80 border-slate-200 hover:shadow-md'
             }`}>
               {/* Gradient top bar for light mode */}
               {!isDark && <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#a05cd4] to-[#8d44d1]" />}
@@ -243,7 +243,7 @@ export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
                         w-12 h-12 rounded-full flex items-center justify-center
                         transition-all duration-500
                         ${nodeActive 
-                          ? 'bg-gradient-to-br from-[#8d44d1] to-[#7030b0] shadow-lg shadow-[#8d44d1]/25' 
+                          ? 'bg-gradient-to-br from-[#8d44d1] to-[#7030b0] shadow-lg' 
                           : isDark ? 'bg-white/10 border border-white/20' : 'bg-slate-100 border border-slate-200'
                         }
                       `}>

@@ -21,7 +21,7 @@ export function HeroSection({ isDark }: HeroSectionProps) {
       data-theme-section="hero"
     >
       {!isDark && (
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-[#f5ecff]/40" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-slate-50" />
       )}
 
       {/* Background blobs */}
@@ -33,8 +33,8 @@ export function HeroSection({ isDark }: HeroSectionProps) {
           </>
         ) : (
           <>
-            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#ede9fe]/60 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
-            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#ede9fe]/60 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
+            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-slate-100/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-slate-100/40 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
           </>
         )}
       </div>
@@ -49,7 +49,7 @@ export function HeroSection({ isDark }: HeroSectionProps) {
               className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-medium ${
                 isDark
                   ? 'bg-[#8d44d1]/10 border-[#8d44d1]/20 text-[#a05cd4]'
-                  : 'bg-[#f5ecff] border-[#d4aaff] text-[#7030b0]'
+                  : 'bg-[#f5ecff] border-slate-200 text-[#7030b0]'
               }`}
             >
               <div className="w-1.5 h-1.5 rounded-full bg-[#a05cd4] animate-pulse" />
@@ -84,7 +84,7 @@ export function HeroSection({ isDark }: HeroSectionProps) {
               <Link href="/signup">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto rounded-full bg-gradient-to-r from-[#8d44d1] to-[#7030b0] hover:from-[#7030b0] hover:to-[#5e269a] text-white border-0 h-12 px-8 text-base font-semibold shadow-lg shadow-[#8d44d1]/25"
+                  className="w-full sm:w-auto rounded-full bg-gradient-to-r from-[#8d44d1] to-[#7030b0] hover:from-[#7030b0] hover:to-[#5e269a] text-white border-0 h-12 px-8 text-base font-semibold shadow-lg"
                 >
                   Become a Partner
                   <ArrowRight className="ml-2 w-4 h-4" />

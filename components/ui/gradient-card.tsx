@@ -19,41 +19,34 @@ interface GradientCardProps extends React.HTMLAttributes<HTMLDivElement> {
   glowOnHover?: boolean
 }
 
-const gradientStyles: Record<GradientVariant, { bar: string; icon: string; glow: string }> = {
+const gradientStyles: Record<GradientVariant, { bar: string; icon: string }> = {
   emerald: {
-    bar: "from-[#8d44d1] to-[#8d44d1]",
-    icon: "bg-gradient-to-br from-[#8d44d1]/20 to-[#8d44d1]/20 text-[#7030b0] dark:text-[#a05cd4]",
-    glow: "hover:shadow-[#8d44d1]/25"
+    bar: "from-[#8d44d1] to-[#7030b0]",
+    icon: "bg-gradient-to-br from-[#8d44d1]/15 to-[#7030b0]/15 text-[#7030b0] dark:text-[#a05cd4]",
   },
   blue: {
     bar: "from-blue-500 to-cyan-400",
-    icon: "bg-gradient-to-br from-blue-500/20 to-cyan-400/20 text-blue-600 dark:text-blue-400",
-    glow: "hover:shadow-blue-500/25"
+    icon: "bg-gradient-to-br from-blue-500/15 to-cyan-400/15 text-blue-600 dark:text-blue-400",
   },
   purple: {
     bar: "from-purple-500 to-pink-400",
-    icon: "bg-gradient-to-br from-purple-500/20 to-pink-400/20 text-purple-600 dark:text-purple-400",
-    glow: "hover:shadow-purple-500/25"
+    icon: "bg-gradient-to-br from-purple-500/15 to-pink-400/15 text-purple-600 dark:text-purple-400",
   },
   orange: {
     bar: "from-orange-500 to-amber-400",
-    icon: "bg-gradient-to-br from-orange-500/20 to-amber-400/20 text-orange-600 dark:text-orange-400",
-    glow: "hover:shadow-orange-500/25"
+    icon: "bg-gradient-to-br from-orange-500/15 to-amber-400/15 text-orange-600 dark:text-orange-400",
   },
   cyan: {
     bar: "from-cyan-500 to-blue-400",
-    icon: "bg-gradient-to-br from-cyan-500/20 to-blue-400/20 text-cyan-600 dark:text-cyan-400",
-    glow: "hover:shadow-cyan-500/25"
+    icon: "bg-gradient-to-br from-cyan-500/15 to-blue-400/15 text-cyan-600 dark:text-cyan-400",
   },
   rose: {
     bar: "from-rose-500 to-pink-400",
-    icon: "bg-gradient-to-br from-rose-500/20 to-pink-400/20 text-rose-600 dark:text-rose-400",
-    glow: "hover:shadow-rose-500/25"
+    icon: "bg-gradient-to-br from-rose-500/15 to-pink-400/15 text-rose-600 dark:text-rose-400",
   },
   amber: {
     bar: "from-amber-500 to-yellow-400",
-    icon: "bg-gradient-to-br from-amber-500/20 to-yellow-400/20 text-amber-600 dark:text-amber-400",
-    glow: "hover:shadow-amber-500/25"
+    icon: "bg-gradient-to-br from-amber-500/15 to-yellow-400/15 text-amber-600 dark:text-amber-400",
   }
 }
 
@@ -71,12 +64,11 @@ export function GradientCard({
   const styles = gradientStyles[variant]
 
   return (
-    <Card 
+    <Card
       className={cn(
-        "relative overflow-hidden transition-all duration-300 hover:-translate-y-1 p-0",
-        glowOnHover && `hover:shadow-xl ${styles.glow}`,
+        "relative overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md p-0",
         className
-      )} 
+      )}
       {...props}
     >
       {/* Gradient top bar */}
