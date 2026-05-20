@@ -44,6 +44,7 @@ import {
   Mail,
   Send,
   RefreshCw,
+  Megaphone,
 } from "lucide-react"
 import toast from "react-hot-toast"
 
@@ -82,6 +83,14 @@ function AdminUsersPage() {
   const [customEmailSubject, setCustomEmailSubject] = useState("")
   const [customEmailBody, setCustomEmailBody] = useState("")
   const [isSendingEmail, setIsSendingEmail] = useState(false)
+
+  // Broadcast state
+  const [broadcastOpen, setBroadcastOpen] = useState(false)
+  const [broadcastSubject, setBroadcastSubject] = useState("")
+  const [broadcastBody, setBroadcastBody] = useState("")
+  const [broadcastFilter, setBroadcastFilter] = useState("active")
+  const [isBroadcasting, setIsBroadcasting] = useState(false)
+  const [broadcastResult, setBroadcastResult] = useState<{ sent: number; failed: number } | null>(null)
 
   useEffect(() => {
     const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
@@ -231,6 +240,47 @@ function AdminUsersPage() {
     }
   }
 
+  const handleBroadcast = async () => {
+    const pool =
+      broadcastFilter === "all"
+        ? users
+        : broadcastFilter === "admins"
+        ? users.filter(u => u.role === "admin")
+        : users.filter(u => !u.suspended)
+
+    const recipients = pool
+      .filter(u => u.email)
+      .map(u => ({ email: u.email, name: u.firstName || "Partner" }))
+
+    if (!recipients.length) {
+      toast.error("No recipients match the selected filter.")
+      return
+    }
+
+    setIsBroadcasting(true)
+    setBroadcastResult(null)
+    try {
+      const res = await fetch("/api/email/broadcast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recipients, subject: broadcastSubject, body: broadcastBody }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "Broadcast failed")
+      setBroadcastResult({ sent: data.sent, failed: data.failed })
+      toast.success(`Broadcast complete — ${data.sent} sent, ${data.failed} failed`)
+      if (data.failed === 0) {
+        setBroadcastOpen(false)
+        setBroadcastSubject("")
+        setBroadcastBody("")
+      }
+    } catch {
+      toast.error("Broadcast failed. Check the console for details.")
+    } finally {
+      setIsBroadcasting(false)
+    }
+  }
+
   const formatDate = (timestamp: any) => {
     if (!timestamp) return 'N/A';
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
@@ -308,15 +358,24 @@ function AdminUsersPage() {
         </Card>
       </div>
 
-      {/* Search */}
-      <div className="relative w-full md:w-64">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search users..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9"
-        />
+      {/* Search + Broadcast */}
+      <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+        <div className="relative w-full sm:w-64">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search users..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Button
+          onClick={() => { setBroadcastOpen(true); setBroadcastResult(null) }}
+          className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0 gap-2"
+        >
+          <Megaphone className="h-4 w-4" />
+          Broadcast Email
+        </Button>
       </div>
 
       {/* Users Table */}
@@ -569,6 +628,92 @@ function AdminUsersPage() {
               className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
             >
               {isSendingEmail ? "Sending…" : <><Send className="w-4 h-4 mr-2" />Send Email</>}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Broadcast Email Dialog */}
+      <Dialog open={broadcastOpen} onOpenChange={open => { setBroadcastOpen(open); if (!open) setBroadcastResult(null) }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Megaphone className="w-4 h-4" />
+              Broadcast Email
+            </DialogTitle>
+            <DialogDescription>
+              Send a message to multiple users at once.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label>Recipients</Label>
+              <Select value={broadcastFilter} onValueChange={setBroadcastFilter}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active users only ({users.filter(u => !u.suspended).length})</SelectItem>
+                  <SelectItem value="all">All users ({users.length})</SelectItem>
+                  <SelectItem value="admins">Admins only ({users.filter(u => u.role === "admin").length})</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Subject</Label>
+              <Input
+                placeholder="Email subject"
+                value={broadcastSubject}
+                onChange={e => setBroadcastSubject(e.target.value)}
+                disabled={isBroadcasting}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Message</Label>
+              <Textarea
+                placeholder="Write your message here…"
+                value={broadcastBody}
+                onChange={e => setBroadcastBody(e.target.value)}
+                rows={5}
+                disabled={isBroadcasting}
+              />
+            </div>
+
+            {broadcastResult && (
+              <div className="rounded-lg bg-muted/50 px-4 py-3 text-sm space-y-1">
+                <p className="text-green-600 font-medium">Sent: {broadcastResult.sent}</p>
+                {broadcastResult.failed > 0 && (
+                  <p className="text-destructive font-medium">Failed: {broadcastResult.failed}</p>
+                )}
+              </div>
+            )}
+
+            {isBroadcasting && (
+              <p className="text-sm text-muted-foreground flex items-center gap-2">
+                <span className="h-3 w-3 animate-spin rounded-full border-2 border-primary border-t-transparent inline-block" />
+                Sending emails, please wait…
+              </p>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBroadcastOpen(false)} disabled={isBroadcasting}>Cancel</Button>
+            <Button
+              onClick={handleBroadcast}
+              disabled={isBroadcasting || !broadcastSubject.trim() || !broadcastBody.trim()}
+              className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
+            >
+              {isBroadcasting
+                ? "Sending…"
+                : <><Send className="w-4 h-4 mr-2" />Send to {
+                    broadcastFilter === "all" ? users.length
+                    : broadcastFilter === "admins" ? users.filter(u => u.role === "admin").length
+                    : users.filter(u => !u.suspended).length
+                  } users</>
+              }
             </Button>
           </DialogFooter>
         </DialogContent>

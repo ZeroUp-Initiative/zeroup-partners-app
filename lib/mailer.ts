@@ -33,6 +33,7 @@ async function createTransporter(): Promise<Transporter> {
   const secure = SMTP_SECURE === 'true';
 
   if (hasSmtpCredentials) {
+    console.log(`[mailer] Connecting to SMTP: ${SMTP_HOST}:${port} (secure=${secure}) as ${SMTP_USER}`);
     transporter = nodemailer.createTransport({
       host: SMTP_HOST,
       port,
@@ -43,6 +44,8 @@ async function createTransporter(): Promise<Transporter> {
       },
     });
   } else {
+    const missing = ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS'].filter(k => !process.env[k]);
+    console.warn(`[mailer] Missing env vars: ${missing.join(', ')} — falling back to Ethereal test account`);
     const testAccount = await nodemailer.createTestAccount();
     etherealAccount = {
       user: testAccount.user,
@@ -93,12 +96,33 @@ export async function sendMail(options: {
     attachments: options.attachments,
   };
 
-  const info = await transport.sendMail(sendOptions);
+  let info: SentMessageInfo;
+  try {
+    info = await transport.sendMail(sendOptions);
+  } catch (err: unknown) {
+    const e = err as { code?: string; responseCode?: number; response?: string; message?: string };
+    transporter = null; // reset so next request retries with fresh config
+    if (e.code === 'EAUTH' || e.responseCode === 535) {
+      console.error('[mailer] SMTP authentication failed.');
+      console.error(`  User:  ${SMTP_USER}`);
+      console.error(`  Host:  ${SMTP_HOST}:${SMTP_PORT}`);
+      console.error('  Fix:   For Gmail, use an App Password (not your account password).');
+      console.error('         Go to Google Account → Security → 2-Step Verification → App passwords.');
+      console.error(`  SMTP response: ${e.response}`);
+    } else if (e.code === 'ECONNECTION' || e.code === 'ESOCKET') {
+      console.error('[mailer] Could not connect to SMTP server.');
+      console.error(`  Check that SMTP_HOST (${SMTP_HOST}) and SMTP_PORT (${SMTP_PORT}) are correct.`);
+      console.error(`  Error: ${e.message}`);
+    } else {
+      console.error('[mailer] Failed to send email:', e.message || err);
+    }
+    throw err;
+  }
 
   if (!SMTP_HOST) {
     const previewUrl = nodemailer.getTestMessageUrl(info);
     if (previewUrl) {
-      console.log('Preview URL:', previewUrl);
+      console.log('[mailer] Ethereal preview URL:', previewUrl);
     }
   }
 

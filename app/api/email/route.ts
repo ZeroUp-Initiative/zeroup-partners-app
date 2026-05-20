@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendMail } from '@/lib/mailer'
 
-const FROM = process.env.EMAIL_FROM ?? 'ZeroUp Partners <onboarding@zeroup.dev>'
+const FROM = process.env.EMAIL_FROM ?? 'ZeroUp Partners <onboarding@zeroup.org>'
 
 const BASE_URL = 'https://zeroup-partners-app.vercel.app'
 
@@ -181,7 +181,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, messageId: result.messageId || null })
   } catch (error) {
-    console.error('Email send error:', error)
     return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
   }
 }
