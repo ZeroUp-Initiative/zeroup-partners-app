@@ -45,14 +45,14 @@ export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
       ref={sectionRef}
       className={`relative py-24 md:py-32 overflow-hidden ${
         isDark 
-          ? 'bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950' 
-          : 'bg-gradient-to-b from-emerald-50/50 via-white to-teal-50/30'
+          ? 'bg-gradient-to-b from-[#130927] via-[#1a0d35] to-[#130927]' 
+          : 'bg-gradient-to-b from-[#f5ecff]/50 via-white to-[#f5ecff]/30'
       }`}
     >
       {/* Subtle grid background */}
       <div className={`absolute inset-0 ${isDark ? 'opacity-5' : 'opacity-40'}`}>
         <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, ${isDark ? 'white' : 'rgb(16, 185, 129)'} 1px, transparent 0)`,
+          backgroundImage: `radial-gradient(circle at 1px 1px, ${isDark ? 'white' : 'rgb(141, 68, 209)'} 1px, transparent 0)`,
           backgroundSize: '40px 40px'
         }} />
       </div>
@@ -60,12 +60,12 @@ export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
       {/* Light mode decorative blobs */}
       {!isDark && (
         <>
-          <div className="absolute top-20 -left-20 w-72 h-72 bg-emerald-200/40 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 -right-20 w-72 h-72 bg-teal-200/40 rounded-full blur-3xl" />
+          <div className="absolute top-20 -left-20 w-72 h-72 bg-[#8d44d1]/6 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 -right-20 w-72 h-72 bg-[#8d44d1]/6 rounded-full blur-3xl" />
         </>
       )}
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="mx-auto max-w-7xl px-4 md:px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Left: Text */}
           <motion.div
@@ -76,17 +76,17 @@ export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
           >
             <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${
               isDark 
-                ? 'bg-emerald-500/10 border-emerald-500/20' 
-                : 'bg-emerald-50 border-emerald-200'
+                ? 'bg-[#8d44d1]/10 border-[#8d44d1]/20' 
+                : 'bg-[#f5ecff] border-slate-200'
             }`}>
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className={`text-sm font-medium ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>The Vision</span>
+              <div className="w-1.5 h-1.5 rounded-full bg-[#a05cd4] animate-pulse" />
+              <span className={`text-sm font-medium ${isDark ? 'text-[#a05cd4]' : 'text-[#7030b0]'}`}>The Vision</span>
             </div>
             
             <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
               Not a Platform.
               <br />
-              <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#a05cd4] to-[#8d44d1] bg-clip-text text-transparent">
                 An Impact System.
               </span>
             </h2>
@@ -109,21 +109,21 @@ export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
           >
             <div className={`relative rounded-2xl border p-8 md:p-12 backdrop-blur-sm overflow-hidden transition-all duration-300 ${
               isDark 
-                ? 'bg-slate-900/50 border-white/5' 
-                : 'bg-white/80 border-emerald-200 shadow-xl shadow-emerald-500/10 hover:shadow-emerald-500/20'
+                ? 'bg-[#1e1040]/50 border-white/5' 
+                : 'bg-white/80 border-slate-200 hover:shadow-md'
             }`}>
               {/* Gradient top bar for light mode */}
-              {!isDark && <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-teal-400" />}
+              {!isDark && <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#a05cd4] to-[#8d44d1]" />}
               
               {/* Glow effect */}
               <div className={`absolute inset-0 ${
                 isDark 
-                  ? 'bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5' 
-                  : 'bg-gradient-to-br from-emerald-50 via-transparent to-teal-50'
+                  ? 'bg-gradient-to-br from-[#8d44d1]/5 via-transparent to-[#7030b0]/5' 
+                  : 'bg-gradient-to-br from-[#f5ecff] via-transparent to-[#f5ecff]'
               }`} />
               
-              {/* SVG Diagram */}
-              <svg viewBox="0 0 500 160" className="w-full h-auto relative z-10">
+              {/* SVG Diagram — desktop/tablet only */}
+              <svg viewBox="0 0 500 160" className="hidden md:block w-full h-auto relative z-10">
                 {/* Connection lines */}
                 {[0, 1, 2].map((index) => (
                   <g key={`line-${index}`}>
@@ -133,7 +133,7 @@ export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
                       y1={nodes[index].y}
                       x2={nodes[index + 1].x - 30}
                       y2={nodes[index + 1].y}
-                      stroke="rgba(255,255,255,0.1)"
+                      stroke={isDark ? "rgba(255,255,255,0.1)" : "rgba(100,116,139,0.25)"}
                       strokeWidth="2"
                       strokeDasharray="4,4"
                     />
@@ -153,7 +153,7 @@ export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         points={`${nodes[index + 1].x - 35},${nodes[index + 1].y - 5} ${nodes[index + 1].x - 25},${nodes[index + 1].y} ${nodes[index + 1].x - 35},${nodes[index + 1].y + 5}`}
-                        fill="rgb(45, 212, 191)"
+                        fill="rgb(112, 48, 176)"
                       />
                     )}
                   </g>
@@ -162,8 +162,8 @@ export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
                 {/* Gradient definition */}
                 <defs>
                   <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="rgb(16, 185, 129)" />
-                    <stop offset="100%" stopColor="rgb(45, 212, 191)" />
+                    <stop offset="0%" stopColor="rgb(141, 68, 209)" />
+                    <stop offset="100%" stopColor="rgb(112, 48, 176)" />
                   </linearGradient>
                 </defs>
 
@@ -190,7 +190,7 @@ export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
                         cy={node.y}
                         r="25"
                         fill={nodeActive ? "url(#nodeGradient)" : (isDark ? "rgba(255,255,255,0.1)" : "rgba(100,116,139,0.1)")}
-                        stroke={nodeActive ? "rgba(16, 185, 129, 0.5)" : (isDark ? "rgba(255,255,255,0.2)" : "rgba(100,116,139,0.3)")}
+                        stroke={nodeActive ? "rgba(141, 68, 209, 0.5)" : (isDark ? "rgba(255,255,255,0.2)" : "rgba(100,116,139,0.3)")}
                         strokeWidth="2"
                         className="transition-all duration-500"
                       />
@@ -221,12 +221,12 @@ export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
                 {/* Gradient definitions */}
                 <defs>
                   <radialGradient id="nodeGlow">
-                    <stop offset="0%" stopColor="rgba(16, 185, 129, 0.3)" />
+                    <stop offset="0%" stopColor="rgba(141, 68, 209, 0.3)" />
                     <stop offset="100%" stopColor="transparent" />
                   </radialGradient>
                   <linearGradient id="nodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="rgb(16, 185, 129)" />
-                    <stop offset="100%" stopColor="rgb(20, 184, 166)" />
+                    <stop offset="0%" stopColor="rgb(141, 68, 209)" />
+                    <stop offset="100%" stopColor="rgb(112, 48, 176)" />
                   </linearGradient>
                 </defs>
               </svg>
@@ -243,7 +243,7 @@ export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
                         w-12 h-12 rounded-full flex items-center justify-center
                         transition-all duration-500
                         ${nodeActive 
-                          ? 'bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/25' 
+                          ? 'bg-gradient-to-br from-[#8d44d1] to-[#7030b0] shadow-lg' 
                           : isDark ? 'bg-white/10 border border-white/20' : 'bg-slate-100 border border-slate-200'
                         }
                       `}>
@@ -257,7 +257,7 @@ export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
                         {node.label}
                       </span>
                       {index < nodes.length - 1 && (
-                        <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/50 to-transparent" />
+                        <div className="flex-1 h-px bg-gradient-to-r from-[#8d44d1]/50 to-transparent" />
                       )}
                     </div>
                   )

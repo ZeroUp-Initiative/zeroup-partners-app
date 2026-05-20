@@ -1,0 +1,133 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // PRODUCTION RULES - Strict security
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    function isValidUserData() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['firstName', 'lastName', 'email']) &&
+             data.firstName is string && data.lastName is string && data.email is string;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Public read of basic profile info
+      allow read: if true;
+      
+      // Users create own profile during signup
+      allow create: if isOwner(userId) && isValidUserData();
+      
+      // Users update own profile (excluding role/sensitive fields)
+      allow update: if isOwner(userId) && 
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'email']));
+      
+      // Admins can update any field including role changes
+      allow update: if isAdmin();
+      
+      // Only admins can delete users
+      allow delete: if isAdmin();
+    }
+    
+    // Payments/Contributions collection
+    match /payments/{paymentId} {
+      // Public read approved payments only
+      allow read: if resource.data.status == 'approved';
+      
+      // Users read their own payments
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      
+      // Admins read all payments
+      allow read: if isAdmin();
+      
+      // Authenticated users create payments (must be their own)
+      allow create: if isAuthenticated() && 
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.keys().hasAll(['userId', 'projectId', 'amount', 'status', 'createdAt']);
+      
+      // Only admins can approve/reject/update payments
+      allow update: if isAdmin();
+      
+      // Only admins can delete
+      allow delete: if isAdmin();
+    }
+    
+    // Projects collection
+    match /projects/{projectId} {
+      // Anyone can read projects
+      allow read: if true;
+      
+      // Only admins create projects
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasAll(['title', 'description', 'status']);
+      
+      // Only admins update projects
+      allow update: if isAdmin();
+      
+      // Only admins delete projects
+      allow delete: if isAdmin();
+    }
+    
+    // Notifications collection
+    match /notifications/{notificationId} {
+      // Users read their own notifications
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      
+      // System/admins create notifications
+      allow create: if isAdmin();
+      
+      // Users mark their own notifications as read
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead', 'readAt']);
+      
+      // Users delete their own notifications
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // Gamification/Coins collection
+    match /userCoins/{userId} {
+      // Users read their own coins
+      allow read: if isOwner(userId);
+      
+      // Only system/admins can update coins
+      allow write: if isAdmin();
+    }
+    
+    // Achievements collection (public read)
+    match /achievements/{achievementId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // User achievements
+    match /userAchievements/{docId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    
+    // Notification preferences
+    match /notificationPreferences/{userId} {
+      // Users read/write their own preferences
+      allow read, write: if isOwner(userId);
+      
+      // Admins can read all preferences
+      allow read: if isAdmin();
+    }
+  }
+}

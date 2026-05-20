@@ -32,8 +32,10 @@ service cloud.firestore {
       allow update: if isOwner(userId) && 
         (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']));
       
-      // Only admins can delete users or change roles
+      // Admins can update any field including role changes
       allow update: if isAdmin();
+      
+      // Only admins can delete users
       allow delete: if isAdmin();
     }
     
@@ -65,8 +67,14 @@ service cloud.firestore {
     match /projects/{projectId} {
       // Anyone can read projects (public)
       allow read: if true;
-      
-      // Only admins can create, update, or delete projects
+
+      // Authenticated users can submit a project for review
+      // Must be pending status and must tag themselves as submitter
+      allow create: if isAuthenticated() &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.submittedBy == request.auth.uid;
+
+      // Admins can create (direct publish), update, or delete any project
       allow create, update, delete: if isAdmin();
     }
     

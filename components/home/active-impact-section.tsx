@@ -28,8 +28,8 @@ const phaseColors: Record<string, { bg: string; text: string; border: string }> 
   'idea': { bg: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/30' },
   'planning': { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/30' },
   'pilot': { bg: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-amber-500/30' },
-  'active': { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/30' },
-  'scaling': { bg: 'bg-teal-500/10', text: 'text-teal-400', border: 'border-teal-500/30' },
+  'active': { bg: 'bg-[#8d44d1]/10', text: 'text-[#a05cd4]', border: 'border-[#8d44d1]/30' },
+  'scaling': { bg: 'bg-[#7030b0]/10', text: 'text-[#8d44d1]', border: 'border-[#7030b0]/30' },
   'completed': { bg: 'bg-green-500/10', text: 'text-green-400', border: 'border-green-500/30' },
 }
 
@@ -61,14 +61,14 @@ export function ActiveImpactSection({ projects, isDark = true }: ActiveImpactSec
       ref={sectionRef}
       className={`relative py-24 md:py-32 overflow-hidden ${
         isDark 
-          ? 'bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950' 
-          : 'bg-gradient-to-b from-emerald-50/40 via-white to-slate-50'
+          ? 'bg-gradient-to-b from-[#130927] via-[#1a0d35] to-[#130927]' 
+          : 'bg-gradient-to-b from-[#f5ecff]/40 via-white to-slate-50'
       }`}
     >
       {/* Background pattern */}
       <div className={`absolute inset-0 ${isDark ? 'opacity-5' : 'opacity-50'}`}>
         <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, ${isDark ? 'white' : 'rgb(16, 185, 129)'} 1px, transparent 0)`,
+          backgroundImage: `radial-gradient(circle at 1px 1px, ${isDark ? 'white' : 'rgb(141, 68, 209)'} 1px, transparent 0)`,
           backgroundSize: '60px 60px'
         }} />
       </div>
@@ -76,12 +76,12 @@ export function ActiveImpactSection({ projects, isDark = true }: ActiveImpactSec
       {/* Light mode decorative blobs */}
       {!isDark && (
         <>
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-200/30 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-200/30 rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#8d44d1]/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#8d44d1]/5 rounded-full blur-3xl" />
         </>
       )}
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="mx-auto max-w-7xl px-4 md:px-6 relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -91,15 +91,15 @@ export function ActiveImpactSection({ projects, isDark = true }: ActiveImpactSec
         >
           <div>
             <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6 ${
-              isDark ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-emerald-50 border-emerald-200'
+              isDark ? 'bg-[#8d44d1]/10 border-[#8d44d1]/20' : 'bg-[#f5ecff] border-slate-200'
             }`}>
-              <Sparkles className={`w-3.5 h-3.5 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`} />
-              <span className={`text-sm font-medium ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>Live Projects</span>
+              <Sparkles className={`w-3.5 h-3.5 ${isDark ? 'text-[#a05cd4]' : 'text-[#7030b0]'}`} />
+              <span className={`text-sm font-medium ${isDark ? 'text-[#a05cd4]' : 'text-[#7030b0]'}`}>Live Projects</span>
             </div>
             
             <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
               Impact in{' '}
-              <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#a05cd4] to-[#8d44d1] bg-clip-text text-transparent">
                 Motion
               </span>
             </h2>
@@ -138,11 +138,11 @@ export function ActiveImpactSection({ projects, isDark = true }: ActiveImpactSec
                 >
                   <div className={`relative h-full backdrop-blur-sm rounded-2xl border overflow-hidden transition-all duration-500 hover:shadow-xl ${
                     isDark 
-                      ? 'bg-slate-900/50 border-white/5 hover:border-emerald-500/30 hover:shadow-emerald-500/5' 
-                      : 'bg-white/90 border-emerald-200 shadow-lg ring-1 ring-emerald-100 hover:border-emerald-400 hover:shadow-emerald-500/20 hover:ring-emerald-200'
+                      ? 'bg-[#1e1040]/50 border-white/5 hover:border-[#8d44d1]/30 hover:shadow-[#8d44d1]/5' 
+                      : 'bg-white/90 border-slate-200 shadow-lg hover:border-slate-300 hover:shadow-md '
                   }`}>
                     {/* Gradient top bar for light mode */}
-                    {!isDark && <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-teal-400 z-10" />}
+                    {!isDark && <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#a05cd4] to-[#8d44d1] z-10" />}
                     {/* Image or gradient header */}
                     <div className="relative h-40 overflow-hidden">
                       {project.imageUrl ? (
@@ -152,10 +152,10 @@ export function ActiveImpactSection({ projects, isDark = true }: ActiveImpactSec
                             alt={project.title}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                           />
-                          <div className={`absolute inset-0 ${isDark ? 'bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent' : 'bg-gradient-to-t from-white via-white/50 to-transparent'}`} />
+                          <div className={`absolute inset-0 ${isDark ? 'bg-gradient-to-t from-[#1e1040] via-[#1a0d35]/50 to-transparent' : 'bg-gradient-to-t from-white via-white/50 to-transparent'}`} />
                         </>
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-emerald-900/50 to-teal-900/50" />
+                        <div className="w-full h-full bg-gradient-to-br from-[#2a0d54]/50 to-[#2a0d54]/50" />
                       )}
                       
                       {/* Phase badge */}
@@ -175,7 +175,7 @@ export function ActiveImpactSection({ projects, isDark = true }: ActiveImpactSec
                       )}
 
                       {/* Title */}
-                      <h3 className={`text-xl font-semibold transition-colors line-clamp-2 ${isDark ? 'text-white group-hover:text-emerald-400' : 'text-slate-900 group-hover:text-emerald-600'}`}>
+                      <h3 className={`text-xl font-semibold transition-colors line-clamp-2 ${isDark ? 'text-white group-hover:text-[#a05cd4]' : 'text-slate-900 group-hover:text-[#7030b0]'}`}>
                         {project.title}
                       </h3>
 
@@ -192,14 +192,14 @@ export function ActiveImpactSection({ projects, isDark = true }: ActiveImpactSec
                               initial={{ width: 0 }}
                               animate={isInView ? { width: `${progress}%` } : {}}
                               transition={{ duration: 1, delay: index * 0.1 + 0.3 }}
-                              className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
+                              className="h-full bg-gradient-to-r from-[#8d44d1] to-[#7030b0] rounded-full"
                             />
                           </div>
                           <div className="flex justify-between text-xs">
                             <span className={isDark ? 'text-white/40' : 'text-slate-500'}>
                               ₦{(project.currentAmount || 0).toLocaleString()}
                             </span>
-                            <span className="text-emerald-500 font-medium">
+                            <span className="text-[#8d44d1] font-medium">
                               {progress.toFixed(0)}%
                             </span>
                           </div>
@@ -220,7 +220,7 @@ export function ActiveImpactSection({ projects, isDark = true }: ActiveImpactSec
                         <Link href={`/contributions?project=${project.id}`} className="flex-1">
                           <Button 
                             size="sm" 
-                            className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+                            className="w-full bg-gradient-to-r from-[#8d44d1] to-[#7030b0] hover:from-[#7030b0] hover:to-[#5e269a] text-white"
                           >
                             Support
                           </Button>
@@ -239,13 +239,13 @@ export function ActiveImpactSection({ projects, isDark = true }: ActiveImpactSec
             animate={isInView ? { opacity: 1 } : {}}
             className="text-center py-16"
           >
-            <div className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${isDark ? 'bg-emerald-500/10' : 'bg-emerald-100'}`}>
-              <Sparkles className="w-10 h-10 text-emerald-400" />
+            <div className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${isDark ? 'bg-[#8d44d1]/10' : 'bg-[#ede9fe]'}`}>
+              <Sparkles className="w-10 h-10 text-[#a05cd4]" />
             </div>
             <h3 className={`text-xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>Projects Coming Soon</h3>
             <p className={`mb-6 ${isDark ? 'text-white/50' : 'text-slate-600'}`}>New impact initiatives are being designed with communities.</p>
             <Link href="/signup">
-              <Button className="bg-gradient-to-r from-emerald-500 to-teal-500">
+              <Button className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0]">
                 Join the Ecosystem
               </Button>
             </Link>

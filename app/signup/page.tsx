@@ -9,20 +9,17 @@ import { auth, db } from "@/lib/firebase/client"
 import { doc, setDoc, serverTimestamp } from "firebase/firestore"
 import Link from "next/link"
 import Image from "next/image"
+import toast from "react-hot-toast"
 
-// UI Components
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ArrowLeft, Eye, EyeOff } from "lucide-react"
-import toast from "react-hot-toast"
+import { ArrowLeft, Eye, EyeOff, TriangleAlert } from "lucide-react"
 
 function FullPageLoader() {
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-background">
-      <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
+    <div className="flex h-screen w-full items-center justify-center" style={{ backgroundColor: '#130927' }}>
+      <div className="h-12 w-12 animate-spin rounded-full border-4 border-solid border-[#8d44d1] border-t-transparent" />
     </div>
   )
 }
@@ -59,142 +56,187 @@ export default function SignupPage() {
         firstName,
         lastName,
         email,
-        organization: organization || "", // Optional field
+        organization: organization || "",
         createdAt: serverTimestamp(),
         emailVerified: false,
       })
-      
-      // Update Firebase Auth profile for immediate local availability
+
       await updateProfile(firebaseUser, {
-        displayName: `${firstName} ${lastName}`.trim()
-      });
+        displayName: `${firstName} ${lastName}`.trim(),
+      })
 
-      // Send email verification
-      await sendEmailVerification(firebaseUser);
-      toast.success("Account created! Please check your email to verify your account.");
-
-      // On success, the useEffect will handle the redirect.
+      await sendEmailVerification(firebaseUser)
+      toast.success("Account created! Check your email to verify your account.")
     } catch (err: any) {
       let errorMessage = "Signup failed. Please try again."
       if (err.code === "auth/email-already-in-use") {
-        errorMessage = "This email is already in use. Please try logging in."
+        errorMessage = "This email is already in use. Try signing in instead."
       } else if (err.code === "auth/weak-password") {
-        errorMessage = "Your password must be at least 6 characters long."
+        errorMessage = "Password must be at least 6 characters."
       } else if (err.code) {
         errorMessage = err.message
       }
       setError(errorMessage)
-      setIsLoading(false) // Re-enable form on error
+      setIsLoading(false)
     }
   }
 
-  if (isAuthLoading || user) {
-    return <FullPageLoader />
-  }
+  if (isAuthLoading || user) return <FullPageLoader />
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-background">
-             <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-             <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-              <div className="absolute inset-0 bg-[url('/bg-pattern.svg')] opacity-5"></div>
-        </div>
+    <div
+      className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden"
+      style={{ backgroundColor: '#130927' }}
+    >
+      {/* Background blobs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#8d44d1]/10 rounded-full blur-3xl -translate-y-1/3 translate-x-1/4" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#7030b0]/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#8d44d1]/5 rounded-full blur-3xl" />
+      </div>
 
-      <div className="w-full max-w-md space-y-8 relative z-10 animate-slide-in-up">
-        <div className="text-center space-y-2">
-          <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors mb-6 group">
-            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            Back to home
-          </Link>
-          <div className="flex flex-col items-center justify-center gap-4 mb-4">
-             <div className="relative w-14 h-14 rounded-xl overflow-hidden shadow-2xl shadow-primary/20">
-                 <Image
-                   src="/zeroup-partners-logo-light-mode.png"
-                   alt="ZeroUp Partners Logo"
-                   fill
-                   className="object-contain dark:hidden"
-                 />
-                 <Image
-                   src="/zeroup-partners-logo-dark-mode.png"
-                   alt="ZeroUp Partners Logo"
-                   fill
-                   className="object-contain hidden dark:block"
-                 />
-            </div>
-            <div className="text-center">
-              <h1 className="text-2xl font-bold text-foreground tracking-tight">ZeroUp Initiative</h1>
-              <p className="text-sm text-muted-foreground font-medium">Partners Hub</p>
-            </div>
+      <div className="w-full max-w-md relative z-10 py-8">
+        {/* Back link */}
+        <Link
+          href="/"
+          className="inline-flex items-center text-sm text-white/40 hover:text-white/70 transition-colors mb-8 group"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+          Back to home
+        </Link>
+
+        {/* Logo + brand */}
+        <div className="flex flex-col items-center gap-3 mb-8">
+          <div className="relative w-14 h-14 rounded-2xl overflow-hidden shadow-xl shadow-[#8d44d1]/20 ring-1 ring-white/10">
+            <Image
+              src="/images/zeroup-partners-logo-light-mode.png"
+              alt="ZeroUp Partners"
+              fill
+              className="object-contain dark:hidden"
+            />
+            <Image
+              src="/images/zeroup-partners-logo-dark-mode.png"
+              alt="ZeroUp Partners"
+              fill
+              className="object-contain hidden dark:block"
+            />
+          </div>
+          <div className="text-center">
+            <h1 className="text-xl font-bold text-white tracking-tight">ZeroUp Partners</h1>
+            <p className="text-sm text-white/40">Partners Hub</p>
           </div>
         </div>
 
-        <Card className="border-border shadow-lg bg-white dark:border-white/10 dark:shadow-2xl dark:bg-black/50 dark:backdrop-blur-md">
-          <CardHeader className="text-center space-y-1 pb-2">
-            <CardTitle className="text-2xl font-bold tracking-tight">Create Account</CardTitle>
-            <CardDescription className="text-base">Join our network to start making a difference</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <form onSubmit={handleSignup} className="space-y-4">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="space-y-2 w-full sm:w-1/2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} required disabled={isLoading} className="bg-background/50 border-input/50 focus:bg-background transition-colors" />
-                </div>
-                <div className="space-y-2 w-full sm:w-1/2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} required disabled={isLoading} className="bg-background/50 border-input/50 focus:bg-background transition-colors" />
-                </div>
+        {/* Card */}
+        <div className="rounded-2xl border border-white/8 bg-[#1e1040]/60 backdrop-blur-xl shadow-2xl shadow-black/40 p-8">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-white">Create Account</h2>
+            <p className="text-sm text-white/50 mt-1">Join the network and start making a difference</p>
+          </div>
+
+          <form onSubmit={handleSignup} className="space-y-5">
+            {error && (
+              <div className="flex gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400">
+                <TriangleAlert className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <p className="text-sm">{error}</p>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} className="bg-background/50 border-input/50 focus:bg-background transition-colors" />
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="space-y-1.5 flex-1">
+                <Label htmlFor="firstName" className="text-white/70 text-sm">First Name</Label>
+                <Input
+                  id="firstName"
+                  placeholder="John"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                  disabled={isLoading}
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-[#8d44d1]/60 focus:bg-white/8 transition-colors h-11"
+                />
               </div>
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Input 
-                    id="password" 
-                    type={showPassword ? "text" : "password"} 
-                    value={password} 
-                    onChange={(e) => setPassword(e.target.value)} 
-                    required 
-                    disabled={isLoading} 
-                    className="bg-background/50 border-input/50 focus:bg-background transition-colors pr-10" 
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground"
-                    onClick={() => setShowPassword(!showPassword)}
-                    disabled={isLoading}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
-                </div>
-              <div className="space-y-2">
-                <Label htmlFor="organization">Organization (Optional)</Label>
-                <Input id="organization" value={organization} onChange={(e) => setOrganization(e.target.value)} disabled={isLoading} className="bg-background/50 border-input/50 focus:bg-background transition-colors" />
+              <div className="space-y-1.5 flex-1">
+                <Label htmlFor="lastName" className="text-white/70 text-sm">Last Name</Label>
+                <Input
+                  id="lastName"
+                  placeholder="Doe"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                  disabled={isLoading}
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-[#8d44d1]/60 focus:bg-white/8 transition-colors h-11"
+                />
               </div>
-              <Button type="submit" className="w-full text-base font-medium h-11 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all font-bold" disabled={isLoading}>
-                {isLoading ? "Creating Account..." : "Create Account"}
-              </Button>
-            </form>
-            <div className="mt-8 text-center">
-              <p className="text-sm text-muted-foreground">
-                Already have an account?{" "}
-                <Link href="/login" className="text-primary hover:text-primary/80 transition-colors font-bold underline-offset-4 hover:underline">
-                  Sign in
-                </Link>
-              </p>
             </div>
-          </CardContent>
-        </Card>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-white/70 text-sm">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={isLoading}
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-[#8d44d1]/60 focus:bg-white/8 transition-colors h-11"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="password" className="text-white/70 text-sm">Password</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="At least 6 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={isLoading}
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-[#8d44d1]/60 focus:bg-white/8 transition-colors h-11 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="organization" className="text-white/70 text-sm">
+                Organization <span className="text-white/30">(optional)</span>
+              </Label>
+              <Input
+                id="organization"
+                placeholder="Your company or NGO"
+                value={organization}
+                onChange={(e) => setOrganization(e.target.value)}
+                disabled={isLoading}
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-[#8d44d1]/60 focus:bg-white/8 transition-colors h-11"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full h-11 text-base font-semibold rounded-xl bg-gradient-to-r from-[#8d44d1] to-[#7030b0] hover:from-[#7030b0] hover:to-[#5e269a] text-white border-0 shadow-lg shadow-[#8d44d1]/25 transition-all hover:shadow-[#8d44d1]/40"
+            >
+              {isLoading ? "Creating Account…" : "Create Account"}
+            </Button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-white/40">
+            Already have an account?{" "}
+            <Link href="/login" className="text-[#a05cd4] hover:text-[#c084f5] font-medium transition-colors">
+              Sign in
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )

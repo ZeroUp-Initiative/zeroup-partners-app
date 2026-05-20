@@ -1,11 +1,7 @@
 const { https } = require("firebase-functions/v1");
 const functions = require("firebase-functions/v1");
 const admin = require("firebase-admin");
-const { Resend } = require("resend");
-const { defineString } = require("firebase-functions/params");
-
-// Define parameters for configuration
-const resendApiKey = defineString("RESEND_API_KEY", { default: "" });
+const { sendEmail: sendEmailWithNodemailer } = require("./mailer");
 
 // Initialize Firebase Admin
 if (!admin.apps.length) {
@@ -13,18 +9,6 @@ if (!admin.apps.length) {
 }
 
 const db = admin.firestore();
-
-// Initialize Resend for email notifications (lazy initialization)
-let resendClient = null;
-function getResendClient() {
-  if (!resendClient) {
-    const apiKey = resendApiKey.value() || process.env.RESEND_API_KEY;
-    if (apiKey) {
-      resendClient = new Resend(apiKey);
-    }
-  }
-  return resendClient;
-}
 
 // Email templates
 const emailTemplates = {
@@ -191,6 +175,107 @@ const emailTemplates = {
     `,
   }),
 
+  projectSubmitted: (name, title) => ({
+    subject: `📋 Project Received: "${title}"`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #8d44d1, #7030b0); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+            .highlight { background: #f5ecff; border-left: 4px solid #8d44d1; padding: 15px; margin: 20px 0; border-radius: 4px; }
+            .button { display: inline-block; background: linear-gradient(135deg, #8d44d1, #7030b0); color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin-top: 20px; }
+            .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header"><h1>📋 Submission Received!</h1></div>
+            <div class="content">
+              <p>Hi ${name},</p>
+              <p>We've received your project submission and it's now pending review by our team.</p>
+              <div class="highlight"><strong>${title}</strong></div>
+              <p>Our team will review your submission within <strong>3–5 business days</strong>. You'll receive an email as soon as a decision is made.</p>
+              <a href="https://zeroup-partners-app.vercel.app/projects" class="button">View Live Projects</a>
+            </div>
+            <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+          </div>
+        </body>
+      </html>
+    `,
+  }),
+
+  projectApproved: (name, title, notes) => ({
+    subject: `🎉 Your Project Has Been Approved — "${title}"`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #8d44d1, #7030b0); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+            .highlight { background: #f5ecff; border-left: 4px solid #8d44d1; padding: 15px; margin: 20px 0; border-radius: 4px; }
+            .button { display: inline-block; background: linear-gradient(135deg, #8d44d1, #7030b0); color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin-top: 20px; }
+            .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header"><h1>🎉 Project Approved!</h1></div>
+            <div class="content">
+              <p>Hi ${name},</p>
+              <p>Your project has been reviewed and <strong>approved</strong>. It's now publicly visible and open for contributions.</p>
+              <div class="highlight"><strong>${title}</strong></div>
+              ${notes ? `<div class="highlight"><strong>Note from our team:</strong><br>${notes}</div>` : ''}
+              <p>Partners can now discover and contribute to your project. Share the link to spread the word!</p>
+              <a href="https://zeroup-partners-app.vercel.app/projects" class="button">View Your Project</a>
+            </div>
+            <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+          </div>
+        </body>
+      </html>
+    `,
+  }),
+
+  projectRejected: (name, title, notes) => ({
+    subject: `Update on Your Project Submission — "${title}"`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #64748b, #475569); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+            .highlight { background: #f1f5f9; border-left: 4px solid #64748b; padding: 15px; margin: 20px 0; border-radius: 4px; }
+            .button { display: inline-block; background: linear-gradient(135deg, #8d44d1, #7030b0); color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin-top: 20px; }
+            .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header"><h1>Project Submission Update</h1></div>
+            <div class="content">
+              <p>Hi ${name},</p>
+              <p>Thank you for submitting your project. After careful review, we were unable to approve it at this time.</p>
+              <div class="highlight"><strong>${title}</strong></div>
+              ${notes ? `<div class="highlight"><strong>Feedback from our team:</strong><br>${notes}</div>` : "<p>If you'd like more information, please reach out to our team directly.</p>"}
+              <p>You're welcome to address any concerns and resubmit your project in the future.</p>
+              <a href="https://zeroup-partners-app.vercel.app/dashboard" class="button">Go to Dashboard</a>
+            </div>
+            <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+          </div>
+        </body>
+      </html>
+    `,
+  }),
+
   welcomeEmail: (name) => ({
     subject: "🎉 Welcome to ZeroUp Partners!",
     html: `
@@ -238,21 +323,29 @@ const emailTemplates = {
 /**
  * Send email notification
  */
+function htmlToText(html) {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 async function sendEmail(to, template) {
-  const client = getResendClient();
-  if (!client) {
-    console.warn("Resend API key not configured, skipping email");
+  if (!to) {
+    console.warn("Email destination missing, skipping email");
     return null;
   }
-  
+
   try {
-    const result = await client.emails.send({
-      from: "ZeroUp Partners <onboarding@resend.dev>",
-      to: [to],
+    const result = await sendEmailWithNodemailer({
+      from: "ZeroUp Partners <onboarding@zeroup.dev>",
+      to,
       subject: template.subject,
       html: template.html,
+      text: htmlToText(template.html),
     });
-    console.log(`Email sent to ${to}:`, result);
+    console.log(`Email sent to ${to}:`, result.messageId || result);
     return result;
   } catch (error) {
     console.error(`Error sending email to ${to}:`, error);

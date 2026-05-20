@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { collection, onSnapshot, doc, updateDoc, query, orderBy, QuerySnapshot, DocumentData, QueryDocumentSnapshot } from "firebase/firestore"
+import { collection, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy, QuerySnapshot, DocumentData, QueryDocumentSnapshot } from "firebase/firestore"
 import { db } from "@/lib/firebase/client"
 import ProtectedRoute from "@/components/auth/protected-route"
 import { useAuth } from "@/contexts/auth-context"
@@ -19,23 +19,31 @@ import {
   DialogDescription, 
   DialogFooter 
 } from "@/components/ui/dialog"
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { 
-  Search, 
-  MoreHorizontal, 
-  Shield, 
-  ShieldOff, 
-  User, 
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Search,
+  MoreHorizontal,
+  Shield,
+  ShieldOff,
+  User,
   Users,
   ChevronLeft,
   ChevronRight,
   AlertTriangle,
-  Ban
+  Ban,
+  Trash2,
+  Mail,
+  Send,
+  RefreshCw,
 } from "lucide-react"
 import toast from "react-hot-toast"
 
@@ -63,6 +71,17 @@ function AdminUsersPage() {
   const [isChangingRole, setIsChangingRole] = useState(false)
   const [newRole, setNewRole] = useState<string>("")
   const itemsPerPage = 10
+
+  // Delete state
+  const [deleteTarget, setDeleteTarget] = useState<UserData | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  // Email state
+  const [emailTarget, setEmailTarget] = useState<UserData | null>(null)
+  const [emailType, setEmailType] = useState("welcome")
+  const [customEmailSubject, setCustomEmailSubject] = useState("")
+  const [customEmailBody, setCustomEmailBody] = useState("")
+  const [isSendingEmail, setIsSendingEmail] = useState(false)
 
   useEffect(() => {
     const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
@@ -158,6 +177,59 @@ function AdminUsersPage() {
       toast.error("Failed to suspend user");
     }
   };
+
+  const handleDeleteUser = async () => {
+    if (!deleteTarget) return
+    setIsDeleting(true)
+    try {
+      await deleteDoc(doc(db, "users", deleteTarget.id))
+      toast.success(`${deleteTarget.firstName} ${deleteTarget.lastName} has been deleted.`)
+      setDeleteTarget(null)
+    } catch {
+      toast.error("Failed to delete user.")
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const handleSendEmail = async () => {
+    if (!emailTarget) return
+    setIsSendingEmail(true)
+    try {
+      const payload =
+        emailType === "custom"
+          ? {
+              to: emailTarget.email,
+              type: "custom",
+              data: {
+                name: emailTarget.firstName || "Partner",
+                subject: customEmailSubject,
+                body: customEmailBody,
+              },
+            }
+          : {
+              to: emailTarget.email,
+              type: emailType,
+              data: { name: emailTarget.firstName || "Partner" },
+            }
+
+      const res = await fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+
+      if (!res.ok) throw new Error("Send failed")
+      toast.success(`Email sent to ${emailTarget.email}`)
+      setEmailTarget(null)
+      setCustomEmailSubject("")
+      setCustomEmailBody("")
+    } catch {
+      toast.error("Failed to send email.")
+    } finally {
+      setIsSendingEmail(false)
+    }
+  }
 
   const formatDate = (timestamp: any) => {
     if (!timestamp) return 'N/A';
@@ -326,39 +398,54 @@ function AdminUsersPage() {
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" disabled={userData.id === user.uid}>
-                              <MoreHorizontal className="h-4 w-4" />
+                            <Button variant="outline" size="sm" className="flex items-center gap-1.5 h-8 px-3">
+                              <MoreHorizontal className="h-3.5 w-3.5" />
+                              <span className="text-xs">Actions</span>
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {userData.role === 'admin' ? (
-                              <DropdownMenuItem 
-                                onClick={() => openRoleDialog(userData, 'user')}
-                                className="text-destructive"
-                              >
-                                <ShieldOff className="w-4 h-4 mr-2" />
-                                Remove Admin
-                              </DropdownMenuItem>
-                            ) : (
-                              <DropdownMenuItem onClick={() => openRoleDialog(userData, 'admin')}>
-                                <Shield className="w-4 h-4 mr-2" />
-                                Make Admin
-                              </DropdownMenuItem>
+                          <DropdownMenuContent align="end" className="w-52">
+                            {/* Role — only for other users */}
+                            {userData.id !== user.uid && (
+                              userData.role === 'admin' ? (
+                                <DropdownMenuItem onClick={() => openRoleDialog(userData, 'user')} className="text-destructive focus:text-destructive">
+                                  <ShieldOff className="w-4 h-4 mr-2" />Remove Admin
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem onClick={() => openRoleDialog(userData, 'admin')}>
+                                  <Shield className="w-4 h-4 mr-2" />Make Admin
+                                </DropdownMenuItem>
+                              )
                             )}
-                            {(userData.flagged || userData.suspended) && (
-                              <DropdownMenuItem onClick={() => handleClearFlags(userData)}>
-                                <User className="w-4 h-4 mr-2" />
-                                Clear Flags & Reactivate
-                              </DropdownMenuItem>
-                            )}
-                            {!userData.suspended && userData.role !== 'admin' && (
-                              <DropdownMenuItem 
-                                onClick={() => handleSuspendUser(userData)}
-                                className="text-destructive"
-                              >
-                                <Ban className="w-4 h-4 mr-2" />
-                                Suspend User
-                              </DropdownMenuItem>
+
+                            <DropdownMenuSeparator />
+
+                            {/* Email actions — available for all users */}
+                            <DropdownMenuItem onClick={() => { setEmailTarget(userData); setEmailType("welcome") }}>
+                              <RefreshCw className="w-4 h-4 mr-2" />Resend Welcome Email
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { setEmailTarget(userData); setEmailType("custom") }}>
+                              <Mail className="w-4 h-4 mr-2" />Send Custom Email
+                            </DropdownMenuItem>
+
+                            {/* Account status — only for other non-admin users */}
+                            {userData.id !== user.uid && userData.role !== 'admin' && (
+                              <>
+                                <DropdownMenuSeparator />
+                                {(userData.flagged || userData.suspended) && (
+                                  <DropdownMenuItem onClick={() => handleClearFlags(userData)}>
+                                    <User className="w-4 h-4 mr-2" />Clear Flags & Reactivate
+                                  </DropdownMenuItem>
+                                )}
+                                {!userData.suspended && (
+                                  <DropdownMenuItem onClick={() => handleSuspendUser(userData)} className="text-amber-600 focus:text-amber-600">
+                                    <Ban className="w-4 h-4 mr-2" />Suspend User
+                                  </DropdownMenuItem>
+                                )}
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => setDeleteTarget(userData)} className="text-destructive focus:text-destructive">
+                                  <Trash2 className="w-4 h-4 mr-2" />Delete User
+                                </DropdownMenuItem>
+                              </>
                             )}
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -401,6 +488,91 @@ function AdminUsersPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete User Dialog */}
+      <Dialog open={deleteTarget !== null} onOpenChange={() => setDeleteTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete User</DialogTitle>
+            <DialogDescription>
+              This will permanently delete <strong>{deleteTarget?.firstName} {deleteTarget?.lastName}</strong>'s profile from the database. Their contribution history will be preserved. This cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDeleteUser} disabled={isDeleting}>
+              {isDeleting ? "Deleting…" : "Delete User"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Send Email Dialog */}
+      <Dialog open={emailTarget !== null} onOpenChange={() => { setEmailTarget(null); setCustomEmailSubject(""); setCustomEmailBody("") }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Send className="w-4 h-4" />
+              Send Email to {emailTarget?.firstName} {emailTarget?.lastName}
+            </DialogTitle>
+            <DialogDescription>{emailTarget?.email}</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label>Email Type</Label>
+              <Select value={emailType} onValueChange={setEmailType}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="welcome">Welcome Email</SelectItem>
+                  <SelectItem value="custom">Custom Message</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {emailType === "custom" && (
+              <>
+                <div className="space-y-1.5">
+                  <Label>Subject</Label>
+                  <Input
+                    placeholder="Email subject"
+                    value={customEmailSubject}
+                    onChange={e => setCustomEmailSubject(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Message</Label>
+                  <Textarea
+                    placeholder="Write your message here…"
+                    value={customEmailBody}
+                    onChange={e => setCustomEmailBody(e.target.value)}
+                    rows={5}
+                  />
+                </div>
+              </>
+            )}
+
+            {emailType !== "custom" && (
+              <p className="text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
+                {emailType === "welcome" && "Sends the standard welcome email with platform overview and a link to the dashboard."}
+              </p>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEmailTarget(null)}>Cancel</Button>
+            <Button
+              onClick={handleSendEmail}
+              disabled={isSendingEmail || (emailType === "custom" && (!customEmailSubject.trim() || !customEmailBody.trim()))}
+              className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
+            >
+              {isSendingEmail ? "Sending…" : <><Send className="w-4 h-4 mr-2" />Send Email</>}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Role Change Confirmation Dialog */}
       <Dialog open={selectedUser !== null} onOpenChange={() => setSelectedUser(null)}>

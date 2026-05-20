@@ -44,9 +44,10 @@ function ProjectsPage() {
       const projectsData: Project[] = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        projectsData.push({ 
-            id: doc.id, 
-            ...data as Omit<Project, 'id'> 
+        if (data.status === 'pending' || data.status === 'rejected') return;
+        projectsData.push({
+            id: doc.id,
+            ...data as Omit<Project, 'id'>
         });
       });
       setProjects(projectsData);

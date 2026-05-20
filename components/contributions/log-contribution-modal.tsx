@@ -135,6 +135,24 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
         createdAt: serverTimestamp(),
       })
 
+      // Send confirmation email (fire-and-forget)
+      if (user.email) {
+        fetch('/api/email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: user.email,
+            type: 'contribution_submitted',
+            data: {
+              name: user.firstName || 'Partner',
+              amount: amount,
+              description: formData.description,
+              date: new Date(formData.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+            },
+          }),
+        }).catch(() => {})
+      }
+
       setSuccess("Contribution logged successfully!")
       setTimeout(() => {
         setOpen(false)
@@ -180,37 +198,37 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
             {success && <Alert className="border-green-500 text-green-500"><AlertDescription>{success}</AlertDescription></Alert>}
 
             {/* Bank Account Details */}
-            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div className="bg-slate-50 dark:bg-[#1e1040]/60 border border-slate-200 dark:border-white/10 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-3">
-                    <Banknote className="w-5 h-5 text-blue-600" />
-                    <h4 className="font-semibold text-blue-900 dark:text-blue-100">Bank Transfer Details</h4>
+                    <Banknote className="w-4 h-4 text-[#8d44d1]" />
+                    <h4 className="font-semibold text-slate-800 dark:text-white text-sm">Bank Transfer Details</h4>
                 </div>
                 <div className="space-y-2 text-sm">
                     <div className="flex justify-between items-center">
-                        <span className="text-gray-600 dark:text-gray-400">Account Number:</span>
+                        <span className="text-slate-500 dark:text-white/40">Account Number:</span>
                         <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold">0219230107</span>
+                            <span className="font-mono font-bold text-slate-800 dark:text-white">0219230107</span>
                             <Button
                                 type="button"
                                 variant="ghost"
                                 size="sm"
                                 onClick={copyAccountNumber}
-                                className="h-6 w-6 p-0 hover:bg-blue-100 dark:hover:bg-blue-900"
+                                className="h-6 w-6 p-0 text-slate-400 hover:text-[#8d44d1] hover:bg-[#8d44d1]/10 dark:text-white/30 dark:hover:text-white/60"
                             >
                                 <Copy className="w-3 h-3" />
                             </Button>
                         </div>
                     </div>
                     <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-400">Bank:</span>
-                        <span className="font-medium">GT Bank</span>
+                        <span className="text-slate-500 dark:text-white/40">Bank:</span>
+                        <span className="font-medium text-slate-700 dark:text-white/80">GT Bank</span>
                     </div>
                     <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-400">Account Name:</span>
-                        <span className="font-medium">PACSDA</span>
+                        <span className="text-slate-500 dark:text-white/40">Account Name:</span>
+                        <span className="font-medium text-slate-700 dark:text-white/80">PACSDA</span>
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                        (Pan African Centre for Social Development and Accountability)
+                    <div className="text-xs text-slate-400 dark:text-white/30 mt-2 border-t border-slate-200 dark:border-white/5 pt-2">
+                        Pan African Centre for Social Development and Accountability
                     </div>
                 </div>
             </div>

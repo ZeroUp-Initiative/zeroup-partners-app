@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { LogContributionModal } from "@/components/contributions/log-contribution-modal"
-import { Plus, LogOut, DollarSign, Calendar, FileText, CheckCircle, Clock, AlertCircle, ArrowLeft, Download, AlertTriangle, Ban } from "lucide-react"
+import { Plus, LogOut, DollarSign, Calendar, FileText, CheckCircle, Clock, AlertCircle, ArrowLeft, Download, AlertTriangle, Ban, ChevronLeft, ChevronRight } from "lucide-react"
 import Link from "next/link"
 import { auth, db } from "@/lib/firebase/client"
 import { collection, query, where, onSnapshot, Timestamp, doc, updateDoc } from "firebase/firestore"
@@ -29,10 +29,13 @@ interface Contribution {
   rejectionReason?: string;
 }
 
+const PAGE_SIZE = 10
+
 function ContributionsContent() {
   const { user, isLoading: isAuthLoading } = useAuth();
   const [contributions, setContributions] = useState<Contribution[]>([]);
   const [isLoadingContributions, setIsLoadingContributions] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (!user) return;
@@ -166,6 +169,9 @@ function ContributionsContent() {
     document.body.removeChild(link);
   };
 
+  const totalPages = Math.ceil(contributions.length / PAGE_SIZE)
+  const pagedContributions = contributions.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+
   if (isAuthLoading || isLoadingContributions) {
       return <div className="flex items-center justify-center h-screen">Loading Dashboard...</div>
   }
@@ -273,15 +279,15 @@ function ContributionsContent() {
           
           <div className="space-y-4">
               {contributions.length > 0 ? (
-                  contributions.map((contribution, index) => (
-                      <Card 
-                        key={contribution.id} 
+                  pagedContributions.map((contribution, index) => (
+                      <Card
+                        key={contribution.id}
                         className="group hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
                         style={{ animationDelay: `${index * 50}ms` }}
                       >
                       {/* Status indicator bar */}
                       <div className={`h-1 ${
-                        contribution.status === 'approved' ? 'bg-gradient-to-r from-emerald-500 to-teal-400' :
+                        contribution.status === 'approved' ? 'bg-gradient-to-r from-[#8d44d1] to-[#8d44d1]' :
                         contribution.status === 'pending' ? 'bg-gradient-to-r from-amber-500 to-yellow-400' :
                         'bg-gradient-to-r from-red-500 to-rose-400'
                       }`} />
@@ -289,7 +295,7 @@ function ContributionsContent() {
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                               <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                                   <div className={`p-2 sm:p-3 rounded-xl transition-transform duration-300 group-hover:scale-110 flex-shrink-0 ${
-                                    contribution.status === 'approved' ? 'bg-gradient-to-br from-emerald-500/20 to-teal-400/20' :
+                                    contribution.status === 'approved' ? 'bg-gradient-to-br from-[#8d44d1]/20 to-[#8d44d1]/20' :
                                     contribution.status === 'pending' ? 'bg-gradient-to-br from-amber-500/20 to-yellow-400/20' :
                                     'bg-gradient-to-br from-red-500/20 to-rose-400/20'
                                   }`}>
@@ -336,6 +342,58 @@ function ContributionsContent() {
                   </Card>
               )}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+              <p className="text-sm text-muted-foreground order-2 sm:order-1">
+                Showing {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, contributions.length)} of {contributions.length} contributions
+              </p>
+              <div className="flex items-center gap-1 order-1 sm:order-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="h-8 w-8 p-0"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => {
+                  const isEdge = page === 1 || page === totalPages
+                  const isNearCurrent = Math.abs(page - currentPage) <= 1
+                  if (!isEdge && !isNearCurrent) {
+                    if (page === 2 || page === totalPages - 1) {
+                      return <span key={page} className="px-1 text-muted-foreground text-sm">…</span>
+                    }
+                    return null
+                  }
+                  return (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(page)}
+                      className={`h-8 w-8 p-0 ${currentPage === page ? 'bg-[#8d44d1] hover:bg-[#7030b0] border-[#8d44d1]' : ''}`}
+                    >
+                      {page}
+                    </Button>
+                  )
+                })}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="h-8 w-8 p-0"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          )}
 
         </div>
       </main>

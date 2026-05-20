@@ -26,17 +26,17 @@ export function PartnersSection({ isDark = true }: PartnersSectionProps) {
     <section 
       ref={sectionRef}
       className={`relative py-24 md:py-32 overflow-hidden ${
-        isDark ? 'bg-slate-950' : 'bg-gradient-to-b from-blue-50/30 via-white to-indigo-50/30'
+        isDark ? 'bg-[#130927]' : 'bg-gradient-to-b from-blue-50/30 via-white to-indigo-50/30'
       }`}
     >
       {/* Light mode decorative blobs */}
       {!isDark && (
         <>
-          <div className="absolute top-20 right-20 w-72 h-72 bg-blue-200/30 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 left-20 w-72 h-72 bg-indigo-200/30 rounded-full blur-3xl" />
+          <div className="absolute top-20 right-20 w-72 h-72 bg-slate-200/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 left-20 w-72 h-72 bg-slate-200/15 rounded-full blur-3xl" />
         </>
       )}
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="mx-auto max-w-7xl px-4 md:px-6 relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -45,15 +45,15 @@ export function PartnersSection({ isDark = true }: PartnersSectionProps) {
           className="text-center mb-16 md:mb-20"
         >
           <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6 ${
-            isDark ? 'bg-blue-500/10 border-blue-500/20' : 'bg-blue-50 border-blue-200'
+            isDark ? 'bg-[#833dc6]/10 border-[#833dc6]/20' : 'bg-[#833dc6]/10 border-[#833dc6]/20'
           }`}>
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-            <span className={`text-sm font-medium ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>Our Partners</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-[#833dc6] animate-pulse" />
+            <span className={`text-sm font-medium ${isDark ? 'text-[#833dc6]' : 'text-[#833dc6]'}`}>Our Partners</span>
           </div>
           
           <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
             Who Builds{' '}
-            <span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#a05cd4] to-[#8d44d1] bg-clip-text text-transparent">
               With Us
             </span>
           </h2>
@@ -80,8 +80,8 @@ export function PartnersSection({ isDark = true }: PartnersSectionProps) {
                 ${hoveredIndex === index 
                   ? 'bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border-blue-500/30' 
                   : isDark 
-                    ? 'bg-slate-900/30 border-white/5 hover:border-white/10' 
-                    : 'bg-white/90 border-blue-200 shadow-lg ring-1 ring-blue-100 hover:border-blue-300 hover:shadow-blue-500/10'
+                    ? 'bg-[#1e1040]/30 border-white/5 hover:border-white/10' 
+                    : 'bg-white/90 border-blue-200 shadow-lg hover:border-blue-300 hover:shadow-blue-500/10'
                 }
               `}>
                 {/* Gradient top bar for light mode when not hovered */}
@@ -127,7 +127,7 @@ export function PartnersSection({ isDark = true }: PartnersSectionProps) {
           </p>
           <a 
             href="mailto:partners@zeroup.org" 
-            className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors font-medium"
+            className="inline-flex items-center gap-2 bg-[#833dc6] text-white p-2 px-3 rounded-full hover:bg-[#833dc6]/80 transition-colors font-medium"
           >
             Get in touch
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
