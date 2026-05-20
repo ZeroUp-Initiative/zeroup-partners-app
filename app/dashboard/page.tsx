@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useAuth } from "@/contexts/auth-context"
 import { db } from "@/lib/firebase/client"
-import { collection, query, where, onSnapshot } from "firebase/firestore"
+import { collection, query, where, onSnapshot, getDocs } from "firebase/firestore"
 import ProtectedRoute from "@/components/auth/protected-route"
 import Header from "@/components/layout/header"
 import { LogContributionModal } from "@/components/contributions/log-contribution-modal"
@@ -15,7 +15,7 @@ const isBrowser = typeof window !== 'undefined';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { DollarSign, Target, TrendingUp, Award, Plus, BarChart, Users, Heart, Trophy, Medal, Star, Receipt, Banknote, Copy, Crown, Sparkles, CalendarDays, ChevronDown, Download, Loader2 } from "lucide-react"
+import { DollarSign, Target, TrendingUp, Award, Plus, BarChart, Users, Heart, Trophy, Medal, Star, Receipt, Banknote, Copy, Crown, Sparkles, CalendarDays, ChevronDown, Download, RefreshCw, Loader2 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -43,6 +43,7 @@ function DashboardPage() {
   const [otherTopContributors, setOtherTopContributors] = useState<{name: string, amount: number, id: string, photoURL?: string}[]>([]);
   const [monthlyTrend, setMonthlyTrend] = useState<MonthlyData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [usersMap, setUsersMap] = useState<Map<string, any>>(new Map());
   const [paymentsData, setPaymentsData] = useState<any[]>([]);
   const [monthlyTopPartners, setMonthlyTopPartners] = useState<Map<string, {name: string, amount: number, id: string, photoURL?: string, month: string, year: number}>>(new Map());
@@ -108,6 +109,23 @@ function DashboardPage() {
 
     return () => unsubUsers();
   }, [user]);
+
+  const refreshTrends = async () => {
+    if (!isBrowser || !user || !db) return;
+
+    setIsRefreshing(true);
+    try {
+      const paymentsQuery = query(collection(db, "payments"), where("status", "==", "approved"));
+      const snapshot = await getDocs(paymentsQuery);
+      const payments = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setPaymentsData(payments as any[]);
+    } catch (error) {
+      console.error("Error refreshing trends:", error);
+      toast.error("Unable to refresh contribution trends. Please try again.");
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     if (!isBrowser || !user || !db) {
@@ -489,7 +507,7 @@ function DashboardPage() {
                   <Card className="relative overflow-hidden">
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8d44d1] to-[#7030b0]" />
                     <CardHeader>
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
                           <div className="p-2.5 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/20">
                             <BarChart className="h-5 w-5 text-violet-600 dark:text-violet-400" />
@@ -499,10 +517,20 @@ function DashboardPage() {
                             <CardDescription>Total contributions over the last 6 months</CardDescription>
                           </div>
                         </div>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={refreshTrends}
+                          disabled={isLoading || isRefreshing}
+                          className="whitespace-nowrap"
+                        >
+                          {isRefreshing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+                          Refresh
+                        </Button>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      {isLoading ? (
+                      {(isLoading || isRefreshing) ? (
                         <div className="h-32 flex items-center justify-center">
                           <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
                         </div>
