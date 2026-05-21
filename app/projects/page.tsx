@@ -37,6 +37,7 @@ function ProjectsPage() {
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState("")
   const [viewingProject, setViewingProject] = useState<Project | null>(null)
+  const [paymentSettings, setPaymentSettings] = useState<{ accountNumber: string; bankName: string; accountName: string; bankDetails: string } | null>(null)
 
   useEffect(() => {
     const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
@@ -52,6 +53,26 @@ function ProjectsPage() {
       });
       setProjects(projectsData);
     });
+
+    const loadPaymentSettings = async () => {
+      try {
+        const res = await fetch('/api/settings/payment')
+        if (!res.ok) return
+        const data = await res.json()
+        if (data?.configured) {
+          setPaymentSettings({
+            accountNumber: data.accountNumber || '',
+            bankName: data.bankName || '',
+            accountName: data.accountName || '',
+            bankDetails: data.bankDetails || '',
+          })
+        }
+      } catch (err) {
+        console.error('Failed to load payment settings:', err)
+      }
+    }
+
+    loadPaymentSettings()
     return () => unsubscribe();
   }, []);
 
@@ -68,7 +89,11 @@ function ProjectsPage() {
   }
 
   const copyAccountNumber = () => {
-    const accountNumber = "0219230107"
+    const accountNumber = paymentSettings?.accountNumber
+    if (!accountNumber) {
+      toast.error("Bank account details are not configured yet.")
+      return
+    }
     navigator.clipboard.writeText(accountNumber)
     toast.success("Account number copied to clipboard!")
   }
@@ -242,7 +267,9 @@ function ProjectsPage() {
                       <div className="flex justify-between items-center">
                           <span className="text-gray-600 dark:text-gray-400">Account Number:</span>
                           <div className="flex items-center gap-2">
-                              <span className="font-mono font-bold">0219230107</span>
+                              <span className="font-mono font-bold">
+                                {paymentSettings?.accountNumber || 'Not configured yet'}
+                              </span>
                               <Button
                                   type="button"
                                   variant="ghost"
@@ -256,14 +283,14 @@ function ProjectsPage() {
                       </div>
                       <div className="flex justify-between">
                           <span className="text-gray-600 dark:text-gray-400">Bank:</span>
-                          <span className="font-medium">GT Bank</span>
+                          <span className="font-medium">{paymentSettings?.bankName || 'Not configured yet'}</span>
                       </div>
                       <div className="flex justify-between">
                           <span className="text-gray-600 dark:text-gray-400">Account Name:</span>
-                          <span className="font-medium">PACSDA</span>
+                          <span className="font-medium">{paymentSettings?.accountName || 'Not configured yet'}</span>
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                          (Pan African Centre for Social Development and Accountability)
+                          {paymentSettings?.bankDetails || 'Please check with the administrator for bank transfer details.'}
                       </div>
                   </div>
               </div>

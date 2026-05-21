@@ -44,6 +44,7 @@ interface Project {
   organizationName?: string
   submittedByName?: string
   submittedByEmail?: string
+  submittedBy?: string
   adminNotes?: string
   createdAt?: any
 }
@@ -102,6 +103,7 @@ function AdminProjectsPage() {
           organizationName: p.organizationName,
           submittedByName: p.submittedByName,
           submittedByEmail: p.submittedByEmail,
+          submittedBy: p.submittedBy,
           adminNotes: p.adminNotes,
           createdAt: p.createdAt,
         })
@@ -146,6 +148,10 @@ function AdminProjectsPage() {
         fundingGoal: Number(newProject.fundingGoal), currentFunding: 0,
         status: 'open', imageUrl,
         dueDate: newProject.dueDate ? new Date(newProject.dueDate) : null,
+        // mark admin as submitter when creating from admin UI
+        submittedBy: user?.uid || '',
+        submittedByName: (user as any)?.firstName ? `${(user as any).firstName} ${(user as any).lastName || ''}`.trim() : (user as any)?.displayName || '',
+        submittedByEmail: (user as any)?.email || '',
         createdAt: serverTimestamp(),
       })
       setNewProject({ title: "", description: "", fundingGoal: "", dueDate: "", imageFile: null })
@@ -328,7 +334,9 @@ function AdminProjectsPage() {
                       <div className="flex items-center gap-1 flex-shrink-0">
                         {statusBadge(project.status)}
                         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEditClick(project)}><Pencil className="h-3.5 w-3.5" /></Button>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => { setProjectToDelete(project); setIsDeleteModalOpen(true) }}><Trash2 className="h-3.5 w-3.5" /></Button>
+                        {(!project.submittedBy || project.submittedBy === user?.uid) && (
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => { setProjectToDelete(project); setIsDeleteModalOpen(true) }}><Trash2 className="h-3.5 w-3.5" /></Button>
+                        )}
                       </div>
                     </div>
                     <CardDescription className="line-clamp-2">{project.description}</CardDescription>
@@ -414,7 +422,9 @@ function AdminProjectsPage() {
                         {statusBadge(project.status)}
                         <CardTitle className="text-base mt-1">{project.title}</CardTitle>
                       </div>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { setProjectToDelete(project); setIsDeleteModalOpen(true) }}><Trash2 className="h-3.5 w-3.5" /></Button>
+                      {(!project.submittedBy || project.submittedBy === user?.uid) && (
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { setProjectToDelete(project); setIsDeleteModalOpen(true) }}><Trash2 className="h-3.5 w-3.5" /></Button>
+                      )}
                     </div>
                     {project.adminNotes && <p className="text-xs text-muted-foreground mt-2 italic">Notes: {project.adminNotes}</p>}
                   </CardHeader>

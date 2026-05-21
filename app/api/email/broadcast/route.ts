@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendMail } from '@/lib/mailer'
 
-const FROM = process.env.EMAIL_FROM ?? 'ZeroUp Partners <onboarding@zeroup.dev>'
 const BASE_URL = 'https://zeroup-partners-app.vercel.app'
 
 const styles = `
@@ -57,7 +56,7 @@ export async function POST(req: NextRequest) {
     for (const { email, name } of recipients) {
       try {
         const html = buildHtml(name || 'Partner', subject, body)
-        await sendMail({ from: FROM, to: email, subject, html, text: htmlToText(html) })
+        await sendMail({ to: email, subject, html, text: htmlToText(html) })
         sent++
       } catch {
         failed++

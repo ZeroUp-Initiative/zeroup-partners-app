@@ -141,8 +141,8 @@ export function SubmitProjectModal({ open, onOpenChange }: SubmitProjectModalPro
 
       // Send confirmation email to submitter
       const recipientEmail = form.contactEmail.trim() || user?.email
+      const recipientName = form.contactName.trim() || user?.firstName || 'Partner'
       if (recipientEmail) {
-        const recipientName = form.contactName.trim() || user?.firstName || 'Partner'
         fetch('/api/email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -151,8 +151,33 @@ export function SubmitProjectModal({ open, onOpenChange }: SubmitProjectModalPro
             type: 'project_submitted',
             data: { name: recipientName, title: form.title.trim() },
           }),
-        }).catch(() => {}) // fire-and-forget, don't block the success screen
+        }).catch(() => {})
       }
+
+      // Notify admin
+      fetch('/api/settings/payment')
+        .then(r => r.json())
+        .then(settings => {
+          if (settings.adminNotificationEmail) {
+            return fetch('/api/email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                to: settings.adminNotificationEmail,
+                type: 'admin_project_submitted',
+                data: {
+                  submitterName: recipientName,
+                  submitterEmail: recipientEmail || '',
+                  title: form.title.trim(),
+                  category: form.category,
+                  location: form.location.trim(),
+                  fundingGoal: form.fundingGoal,
+                },
+              }),
+            })
+          }
+        })
+        .catch(() => {})
 
       setSubmitted(true)
       toast.success('Project submitted successfully!')
