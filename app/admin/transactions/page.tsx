@@ -25,6 +25,7 @@ interface Transaction {
   projectTitle: string;
   userId: string;
   userFullName: string;
+  userEmail?: string;
   status: 'pending' | 'approved' | 'declined';
   receiptUrl?: string;
   createdAt: any;
@@ -58,6 +59,7 @@ function AdminTransactionsPage() {
           projectTitle: data.projectTitle,
           userId: data.userId,
           userFullName: data.userFullName,
+          userEmail: data.userEmail,
           status: data.status,
           receiptUrl: data.proofURL,
           createdAt: data.createdAt,
@@ -107,13 +109,30 @@ function AdminTransactionsPage() {
 
       await batch.commit();
       
-      // Send notification to user
+      // Send in-app notification
       await NotificationHelpers.contributionApproved(
         selectedTransaction.userId,
         selectedTransaction.amount,
         selectedTransaction.projectTitle
       );
-      
+
+      // Send approval confirmation email to contributor (fire-and-forget)
+      if (selectedTransaction.userEmail) {
+        fetch('/api/email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: selectedTransaction.userEmail,
+            type: 'contribution_approved',
+            data: {
+              name: selectedTransaction.userFullName?.split(' ')[0] || 'Partner',
+              amount: selectedTransaction.amount,
+              projectTitle: selectedTransaction.projectTitle,
+            },
+          }),
+        }).catch(() => {})
+      }
+
       setSelectedTransaction(null);
       setAdminDescription("");
     } catch (err) {

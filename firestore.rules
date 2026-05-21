@@ -70,12 +70,22 @@ service cloud.firestore {
 
       // Authenticated users can submit a project for review
       // Must be pending status and must tag themselves as submitter
-      allow create: if isAuthenticated() &&
-        request.resource.data.status == 'pending' &&
-        request.resource.data.submittedBy == request.auth.uid;
+      // Admins are allowed to create projects directly (they should set submittedBy to their uid)
+      allow create: if isAuthenticated() && (
+        (request.resource.data.status == 'pending' && request.resource.data.submittedBy == request.auth.uid)
+        || isAdmin()
+      );
 
-      // Admins can create (direct publish), update, or delete any project
-      allow create, update, delete: if isAdmin();
+      // Updates: owners can update their own projects fully.
+      // Admins may only modify review-related fields (status, adminNotes, reviewedAt, reviewedBy).
+      allow update: if (
+        isAuthenticated() && resource.data.submittedBy == request.auth.uid
+      ) || (
+        isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','adminNotes','reviewedAt','reviewedBy'])
+      );
+
+      // Deletes: only the original submitter (owner) may delete their project.
+      allow delete: if isAuthenticated() && resource.data.submittedBy == request.auth.uid;
     }
     
     // Notifications collection

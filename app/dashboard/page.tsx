@@ -53,10 +53,15 @@ function DashboardPage() {
   });
   const [isDownloadingFlier, setIsDownloadingFlier] = useState(false);
   const [isSubmitProjectOpen, setIsSubmitProjectOpen] = useState(false);
+  const [paymentSettings, setPaymentSettings] = useState<{ accountNumber: string; bankName: string; accountName: string; bankDetails: string } | null>(null);
   const partnerFlierRef = useRef<HTMLDivElement>(null);
 
   const copyAccountNumber = () => {
-    const accountNumber = "0219230107"
+    const accountNumber = paymentSettings?.accountNumber
+    if (!accountNumber) {
+      toast.error("Bank account details are not configured yet.")
+      return
+    }
     navigator.clipboard.writeText(accountNumber)
     toast.success("Account number copied to clipboard!")
   }
@@ -109,6 +114,28 @@ function DashboardPage() {
 
     return () => unsubUsers();
   }, [user]);
+
+  useEffect(() => {
+    const loadPaymentSettings = async () => {
+      try {
+        const res = await fetch('/api/settings/payment')
+        if (!res.ok) return
+        const data = await res.json()
+        if (data?.configured) {
+          setPaymentSettings({
+            accountNumber: data.accountNumber || '',
+            bankName: data.bankName || '',
+            accountName: data.accountName || '',
+            bankDetails: data.bankDetails || '',
+          })
+        }
+      } catch (err) {
+        console.error('Failed to load payment settings:', err)
+      }
+    }
+
+    loadPaymentSettings()
+  }, []);
 
   const refreshTrends = async () => {
     if (!isBrowser || !user || !db) return;
@@ -598,6 +625,19 @@ function DashboardPage() {
                             </div>
                         </CardHeader>
                     </Card>
+                    <Link href="/dashboard/my-projects">
+                        <Card className="group hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
+                            <CardHeader className="flex flex-row items-center gap-4">
+                                <div className="bg-gradient-to-br from-pink-500/20 to-rose-400/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                                    <BarChart className="h-6 w-6 text-pink-600 dark:text-pink-400" />
+                                </div>
+                                <div>
+                                    <CardTitle className="group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">My Projects</CardTitle>
+                                    <CardDescription>Manage your submitted projects.</CardDescription>
+                                </div>
+                            </CardHeader>
+                        </Card>
+                    </Link>
                     
                     {/* Bank Account Details Card */}
                     <Card className="lg:col-span-2 relative overflow-hidden">
@@ -616,7 +656,9 @@ function DashboardPage() {
                                 <div className="flex justify-between items-center">
                                     <span className="text-muted-foreground font-medium">Account Number:</span>
                                     <div className="flex items-center gap-2">
-                                        <span className="font-mono font-bold text-base">0219230107</span>
+                                        <span className="font-mono font-bold text-base">
+                                          {paymentSettings?.accountNumber || 'Not configured yet'}
+                                        </span>
                                         <Button
                                             type="button"
                                             variant="outline"
@@ -631,15 +673,15 @@ function DashboardPage() {
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-muted-foreground font-medium">Bank:</span>
-                                    <span className="font-semibold">GT Bank</span>
+                                    <span className="font-semibold">{paymentSettings?.bankName || 'Not configured yet'}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-muted-foreground font-medium">Account Name:</span>
-                                    <span className="font-semibold">PACSDA</span>
+                                    <span className="font-semibold">{paymentSettings?.accountName || 'Not configured yet'}</span>
                                 </div>
                             </div>
                             <p className="text-xs text-muted-foreground text-center">
-                                Pan African Centre for Social Development and Accountability
+                                {paymentSettings?.bankDetails || 'Please check with the administrator for bank transfer details.'}
                             </p>
                         </CardContent>
                     </Card>

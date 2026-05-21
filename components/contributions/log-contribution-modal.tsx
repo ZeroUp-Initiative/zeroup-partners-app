@@ -21,6 +21,7 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const [paymentSettings, setPaymentSettings] = useState<{ accountNumber: string; bankName: string; accountName: string; bankDetails: string } | null>(null)
   
   const [projects, setProjects] = useState<{id: string, title: string}[]>([])
   const [formData, setFormData] = useState({
@@ -47,7 +48,27 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
             console.error("Error fetching projects:", error);
         }
     }
-    fetchProjects();
+
+    const fetchPaymentSettings = async () => {
+      try {
+        const res = await fetch('/api/settings/payment')
+        if (!res.ok) return
+        const data = await res.json()
+        if (data?.configured) {
+          setPaymentSettings({
+            accountNumber: data.accountNumber || '',
+            bankName: data.bankName || '',
+            accountName: data.accountName || '',
+            bankDetails: data.bankDetails || '',
+          })
+        }
+      } catch (err) {
+        console.error('Failed to load payment settings:', err)
+      }
+    }
+
+    fetchProjects()
+    fetchPaymentSettings()
   }, []);
 
   const handleInputChange = (field: string, value: string | boolean) => {
@@ -77,7 +98,11 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
   }
 
   const copyAccountNumber = () => {
-    const accountNumber = "0219230107"
+    const accountNumber = paymentSettings?.accountNumber
+    if (!accountNumber) {
+      toast.error("Bank account details are not configured yet.")
+      return
+    }
     navigator.clipboard.writeText(accountNumber)
     toast.success("Account number copied to clipboard!")
   }
@@ -120,22 +145,27 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
       // Upload using the ZeroUp Image Upload API (Cloudinary)
       const proofURL = await uploadImage(file)
 
-        await addDoc(collection(db, "payments"), {
+      const partnerName = `${user.firstName} ${user.lastName}`.trim() || 'Partner'
+      const dateFormatted = new Date(formData.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      const projectTitle = formData.projectTitle || "General Contribution"
+
+      await addDoc(collection(db, "payments"), {
         userId: user.uid,
         userFirstName: user.firstName,
         userLastName: user.lastName,
-        userFullName: `${user.firstName} ${user.lastName}`,
+        userFullName: partnerName,
+        userEmail: user.email || '',
         amount: amount,
         date: Timestamp.fromDate(new Date(formData.date)),
         description: formData.description,
         projectId: formData.projectId || "general",
-        projectTitle: formData.projectTitle || "General Contribution",
+        projectTitle,
         proofURL: proofURL,
         status: "pending",
         createdAt: serverTimestamp(),
       })
 
-      // Send confirmation email (fire-and-forget)
+      // Send confirmation email to contributor (fire-and-forget)
       if (user.email) {
         fetch('/api/email', {
           method: 'POST',
@@ -147,11 +177,35 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
               name: user.firstName || 'Partner',
               amount: amount,
               description: formData.description,
-              date: new Date(formData.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+              date: dateFormatted,
             },
           }),
         }).catch(() => {})
       }
+
+      // Notify admin (fire-and-forget)
+      fetch('/api/settings/payment')
+        .then(r => r.json())
+        .then(settings => {
+          if (settings.adminNotificationEmail) {
+            return fetch('/api/email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                to: settings.adminNotificationEmail,
+                type: 'admin_contribution_submitted',
+                data: {
+                  partnerName,
+                  partnerEmail: user.email || '',
+                  amount,
+                  projectTitle,
+                  date: dateFormatted,
+                },
+              }),
+            })
+          }
+        })
+        .catch(() => {})
 
       setSuccess("Contribution logged successfully!")
       setTimeout(() => {
@@ -207,7 +261,9 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
                     <div className="flex justify-between items-center">
                         <span className="text-slate-500 dark:text-white/40">Account Number:</span>
                         <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-slate-800 dark:text-white">0219230107</span>
+                            <span className="font-mono font-bold text-slate-800 dark:text-white">
+                              {paymentSettings?.accountNumber || 'Not configured yet'}
+                            </span>
                             <Button
                                 type="button"
                                 variant="ghost"
@@ -221,14 +277,18 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
                     </div>
                     <div className="flex justify-between">
                         <span className="text-slate-500 dark:text-white/40">Bank:</span>
-                        <span className="font-medium text-slate-700 dark:text-white/80">GT Bank</span>
+                        <span className="font-medium text-slate-700 dark:text-white/80">
+                          {paymentSettings?.bankName || 'Not configured yet'}
+                        </span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-slate-500 dark:text-white/40">Account Name:</span>
-                        <span className="font-medium text-slate-700 dark:text-white/80">PACSDA</span>
+                        <span className="font-medium text-slate-700 dark:text-white/80">
+                          {paymentSettings?.accountName || 'Not configured yet'}
+                        </span>
                     </div>
                     <div className="text-xs text-slate-400 dark:text-white/30 mt-2 border-t border-slate-200 dark:border-white/5 pt-2">
-                        Pan African Centre for Social Development and Accountability
+                        {paymentSettings?.bankDetails || 'Please check with the administrator for bank transfer details.'}
                     </div>
                 </div>
             </div>

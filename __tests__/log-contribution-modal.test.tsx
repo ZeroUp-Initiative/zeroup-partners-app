@@ -57,6 +57,16 @@ describe('LogContributionModal', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    global.fetch = jest.fn(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({
+        configured: true,
+        accountNumber: '0219230107',
+        bankName: 'GT Bank',
+        accountName: 'PACSDA',
+        bankDetails: 'Pan African Centre for Social Development and Accountability',
+      }),
+    })) as jest.Mock
   })
 
   it('renders with a trigger button', () => {
@@ -94,7 +104,7 @@ describe('LogContributionModal', () => {
     
     await waitFor(() => {
       expect(screen.getByText(/0219230107/)).toBeInTheDocument()
-      expect(screen.getByText(/DAVID OLAYEMI ADEBAYO/i)).toBeInTheDocument()
+      expect(screen.getByText(/PACSDA/i)).toBeInTheDocument()
     })
   })
 

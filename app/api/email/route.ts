@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendMail } from '@/lib/mailer'
 
-const FROM = process.env.EMAIL_FROM ?? 'ZeroUp Partners <onboarding@zeroup.dev>'
-
 const BASE_URL = 'https://zeroup-partners-app.vercel.app'
 
 const sharedStyles = `
@@ -136,6 +134,88 @@ const templates: Record<string, (data: EmailData) => { subject: string; html: st
     `,
   }),
 
+  contribution_approved: ({ name, amount, projectTitle }) => ({
+    subject: `✅ Your Contribution Has Been Confirmed — ₦${Number(amount).toLocaleString()}`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header">
+          <h1>✅ Contribution Confirmed!</h1>
+          <p>Your payment has been verified and approved.</p>
+        </div>
+        <div class="body">
+          <p>Hi ${name},</p>
+          <p>Great news! Your contribution has been reviewed and <strong>confirmed</strong> by our team. Thank you for your continued support.</p>
+          <div class="highlight">
+            <strong>Confirmed Amount</strong>
+            ₦${Number(amount).toLocaleString()}
+          </div>
+          ${projectTitle ? `<div class="highlight"><strong>Project</strong>${projectTitle}</div>` : ''}
+          <p>Your generosity is making a real difference. Keep an eye on your dashboard to track your impact.</p>
+          <a href="${BASE_URL}/dashboard" class="btn">View My Dashboard</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  admin_project_submitted: ({ submitterName, submitterEmail, title, category, location, fundingGoal }) => ({
+    subject: `📋 New Project Submission: "${title}"`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header">
+          <h1>📋 New Project Submitted</h1>
+          <p>A partner has submitted a project for review.</p>
+        </div>
+        <div class="body">
+          <p>A new project has been submitted and is awaiting your review.</p>
+          <div class="highlight">
+            <strong>Project Title</strong>
+            ${title}
+          </div>
+          ${category ? `<div class="highlight"><strong>Category</strong>${category}</div>` : ''}
+          ${location ? `<div class="highlight"><strong>Location</strong>${location}</div>` : ''}
+          ${fundingGoal ? `<div class="highlight"><strong>Funding Goal</strong>₦${Number(fundingGoal).toLocaleString()}</div>` : ''}
+          <div class="highlight">
+            <strong>Submitted By</strong>
+            ${submitterName || 'Unknown'} ${submitterEmail ? `(${submitterEmail})` : ''}
+          </div>
+          <a href="${BASE_URL}/admin/projects" class="btn">Review in Admin Panel</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Admin Notification</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  admin_contribution_submitted: ({ partnerName, partnerEmail, amount, projectTitle, date }) => ({
+    subject: `💰 New Contribution Logged — ₦${Number(amount).toLocaleString()}`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header">
+          <h1>💰 New Contribution Logged</h1>
+          <p>A partner has logged a new contribution for review.</p>
+        </div>
+        <div class="body">
+          <p>A new contribution has been submitted and is pending your approval.</p>
+          <div class="highlight">
+            <strong>Amount</strong>
+            ₦${Number(amount).toLocaleString()}
+          </div>
+          ${projectTitle ? `<div class="highlight"><strong>Project</strong>${projectTitle}</div>` : ''}
+          ${date ? `<div class="highlight"><strong>Date</strong>${date}</div>` : ''}
+          <div class="highlight">
+            <strong>Partner</strong>
+            ${partnerName || 'Unknown'} ${partnerEmail ? `(${partnerEmail})` : ''}
+          </div>
+          <a href="${BASE_URL}/admin/transactions" class="btn">Review in Admin Panel</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Admin Notification</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
   project_rejected: ({ name, title, notes }) => ({
     subject: `Update on Your Project Submission — "${title}"`,
     html: `
@@ -173,7 +253,6 @@ export async function POST(req: NextRequest) {
     const template = templates[type](data ?? {})
 
     const result = await sendMail({
-      from: FROM,
       to,
       subject: template.subject,
       html: template.html,
@@ -181,7 +260,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, messageId: result.messageId || null })
   } catch (error) {
-    console.error('Email send error:', error)
     return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
   }
 }
