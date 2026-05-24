@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir /a /b .env*)",
+      "Bash(dir /a /s /b .env*)",
+      "Bash(npm i *)",
+      "Bash(vercel *)",
+      "Bash(git pull *)",
+      "Bash(git rm *)",
+      "Bash(npm ci *)",
+      "Bash(npm run *)"
+    ]
+  }
+}

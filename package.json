@@ -9,7 +9,6 @@
     "start": "next start",
     "test": "jest"
   },
-  "packageManager": "pnpm@10.27.0",
   "dependencies": {
     "@firebase/messaging": "^0.12.23",
     "@hookform/resolvers": "^3.10.0",
