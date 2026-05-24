@@ -26,6 +26,7 @@ import { ProgressRing } from "@/components/ui/progress-ring"
 import { MiniBarChart } from "@/components/ui/mini-chart"
 import { PartnerFlierModal } from "@/components/partner-flier-card"
 import { SubmitProjectModal } from "@/components/projects/submit-project-modal"
+import { DreamerDashboardCard } from "@/components/dreamers/dreamer-dashboard-card"
 import toast from "react-hot-toast"
 
 interface MonthlyData {
@@ -638,7 +639,8 @@ function DashboardPage() {
                             </CardHeader>
                         </Card>
                     </Link>
-                    
+                    <DreamerDashboardCard />
+
                     {/* Bank Account Details Card */}
                     <Card className="lg:col-span-2 relative overflow-hidden">
                         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8d44d1] to-[#7030b0]" />
