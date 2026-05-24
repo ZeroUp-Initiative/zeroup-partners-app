@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Upload, Loader2, DollarSign, Target, PieChart, Plus, Search, Pencil, Trash2, Clock, CheckCircle, XCircle, Eye, Phone, Mail, User, Building2, Users, Banknote, Calendar } from "lucide-react"
@@ -46,13 +47,14 @@ interface Project {
   submittedByEmail?: string
   submittedBy?: string
   adminNotes?: string
+  ownedByZeroUp?: boolean
   createdAt?: any
 }
 
 function AdminProjectsPage() {
   const { user } = useAuth()
   const [projects, setProjects] = useState<Project[]>([])
-  const [newProject, setNewProject] = useState({ title: "", description: "", fundingGoal: "", dueDate: "", imageFile: null as File | null })
+  const [newProject, setNewProject] = useState({ title: "", description: "", fundingGoal: "", dueDate: "", imageFile: null as File | null, ownedByZeroUp: true })
   const [stats, setStats] = useState({ totalProjects: 0, totalGoal: 0, totalRaised: 0, pendingCount: 0 })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -62,7 +64,7 @@ function AdminProjectsPage() {
 
   // Edit
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [editFormData, setEditFormData] = useState({ id: "", title: "", description: "", fundingGoal: "", dueDate: "", imageUrl: "", imageFile: null as File | null })
+  const [editFormData, setEditFormData] = useState({ id: "", title: "", description: "", fundingGoal: "", dueDate: "", imageUrl: "", imageFile: null as File | null, ownedByZeroUp: true })
 
   // Delete
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -105,6 +107,7 @@ function AdminProjectsPage() {
           submittedByEmail: p.submittedByEmail,
           submittedBy: p.submittedBy,
           adminNotes: p.adminNotes,
+          ownedByZeroUp: p.ownedByZeroUp,
           createdAt: p.createdAt,
         })
       })
@@ -147,6 +150,7 @@ function AdminProjectsPage() {
         title: newProject.title, description: newProject.description,
         fundingGoal: Number(newProject.fundingGoal), currentFunding: 0,
         status: 'open', imageUrl,
+        ownedByZeroUp: newProject.ownedByZeroUp,
         dueDate: newProject.dueDate ? new Date(newProject.dueDate) : null,
         // mark admin as submitter when creating from admin UI
         submittedBy: user?.uid || '',
@@ -154,7 +158,7 @@ function AdminProjectsPage() {
         submittedByEmail: (user as any)?.email || '',
         createdAt: serverTimestamp(),
       })
-      setNewProject({ title: "", description: "", fundingGoal: "", dueDate: "", imageFile: null })
+      setNewProject({ title: "", description: "", fundingGoal: "", dueDate: "", imageFile: null, ownedByZeroUp: true })
       setIsCreateModalOpen(false)
       toast.success("Project created.")
     } catch { setError("Failed to create project.") }
@@ -163,7 +167,7 @@ function AdminProjectsPage() {
 
   // Edit
   const handleEditClick = (p: Project) => {
-    setEditFormData({ id: p.id, title: p.title, description: p.description, fundingGoal: p.fundingGoal.toString(), dueDate: p.dueDate ? new Date(p.dueDate).toISOString().split('T')[0] : "", imageUrl: p.imageUrl || "", imageFile: null })
+    setEditFormData({ id: p.id, title: p.title, description: p.description, fundingGoal: p.fundingGoal.toString(), dueDate: p.dueDate ? new Date(p.dueDate).toISOString().split('T')[0] : "", imageUrl: p.imageUrl || "", imageFile: null, ownedByZeroUp: p.ownedByZeroUp ?? false })
     setIsEditModalOpen(true)
   }
 
@@ -182,6 +186,7 @@ function AdminProjectsPage() {
       await updateDoc(doc(db, "projects", editFormData.id), {
         title: editFormData.title, description: editFormData.description,
         fundingGoal: Number(editFormData.fundingGoal), imageUrl,
+        ownedByZeroUp: editFormData.ownedByZeroUp,
         dueDate: editFormData.dueDate ? new Date(editFormData.dueDate) : null,
       })
       setIsEditModalOpen(false)
@@ -534,6 +539,13 @@ function AdminProjectsPage() {
                 </label>
               </div>
             </div>
+            <div className="flex items-start gap-2 rounded-lg border p-3">
+              <Checkbox id="ownedByZeroUp" checked={newProject.ownedByZeroUp} onCheckedChange={(c) => setNewProject(p => ({ ...p, ownedByZeroUp: c === true }))} className="mt-0.5" />
+              <Label htmlFor="ownedByZeroUp" className="text-sm font-normal leading-snug cursor-pointer">
+                ZeroUp-owned project
+                <span className="block text-xs text-muted-foreground">Dreamers earn dream coins (100 DR per ₦1,000) for supporting this project.</span>
+              </Label>
+            </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancel</Button>
@@ -564,6 +576,13 @@ function AdminProjectsPage() {
                   <p className="text-xs text-muted-foreground">JPG, PNG, GIF, WebP (max 10MB)</p>
                 </label>
               </div>
+            </div>
+            <div className="flex items-start gap-2 rounded-lg border p-3">
+              <Checkbox id="edit-ownedByZeroUp" checked={editFormData.ownedByZeroUp} onCheckedChange={(c) => setEditFormData(p => ({ ...p, ownedByZeroUp: c === true }))} className="mt-0.5" />
+              <Label htmlFor="edit-ownedByZeroUp" className="text-sm font-normal leading-snug cursor-pointer">
+                ZeroUp-owned project
+                <span className="block text-xs text-muted-foreground">Dreamers earn dream coins (100 DR per ₦1,000) for supporting this project.</span>
+              </Label>
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex justify-end gap-2">

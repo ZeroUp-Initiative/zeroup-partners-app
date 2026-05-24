@@ -4,7 +4,8 @@ export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from "react"
 import { collection, onSnapshot, query, orderBy, doc, updateDoc, writeBatch, getDoc } from "firebase/firestore"
-import { db } from "@/lib/firebase/client"
+import { db, auth } from "@/lib/firebase/client"
+import toast from "react-hot-toast"
 import ProtectedRoute from "@/components/auth/protected-route"
 import { useAuth } from "@/contexts/auth-context"
 import { Button } from "@/components/ui/button"
@@ -131,6 +132,24 @@ function AdminTransactionsPage() {
             },
           }),
         }).catch(() => {})
+      }
+
+      // Award dream coins (only credits linked Dreamers contributing to ZeroUp-owned targets)
+      try {
+        const idToken = await auth?.currentUser?.getIdToken()
+        if (idToken) {
+          const res = await fetch('/api/dreamers/award', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+            body: JSON.stringify({ paymentId: selectedTransaction.id }),
+          })
+          const data = await res.json().catch(() => ({}))
+          if (res.ok && data.awarded > 0) {
+            toast.success(`Awarded ${Number(data.awarded).toLocaleString()} dream coins to this Dreamer`)
+          }
+        }
+      } catch (awardErr) {
+        console.error("Dream coin award failed:", awardErr)
       }
 
       setSelectedTransaction(null);

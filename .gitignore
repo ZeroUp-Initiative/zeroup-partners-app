@@ -13,8 +13,8 @@
 # coverage
 /coverage/
 
-# package manager artifacts
-/package-lock.json
+# supabase CLI temp
+/supabase/.temp/
 
 # debug
 npm-debug.log*
