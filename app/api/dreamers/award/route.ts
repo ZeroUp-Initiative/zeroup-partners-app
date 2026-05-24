@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin'
 import { getDreamerDashDb } from '@/lib/supabase/admin'
 
+export const dynamic = 'force-dynamic'
+
 // 100 DR per ₦1,000  ->  DR = floor(naira / 10)
 function drForAmount(naira: number) {
   return Math.floor((Number(naira) || 0) / 10)
