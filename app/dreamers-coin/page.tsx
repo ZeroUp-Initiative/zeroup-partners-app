@@ -6,6 +6,8 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { CoinDropAnimation } from "@/components/coin-drop-animation"
 import { SlotMachineCounter } from "@/components/slot-machine-counter"
 import { LinkDreamerCard } from "@/components/dreamers/link-dreamer-card"
+import { DreamCard } from "@/components/dreamers/dream-card"
+import { getTierStatus, DREAM_TIERS } from "@/lib/dreamers/tiers"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -13,7 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import {
-  Coins, Trophy, Medal, Award, LogOut, Crown, Flame, Gift,
+  Coins, Trophy, Medal, Award, LogOut, Crown, Flame,
   TrendingUp, Wallet, ShoppingBag, ArrowLeft, Loader2,
 } from "lucide-react"
 import Link from "next/link"
@@ -31,9 +33,11 @@ interface DreamerData {
     totalEarned: number
     streak: number
     rank: number
+    partneredTotal: number
+    memberNumber: string
+    memberSince: string
   }
   leaderboard?: { rank: number; name: string; username: string | null; photoUrl: string | null; balance: number; isMe: boolean }[]
-  perks?: { id: string; title: string; description: string; cost: number }[]
   history?: { type: string; amount: number; description: string; createdAt: string }[]
 }
 
@@ -142,7 +146,7 @@ function DreamersCoinContent() {
               <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 {me?.firstName ? `${me.firstName}'s` : "Your"} Dreamers Coin Wallet
               </h2>
-              <p className="text-muted-foreground">Live from Dreamer Dash — earned by being an active member of the community.</p>
+              <p className="text-muted-foreground">Your dream coins live here on the Partners app too. Earn them by being an active member in Dreamer Dash and by partnering with ZeroUp — and climb Dream Card tiers as you go.</p>
             </div>
 
             {/* Wallet stats */}
@@ -199,12 +203,82 @@ function DreamersCoinContent() {
             </div>
 
             {/* Tabs */}
-            <Tabs defaultValue="leaderboard" className="space-y-6">
+            <Tabs defaultValue="card" className="space-y-6">
               <TabsList className="grid w-full grid-cols-3 glass-card">
+                <TabsTrigger value="card">My Card</TabsTrigger>
                 <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
-                <TabsTrigger value="redeem">Perks</TabsTrigger>
                 <TabsTrigger value="history">History</TabsTrigger>
               </TabsList>
+
+              <TabsContent value="card" className="space-y-6">
+                {(() => {
+                  const partnered = me?.partneredTotal || 0
+                  const status = getTierStatus(partnered)
+                  const tierForCard = status.current || DREAM_TIERS[0]
+                  const locked = !status.current
+                  const qrValue = `https://zeroup-partners-app.vercel.app/dreamers-coin?card=${encodeURIComponent((me?.memberNumber || "").replace(/\s/g, ""))}`
+                  return (
+                    <div className="space-y-6">
+                      <Card className="glass-card">
+                        <CardHeader>
+                          <CardTitle>Your Dream Card</CardTitle>
+                          <CardDescription>
+                            Earn dream coins as a ZeroUp partner. The more you partner directly with ZeroUp, the higher your Dream Card tier — download your card to print and carry it.
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <DreamCard
+                            tier={tierForCard}
+                            name={me?.firstName || me?.username || "Dreamer"}
+                            drBalance={me?.balance || 0}
+                            memberNumber={me?.memberNumber || ""}
+                            memberSince={me?.memberSince || ""}
+                            qrValue={qrValue}
+                            locked={locked}
+                            unlockHint={`Partner ₦${DREAM_TIERS[0].min.toLocaleString()} with ZeroUp to unlock your Blue Dream Card`}
+                          />
+                        </CardContent>
+                      </Card>
+
+                      <Card className="glass-card">
+                        <CardHeader>
+                          <CardTitle>{status.current ? status.current.cardName : "Not yet a card holder"}</CardTitle>
+                          <CardDescription>You've partnered ₦{partnered.toLocaleString()} with ZeroUp so far.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          {status.next ? (
+                            <div>
+                              <div className="flex justify-between text-sm mb-1">
+                                <span className="text-muted-foreground">Progress to {status.next.name}</span>
+                                <span className="font-medium">₦{status.amountToNext.toLocaleString()} to go</span>
+                              </div>
+                              <Progress value={Math.round(status.progress * 100)} />
+                            </div>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">You've reached the highest tier. 🖤</p>
+                          )}
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                            {DREAM_TIERS.map((t) => {
+                              const reached = partnered >= t.min
+                              const isCurrent = status.current?.id === t.id
+                              return (
+                                <div key={t.id} className={`rounded-xl p-3 text-center border ${isCurrent ? "border-amber-400 ring-1 ring-amber-400/40" : "border-border"} ${reached ? "" : "opacity-50"}`}>
+                                  <div className="h-8 rounded-md mb-2" style={{ background: t.gradient }} />
+                                  <p className="text-xs font-semibold">{t.name}</p>
+                                  <p className="text-[10px] text-muted-foreground">₦{t.min.toLocaleString()}+</p>
+                                </div>
+                              )
+                            })}
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            Perks for each tier are being finalized — you'll get an email when you reach a new card level.
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  )
+                })()}
+              </TabsContent>
 
               <TabsContent value="leaderboard" className="space-y-6">
                 <Card className="glass-card">
@@ -242,38 +316,6 @@ function DreamersCoinContent() {
                     </div>
                   </CardContent>
                 </Card>
-              </TabsContent>
-
-              <TabsContent value="redeem" className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {(data.perks || []).map((perk) => {
-                    const affordable = (me?.balance || 0) >= perk.cost
-                    return (
-                      <Card key={perk.id} className={`glass-card h-full ${affordable ? "" : "opacity-60"}`}>
-                        <CardHeader>
-                          <div className="flex items-center gap-3">
-                            <Gift className="w-6 h-6 text-primary" />
-                            <CardTitle className="text-lg">{perk.title}</CardTitle>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          <p className="text-sm text-muted-foreground">{perk.description}</p>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <Coins className="w-4 h-4 text-primary" />
-                              <span className="font-bold">{perk.cost.toLocaleString()}</span>
-                            </div>
-                            <Badge variant={affordable ? "default" : "secondary"}>{affordable ? "Redeem in Dreamer Dash" : "Not enough DR"}</Badge>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )
-                  })}
-                  {(!data.perks || data.perks.length === 0) && (
-                    <p className="text-sm text-muted-foreground col-span-full text-center py-6">No perks available right now.</p>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground text-center">Redeeming happens in the Dreamer Dash app to keep your balance in sync.</p>
               </TabsContent>
 
               <TabsContent value="history" className="space-y-6">
