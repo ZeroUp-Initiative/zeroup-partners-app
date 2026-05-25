@@ -7,7 +7,8 @@ import { CoinDropAnimation } from "@/components/coin-drop-animation"
 import { SlotMachineCounter } from "@/components/slot-machine-counter"
 import { LinkDreamerCard } from "@/components/dreamers/link-dreamer-card"
 import { DreamCard } from "@/components/dreamers/dream-card"
-import { getTierStatus, resolveTierStyle, DEFAULT_DREAM_TIERS, type DreamTierConfig } from "@/lib/dreamers/tiers"
+import { getEffectiveTierStatus, resolveTierStyle, DEFAULT_DREAM_TIERS, type DreamTierConfig } from "@/lib/dreamers/tiers"
+import toast from "react-hot-toast"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -34,6 +35,7 @@ interface DreamerData {
     streak: number
     rank: number
     dreamerId: string
+    grantedTierId: string | null
     partneredTotal: number
     memberNumber: string
     memberSince: string
@@ -60,6 +62,7 @@ function DreamersCoinContent() {
   const [proposals, setProposals] = useState<{ id: string; title: string; description: string; voteCount: number }[]>([])
   const [myVotes, setMyVotes] = useState<string[]>([])
   const [votingId, setVotingId] = useState<string | null>(null)
+  const [upgradingId, setUpgradingId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!data?.linked) return
@@ -89,6 +92,29 @@ function DreamersCoinContent() {
       )
     } finally {
       setVotingId(null)
+    }
+  }
+
+  const upgradeTier = async (tierId: string) => {
+    setUpgradingId(tierId)
+    try {
+      const idToken = await auth?.currentUser?.getIdToken()
+      const res = await fetch("/api/dreamers/upgrade-tier", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({ tierId }),
+      })
+      const d = await res.json()
+      if (!res.ok) {
+        toast.error(d.error || "Upgrade failed")
+        return
+      }
+      toast.success(`Upgraded to ${d.tier?.name || "a new"} Dream Card!`)
+      await load()
+    } catch {
+      toast.error("Something went wrong")
+    } finally {
+      setUpgradingId(null)
     }
   }
 
@@ -258,7 +284,9 @@ function DreamersCoinContent() {
               <TabsContent value="card" className="space-y-6">
                 {(() => {
                   const partnered = me?.partneredTotal || 0
-                  const status = getTierStatus(partnered, tiers)
+                  const status = getEffectiveTierStatus(partnered, me?.grantedTierId, tiers)
+                  const balance = me?.balance || 0
+                  const upgradable = tiers.filter((t) => t.drCost > 0 && (!status.current || t.min > status.current.min))
                   const tierForCard = status.current || tiers[0]
                   const locked = !status.current
                   const origin = typeof window !== "undefined" ? window.location.origin : "https://zeroup-partners-app.vercel.app"
@@ -345,6 +373,33 @@ function DreamersCoinContent() {
                         </CardContent>
                       </Card>
 
+                      {upgradable.length > 0 && (
+                        <Card className="glass-card">
+                          <CardHeader>
+                            <CardTitle>Upgrade with dream coins</CardTitle>
+                            <CardDescription>Use your DR to upgrade your card now instead of waiting to partner more. Balance: {balance.toLocaleString()} DR.</CardDescription>
+                          </CardHeader>
+                          <CardContent className="space-y-3">
+                            {upgradable.map((t) => {
+                              const afford = balance >= t.drCost
+                              const st = resolveTierStyle(t.style)
+                              return (
+                                <div key={t.id} className="flex items-center gap-3 p-3 rounded-lg border">
+                                  <span className="w-8 h-5 rounded-sm flex-shrink-0" style={{ background: st.gradient }} />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-semibold">{t.name} Dream Card</p>
+                                    <p className="text-xs text-muted-foreground">{t.drCost.toLocaleString()} DR</p>
+                                  </div>
+                                  <Button size="sm" disabled={!afford || upgradingId === t.id} onClick={() => upgradeTier(t.id)}>
+                                    {upgradingId === t.id ? <Loader2 className="w-4 h-4 animate-spin" /> : afford ? "Upgrade" : "Not enough DR"}
+                                  </Button>
+                                </div>
+                              )
+                            })}
+                          </CardContent>
+                        </Card>
+                      )}
+
                       <Card className="glass-card">
                         <CardHeader>
                           <CardTitle>Card Benefits</CardTitle>
@@ -352,7 +407,7 @@ function DreamersCoinContent() {
                         </CardHeader>
                         <CardContent className="space-y-5">
                           {tiers.map((t) => {
-                            const unlocked = partnered >= t.min
+                            const unlocked = !!status.current && status.current.min >= t.min
                             const st = resolveTierStyle(t.style)
                             return (
                               <div key={t.id}>

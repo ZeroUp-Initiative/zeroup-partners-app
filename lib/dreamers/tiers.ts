@@ -26,7 +26,8 @@ export const TIER_STYLE_KEYS = Object.keys(TIER_STYLES) as TierStyleKey[]
 export interface DreamTierConfig {
   id: string
   name: string // e.g. "Blue"
-  min: number // Naira threshold to reach this tier
+  min: number // Naira threshold to reach this tier (earned)
+  drCost: number // dream coins to upgrade to this tier (0 = not purchasable)
   perks: string[]
   style: TierStyleKey
 }
@@ -38,6 +39,7 @@ export const DEFAULT_DREAM_TIERS: DreamTierConfig[] = [
     id: 'blue',
     name: 'Blue',
     min: 5000,
+    drCost: 0,
     style: 'blue',
     perks: [
       'Digital + printable Dream Card',
@@ -50,6 +52,7 @@ export const DEFAULT_DREAM_TIERS: DreamTierConfig[] = [
     id: 'gold',
     name: 'Gold',
     min: 50000,
+    drCost: 5000,
     style: 'gold',
     perks: [
       'Discounts at Dreamer partner stores (show your card)',
@@ -61,6 +64,7 @@ export const DEFAULT_DREAM_TIERS: DreamTierConfig[] = [
     id: 'diamond',
     name: 'Diamond',
     min: 250000,
+    drCost: 20000,
     style: 'diamond',
     perks: [
       'A vote on which projects ZeroUp funds next',
@@ -72,6 +76,7 @@ export const DEFAULT_DREAM_TIERS: DreamTierConfig[] = [
     id: 'black',
     name: 'Black',
     min: 1000000,
+    drCost: 50000,
     style: 'black',
     perks: [
       'ZeroUp Leadership Circle access',
@@ -99,6 +104,33 @@ export interface TierStatus {
   next: DreamTierConfig | null // null = at the top tier
   progress: number // 0..1 toward the next tier
   amountToNext: number // Naira remaining to reach next tier
+}
+
+// Effective tier = the higher of the Naira-earned tier and a DR-granted (upgraded/sponsored) tier.
+export function getEffectiveTierStatus(
+  nairaPartnered: number,
+  grantedTierId: string | null | undefined,
+  tiers: DreamTierConfig[],
+): TierStatus {
+  const sorted = sortTiers(tiers)
+  const base = getTierStatus(nairaPartnered, tiers)
+  const granted = grantedTierId ? sorted.find((t) => t.id === grantedTierId) || null : null
+
+  let current = base.current
+  if (granted && (!current || granted.min > current.min)) current = granted
+
+  const currentIndex = current ? sorted.findIndex((t) => t.id === current!.id) : -1
+  const next = currentIndex < sorted.length - 1 ? sorted[currentIndex + 1] : null
+
+  const amount = Math.max(0, nairaPartnered || 0)
+  let progress = 1
+  let amountToNext = 0
+  if (next) {
+    const baseMin = current ? current.min : 0
+    progress = Math.min(1, Math.max(0, (amount - baseMin) / (next.min - baseMin)))
+    amountToNext = Math.max(0, next.min - amount)
+  }
+  return { current, next, progress, amountToNext }
 }
 
 export function getTierStatus(nairaPartnered: number, tiers: DreamTierConfig[]): TierStatus {
@@ -136,11 +168,12 @@ export function normalizeTiers(input: unknown): DreamTierConfig[] {
       const min = Number(r.min)
       if (!name || !Number.isFinite(min) || min < 0) return null
       const style = (TIER_STYLES[r.style as TierStyleKey] ? r.style : 'blue') as TierStyleKey
+      const drCost = Math.max(0, Number(r.drCost) || 0)
       const perks = Array.isArray(r.perks)
         ? r.perks.map((p) => String(p).trim()).filter(Boolean)
         : []
       const id = String(r.id ?? '').trim() || name.toLowerCase().replace(/[^a-z0-9]+/g, '-')
-      return { id, name, min, perks, style }
+      return { id, name, min, drCost, perks, style }
     })
     .filter((t): t is DreamTierConfig => t !== null)
   return cleaned.length ? sortTiers(cleaned) : DEFAULT_DREAM_TIERS

@@ -104,6 +104,7 @@ export async function GET(req: NextRequest) {
         rank: (higher ?? 0) + 1,
         dreamerId,
         partneredTotal,
+        grantedTierId: (userSnap.data()?.grantedTierId as string | undefined) || null,
         memberNumber,
         memberSince,
       },

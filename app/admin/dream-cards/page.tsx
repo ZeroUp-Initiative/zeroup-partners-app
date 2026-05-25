@@ -36,7 +36,7 @@ function AdminDreamCardsPage() {
   const remove = (i: number) => setTiers((prev) => prev.filter((_, idx) => idx !== i))
 
   const add = () =>
-    setTiers((prev) => [...prev, { id: `tier-${Date.now()}`, name: "New Tier", min: 0, perks: [], style: "blue" }])
+    setTiers((prev) => [...prev, { id: `tier-${Date.now()}`, name: "New Tier", min: 0, drCost: 0, perks: [], style: "blue" }])
 
   const save = async () => {
     setSaving(true)
@@ -104,7 +104,7 @@ function AdminDreamCardsPage() {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1.5">
                         <Label>Tier name</Label>
                         <Input value={t.name} onChange={(e) => update(i, { name: e.target.value })} placeholder="e.g. Gold" />
@@ -116,6 +116,15 @@ function AdminDreamCardsPage() {
                           value={t.min}
                           onChange={(e) => update(i, { min: Number(e.target.value) })}
                           placeholder="50000"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label>Upgrade cost (DR)</Label>
+                        <Input
+                          type="number"
+                          value={t.drCost}
+                          onChange={(e) => update(i, { drCost: Number(e.target.value) })}
+                          placeholder="0 = not purchasable"
                         />
                       </div>
                       <div className="space-y-1.5">

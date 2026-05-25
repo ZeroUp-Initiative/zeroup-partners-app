@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminDb } from '@/lib/firebase/admin'
 import { getDreamerDashDb } from '@/lib/supabase/admin'
-import { DEFAULT_DREAM_TIERS, normalizeTiers, getTierStatus } from '@/lib/dreamers/tiers'
+import { DEFAULT_DREAM_TIERS, normalizeTiers, getEffectiveTierStatus } from '@/lib/dreamers/tiers'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,6 +24,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
     // Impact (from the linked web/Firebase account, if any)
     let partneredTotal = 0
     let projectsBacked = 0
+    let grantedTierId: string | null = null
     let tiers = DEFAULT_DREAM_TIERS
 
     if (fdb) {
@@ -40,6 +41,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
         const linkSnap = await fdb.collection('users').where('dreamerDashUserId', '==', id).limit(1).get()
         if (!linkSnap.empty) {
           const uid = linkSnap.docs[0].id
+          grantedTierId = (linkSnap.docs[0].data()?.grantedTierId as string) || null
           const paySnap = await fdb.collection('payments').where('userId', '==', uid).where('status', '==', 'approved').get()
           const rows: { amount: number; projectId?: string }[] = []
           const projectIds = new Set<string>()
@@ -70,7 +72,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
       }
     }
 
-    const status = getTierStatus(partneredTotal, tiers)
+    const status = getEffectiveTierStatus(partneredTotal, grantedTierId, tiers)
 
     return NextResponse.json({
       name: u.first_name || u.username || 'Dreamer',
