@@ -60,6 +60,7 @@ function DreamersCoinContent() {
   const [showCoinDrop, setShowCoinDrop] = useState(false)
   const [tiers, setTiers] = useState<DreamTierConfig[]>(DEFAULT_DREAM_TIERS)
   const [refCopied, setRefCopied] = useState(false)
+  const [merchants, setMerchants] = useState<{ id: string; name: string; category: string; location: string; description: string; discount: string; minTierId: string }[]>([])
   const [proposals, setProposals] = useState<{ id: string; title: string; description: string; voteCount: number }[]>([])
   const [myVotes, setMyVotes] = useState<string[]>([])
   const [votingId, setVotingId] = useState<string | null>(null)
@@ -155,6 +156,10 @@ function DreamersCoinContent() {
     fetch("/api/dream-tiers")
       .then((r) => r.json())
       .then((d) => { if (Array.isArray(d?.tiers) && d.tiers.length) setTiers(d.tiers) })
+      .catch(() => {})
+    fetch("/api/merchants")
+      .then((r) => r.json())
+      .then((d) => setMerchants(d?.merchants || []))
       .catch(() => {})
   }, [])
 
@@ -500,6 +505,41 @@ function DreamersCoinContent() {
                           })}
                         </CardContent>
                       </Card>
+
+                      {merchants.length > 0 && (
+                        <Card className="glass-card">
+                          <CardHeader>
+                            <CardTitle>Where to use your card</CardTitle>
+                            <CardDescription>Show your Dream Card at these partners for a discount.</CardDescription>
+                          </CardHeader>
+                          <CardContent className="space-y-3">
+                            {merchants.map((m) => {
+                              const minTier = m.minTierId ? tiers.find((t) => t.id === m.minTierId) : null
+                              const qualifies = !minTier || (!!status.current && status.current.min >= minTier.min)
+                              return (
+                                <div key={m.id} className="flex items-start gap-3 p-3 rounded-lg border">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2">
+                                      <p className="font-semibold">{m.name}</p>
+                                      {m.category && <span className="text-xs text-muted-foreground">{m.category}</span>}
+                                    </div>
+                                    {m.location && <p className="text-xs text-muted-foreground">{m.location}</p>}
+                                    {m.description && <p className="text-sm text-muted-foreground mt-0.5">{m.description}</p>}
+                                    <p className="text-sm font-semibold text-primary mt-1">{m.discount}</p>
+                                  </div>
+                                  <div className="flex-shrink-0">
+                                    {qualifies ? (
+                                      <Badge variant="secondary" className="text-[10px]">You qualify</Badge>
+                                    ) : (
+                                      <span className="text-[10px] text-muted-foreground flex items-center gap-1"><Lock className="w-3 h-3" /> {minTier?.name}+</span>
+                                    )}
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </CardContent>
+                        </Card>
+                      )}
                     </div>
                   )
                 })()}
