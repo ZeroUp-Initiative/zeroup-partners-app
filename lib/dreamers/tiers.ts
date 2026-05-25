@@ -32,11 +32,54 @@ export interface DreamTierConfig {
 }
 
 // Defaults / seed (used when nothing is saved in Firestore yet).
+// Perks are incremental per tier (each tier adds to the ones below it).
 export const DEFAULT_DREAM_TIERS: DreamTierConfig[] = [
-  { id: 'blue', name: 'Blue', min: 5000, perks: [], style: 'blue' },
-  { id: 'gold', name: 'Gold', min: 50000, perks: [], style: 'gold' },
-  { id: 'diamond', name: 'Diamond', min: 250000, perks: [], style: 'diamond' },
-  { id: 'black', name: 'Black', min: 1000000, perks: [], style: 'black' },
+  {
+    id: 'blue',
+    name: 'Blue',
+    min: 5000,
+    style: 'blue',
+    perks: [
+      'Digital + printable Dream Card',
+      'Public impact profile via your card’s QR code',
+      'Your name on the Dreamers Wall',
+      'Earn dream coins every time you partner with ZeroUp',
+    ],
+  },
+  {
+    id: 'gold',
+    name: 'Gold',
+    min: 50000,
+    style: 'gold',
+    perks: [
+      'Discounts at Dreamer partner stores (show your card)',
+      'Access to ZeroUp events + earn dream coins for attending',
+      'Your personal “partner through me” referral link',
+    ],
+  },
+  {
+    id: 'diamond',
+    name: 'Diamond',
+    min: 250000,
+    style: 'diamond',
+    perks: [
+      'A vote on which projects ZeroUp funds next',
+      'Featured Dreamer spotlight',
+      'Priority for Partner of the Month',
+    ],
+  },
+  {
+    id: 'black',
+    name: 'Black',
+    min: 1000000,
+    style: 'black',
+    perks: [
+      'ZeroUp Leadership Circle access',
+      'Invitations to exclusive galas & demo days',
+      'Gift dream coins or sponsor another Dreamer’s tier',
+      'A direct line to the ZeroUp team',
+    ],
+  },
 ]
 
 export function resolveTierStyle(style: string): TierStyle {

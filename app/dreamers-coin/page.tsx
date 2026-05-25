@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import {
   Coins, Trophy, Medal, Award, LogOut, Crown, Flame,
-  TrendingUp, Wallet, ShoppingBag, ArrowLeft, Loader2,
+  TrendingUp, Wallet, ShoppingBag, ArrowLeft, Loader2, Check, Lock,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -279,8 +279,52 @@ function DreamersCoinContent() {
                             })}
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            Perks for each tier are being finalized — you'll get an email when you reach a new card level.
+                            You'll get an email when you reach a new card level.
                           </p>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="glass-card">
+                        <CardHeader>
+                          <CardTitle>Card Benefits</CardTitle>
+                          <CardDescription>What your Dream Card unlocks — and what's waiting at the next tiers.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-5">
+                          {tiers.map((t) => {
+                            const unlocked = partnered >= t.min
+                            const st = resolveTierStyle(t.style)
+                            return (
+                              <div key={t.id}>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="w-6 h-4 rounded-sm" style={{ background: st.gradient }} />
+                                  <span className="font-semibold">{t.name} Dream Card</span>
+                                  {unlocked ? (
+                                    <Badge variant="secondary" className="text-[10px]">Unlocked</Badge>
+                                  ) : (
+                                    <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                      <Lock className="w-3 h-3" /> ₦{t.min.toLocaleString()}+
+                                    </span>
+                                  )}
+                                </div>
+                                {t.perks.length ? (
+                                  <ul className="space-y-1.5 pl-1">
+                                    {t.perks.map((p, i) => (
+                                      <li key={i} className={`flex items-start gap-2 text-sm ${unlocked ? "" : "text-muted-foreground"}`}>
+                                        {unlocked ? (
+                                          <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                        ) : (
+                                          <Lock className="w-3.5 h-3.5 mt-0.5 opacity-60 flex-shrink-0" />
+                                        )}
+                                        <span>{p}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                ) : (
+                                  <p className="text-sm text-muted-foreground pl-1">Perks coming soon.</p>
+                                )}
+                              </div>
+                            )
+                          })}
                         </CardContent>
                       </Card>
                     </div>
