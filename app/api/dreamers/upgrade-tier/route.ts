@@ -26,7 +26,8 @@ export async function POST(req: NextRequest) {
     const userSnap = await fdb.collection('users').doc(uid).get()
     const dreamerId = userSnap.data()?.dreamerDashUserId as string | undefined
     if (!dreamerId) return NextResponse.json({ error: 'Link your Dreamer account first.' }, { status: 403 })
-    const grantedTierId = (userSnap.data()?.grantedTierId as string | undefined) || null
+    const grantSnap = await fdb.collection('dreamerGrants').doc(dreamerId).get()
+    const grantedTierId = (grantSnap.data()?.grantedTierId as string | undefined) || null
 
     const body = await req.json().catch(() => ({}))
     const tierId = String(body?.tierId ?? '')
@@ -91,7 +92,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Not enough dream coins for this upgrade.' }, { status: 400 })
     }
 
-    await fdb.collection('users').doc(uid).set({ grantedTierId: tier.id, grantedTierAt: new Date() }, { merge: true })
+    await fdb.collection('dreamerGrants').doc(dreamerId).set(
+      { dreamerId, grantedTierId: tier.id, grantedTierAt: new Date() },
+      { merge: true },
+    )
 
     return NextResponse.json({ ok: true, tier: { name: tier.name, style: tier.style } })
   } catch (e) {

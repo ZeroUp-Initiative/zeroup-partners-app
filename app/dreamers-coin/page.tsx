@@ -15,9 +15,10 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
+import { Input } from "@/components/ui/input"
 import {
   Coins, Trophy, Medal, Award, LogOut, Crown, Flame,
-  TrendingUp, Wallet, ShoppingBag, ArrowLeft, Loader2, Check, Lock, Copy, Share2, Heart,
+  TrendingUp, Wallet, ShoppingBag, ArrowLeft, Loader2, Check, Lock, Copy, Share2, Heart, Gift,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -63,6 +64,38 @@ function DreamersCoinContent() {
   const [myVotes, setMyVotes] = useState<string[]>([])
   const [votingId, setVotingId] = useState<string | null>(null)
   const [upgradingId, setUpgradingId] = useState<string | null>(null)
+  const [sponsorUsername, setSponsorUsername] = useState("")
+  const [sponsorTierId, setSponsorTierId] = useState("")
+  const [sponsoring, setSponsoring] = useState(false)
+
+  const sponsorTier = async () => {
+    if (!sponsorUsername.trim() || !sponsorTierId) {
+      toast.error("Enter a username and pick a tier")
+      return
+    }
+    setSponsoring(true)
+    try {
+      const idToken = await auth?.currentUser?.getIdToken()
+      const res = await fetch("/api/dreamers/sponsor-tier", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({ recipientUsername: sponsorUsername.trim(), tierId: sponsorTierId }),
+      })
+      const d = await res.json()
+      if (!res.ok) {
+        toast.error(d.error || "Sponsorship failed")
+        return
+      }
+      toast.success(`Sponsored ${d.recipient?.name || "a Dreamer"}'s ${d.tier?.name} Dream Card!`)
+      setSponsorUsername("")
+      setSponsorTierId("")
+      await load()
+    } catch {
+      toast.error("Something went wrong")
+    } finally {
+      setSponsoring(false)
+    }
+  }
 
   useEffect(() => {
     if (!data?.linked) return
@@ -399,6 +432,30 @@ function DreamersCoinContent() {
                           </CardContent>
                         </Card>
                       )}
+
+                      <Card className="glass-card">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2"><Gift className="w-4 h-4" /> Sponsor a Dreamer</CardTitle>
+                          <CardDescription>Use your dream coins to gift another Dreamer a card tier. Enter their Telegram username.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <Input placeholder="@username" value={sponsorUsername} onChange={(e) => setSponsorUsername(e.target.value)} />
+                          <select
+                            value={sponsorTierId}
+                            onChange={(e) => setSponsorTierId(e.target.value)}
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          >
+                            <option value="">Choose a tier to gift…</option>
+                            {tiers.filter((t) => t.drCost > 0).map((t) => (
+                              <option key={t.id} value={t.id}>{t.name} — {t.drCost.toLocaleString()} DR</option>
+                            ))}
+                          </select>
+                          <Button className="w-full" disabled={sponsoring} onClick={sponsorTier}>
+                            {sponsoring ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Gift className="w-4 h-4 mr-2" />}
+                            Sponsor
+                          </Button>
+                        </CardContent>
+                      </Card>
 
                       <Card className="glass-card">
                         <CardHeader>

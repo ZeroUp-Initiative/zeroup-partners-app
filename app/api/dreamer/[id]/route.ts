@@ -41,7 +41,6 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
         const linkSnap = await fdb.collection('users').where('dreamerDashUserId', '==', id).limit(1).get()
         if (!linkSnap.empty) {
           const uid = linkSnap.docs[0].id
-          grantedTierId = (linkSnap.docs[0].data()?.grantedTierId as string) || null
           const paySnap = await fdb.collection('payments').where('userId', '==', uid).where('status', '==', 'approved').get()
           const rows: { amount: number; projectId?: string }[] = []
           const projectIds = new Set<string>()
@@ -69,6 +68,13 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
         }
       } catch (e) {
         console.error('[dreamer/[id]] impact calc failed:', e)
+      }
+
+      try {
+        const grantSnap = await fdb.collection('dreamerGrants').doc(id).get()
+        grantedTierId = (grantSnap.data()?.grantedTierId as string) || null
+      } catch {
+        /* ignore */
       }
     }
 

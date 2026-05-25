@@ -79,6 +79,9 @@ export async function GET(req: NextRequest) {
       console.error('[dreamers/me] partneredTotal calc failed:', e)
     }
 
+    const grantSnap = await fdb.collection('dreamerGrants').doc(dreamerId).get()
+    const grantedTierId = (grantSnap.data()?.grantedTierId as string | undefined) || null
+
     const [{ count: higher }, topRes, historyRes] = await Promise.all([
       sb.from('users').select('id', { count: 'exact', head: true }).gt('balance', balance),
       sb.from('users').select('id, first_name, username, photo_url, balance').order('balance', { ascending: false }).limit(10),
@@ -104,7 +107,7 @@ export async function GET(req: NextRequest) {
         rank: (higher ?? 0) + 1,
         dreamerId,
         partneredTotal,
-        grantedTierId: (userSnap.data()?.grantedTierId as string | undefined) || null,
+        grantedTierId,
         memberNumber,
         memberSince,
       },
