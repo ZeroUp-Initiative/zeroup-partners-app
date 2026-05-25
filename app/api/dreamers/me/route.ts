@@ -102,6 +102,7 @@ export async function GET(req: NextRequest) {
         totalEarned: me.total_earned ?? 0,
         streak: me.streak ?? 0,
         rank: (higher ?? 0) + 1,
+        dreamerId,
         partneredTotal,
         memberNumber,
         memberSince,

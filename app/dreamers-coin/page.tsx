@@ -33,6 +33,7 @@ interface DreamerData {
     totalEarned: number
     streak: number
     rank: number
+    dreamerId: string
     partneredTotal: number
     memberNumber: string
     memberSince: string
@@ -224,7 +225,8 @@ function DreamersCoinContent() {
                   const status = getTierStatus(partnered, tiers)
                   const tierForCard = status.current || tiers[0]
                   const locked = !status.current
-                  const qrValue = `https://zeroup-partners-app.vercel.app/dreamers-coin?card=${encodeURIComponent((me?.memberNumber || "").replace(/\s/g, ""))}`
+                  const origin = typeof window !== "undefined" ? window.location.origin : "https://zeroup-partners-app.vercel.app"
+                  const qrValue = `${origin}/dreamer/${me?.dreamerId || ""}`
                   return (
                     <div className="space-y-6">
                       <Card className="glass-card">
