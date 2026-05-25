@@ -40,6 +40,51 @@ export async function POST(req: NextRequest) {
 
     const paymentRef = fdb.collection('payments').doc(String(paymentId))
 
+    // --- Referral award (independent + idempotent): credit the referrer who brought this contribution ---
+    // Referrer earns 50 DR per ₦1,000 referred (floor(amount / 20)).
+    try {
+      const pSnap = await paymentRef.get()
+      const p0 = pSnap.exists ? (pSnap.data() as Record<string, any>) : null
+      const refId: string | undefined = p0?.referrerDreamerId || undefined
+      if (p0 && p0.status === 'approved' && refId && !p0.referralAwarded) {
+        const contributorSnap = await fdb.collection('users').doc(String(p0.userId)).get()
+        const contributorDreamerId = contributorSnap.data()?.dreamerDashUserId
+        if (contributorDreamerId && contributorDreamerId === refId) {
+          await paymentRef.update({ referralAwarded: true, referralSkippedReason: 'self_referral' })
+        } else {
+          const { data: refUser } = await sb.from('users').select('id').eq('id', refId).maybeSingle()
+          const refDr = Math.floor((Number(p0.amount) || 0) / 20)
+          if (!refUser) {
+            await paymentRef.update({ referralAwarded: true, referralSkippedReason: 'referrer_not_found' })
+          } else if (refDr <= 0) {
+            await paymentRef.update({ referralAwarded: true, referralSkippedReason: 'amount_too_small' })
+          } else {
+            const claimedRef = await fdb.runTransaction(async (tx) => {
+              const s = await tx.get(paymentRef)
+              if (s.data()?.referralAwarded) return false
+              tx.update(paymentRef, { referralAwarded: true })
+              return true
+            })
+            if (claimedRef) {
+              const { error: refErr } = await sb.rpc('award_dream_coins', {
+                p_user_id: refId,
+                p_amount: refDr,
+                p_description: `Referral: ${p0.userFullName || 'a partner'} partnered ₦${(Number(p0.amount) || 0).toLocaleString()}`,
+              })
+              if (refErr) {
+                await paymentRef.update({ referralAwarded: false, referralSkippedReason: 'award_failed' })
+                console.error('[dreamers/award] referral RPC error:', refErr)
+              } else {
+                await paymentRef.update({ referralAmount: refDr, referralAwardedAt: new Date() })
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error('[dreamers/award] referral block error:', e)
+    }
+
     // Atomically claim the award so a double-click / re-approval can't double-credit
     const claim = await fdb.runTransaction(async (tx) => {
       const snap = await tx.get(paymentRef)

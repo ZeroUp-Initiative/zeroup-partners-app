@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import {
   Coins, Trophy, Medal, Award, LogOut, Crown, Flame,
-  TrendingUp, Wallet, ShoppingBag, ArrowLeft, Loader2, Check, Lock,
+  TrendingUp, Wallet, ShoppingBag, ArrowLeft, Loader2, Check, Lock, Copy, Share2,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -56,6 +56,7 @@ function DreamersCoinContent() {
   const [loading, setLoading] = useState(true)
   const [showCoinDrop, setShowCoinDrop] = useState(false)
   const [tiers, setTiers] = useState<DreamTierConfig[]>(DEFAULT_DREAM_TIERS)
+  const [refCopied, setRefCopied] = useState(false)
 
   useEffect(() => {
     fetch("/api/dream-tiers")
@@ -247,6 +248,29 @@ function DreamersCoinContent() {
                             locked={locked}
                             unlockHint={`Partner ₦${tiers[0].min.toLocaleString()} with ZeroUp to unlock your ${tiers[0].name} Dream Card`}
                           />
+                        </CardContent>
+                      </Card>
+
+                      <Card className="glass-card">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2"><Share2 className="w-4 h-4" /> Partner through me</CardTitle>
+                          <CardDescription>Share your link. When someone partners with ZeroUp through it, you earn referral dream coins (50 DR per ₦1,000).</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex gap-2 items-center">
+                            <div className="flex-1 bg-muted/50 rounded-lg px-3 py-2 text-sm font-mono truncate">{`${origin}/?ref=${me?.dreamerId || ""}`}</div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                navigator.clipboard.writeText(`${origin}/?ref=${me?.dreamerId || ""}`)
+                                setRefCopied(true)
+                                setTimeout(() => setRefCopied(false), 2000)
+                              }}
+                            >
+                              {refCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                            </Button>
+                          </div>
                         </CardContent>
                       </Card>
 

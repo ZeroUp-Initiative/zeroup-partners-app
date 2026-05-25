@@ -5,6 +5,7 @@ import { db } from "@/lib/firebase/client"
 import { addDoc, collection, serverTimestamp, Timestamp, query, where, getDocs, orderBy } from "firebase/firestore"
 import { uploadImage, validateImageFile } from "@/lib/image-upload"
 import { useAuth } from "@/contexts/auth-context"
+import { getStoredRef } from "@/lib/referral"
 import toast from "react-hot-toast"
 
 import { Button } from "@/components/ui/button"
@@ -162,6 +163,7 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
         projectTitle,
         proofURL: proofURL,
         status: "pending",
+        referrerDreamerId: getStoredRef() || null,
         createdAt: serverTimestamp(),
       })
 

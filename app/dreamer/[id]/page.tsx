@@ -111,7 +111,7 @@ export default function DreamerProfilePage({ params }: { params: { id: string } 
           <p className="text-sm text-muted-foreground">
             {profile.name} is part of the <span className="font-semibold text-foreground">ZeroUp Dreamers Community</span> — partners co-creating real social impact.
           </p>
-          <Link href="/"><Button className="w-full">Become a ZeroUp Partner</Button></Link>
+          <Link href={`/?ref=${params.id}`}><Button className="w-full">Become a ZeroUp Partner</Button></Link>
         </div>
 
         <div className="flex items-center justify-center gap-2 pt-2 opacity-70">

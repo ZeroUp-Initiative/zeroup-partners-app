@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { ArrowLeft, Upload, Loader2, Copy, Banknote } from "lucide-react"
 import { uploadImage, validateImageFile } from "@/lib/image-upload"
+import { getStoredRef } from "@/lib/referral"
 import toast from "react-hot-toast"
 
 interface Project {
@@ -141,6 +142,7 @@ function ProjectsPage() {
             userFullName: `${user?.firstName} ${user?.lastName}`,
             status: 'pending',
             proofURL: receiptUrl,
+            referrerDreamerId: getStoredRef() || null,
             createdAt: new Date(),
             date: new Date(),
             description: selectedProject.id === "general" ? "General contribution" : `Contribution to project: ${selectedProject.title}`,

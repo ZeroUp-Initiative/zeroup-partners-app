@@ -5,8 +5,14 @@ import { PageTransition } from "@/components/page-transition"
 import { Toaster } from "react-hot-toast"
 import toast from "react-hot-toast"
 import { onForegroundMessage } from "@/lib/push-notifications"
+import { captureRefFromUrl } from "@/lib/referral"
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
+  // Capture a "?ref=<dreamerId>" referral attribution if present
+  useEffect(() => {
+    captureRefFromUrl()
+  }, [])
+
   // Register service worker and set up foreground message handler
   useEffect(() => {
     // Register the Firebase messaging service worker
