@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
+import { auth } from "@/lib/firebase/client"
 import ProtectedRoute from "@/components/auth/protected-route"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -38,7 +39,7 @@ function AdminSettingsPage() {
   }, [user])
 
   async function getToken() {
-    return (user as any)?.getIdToken?.() ?? ""
+    return auth?.currentUser?.getIdToken() ?? ""
   }
 
   async function loadSettings() {

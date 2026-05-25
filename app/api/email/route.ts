@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendMail } from '@/lib/mailer'
+import { getAdminDb } from '@/lib/firebase/admin'
 
 const BASE_URL = 'https://zeroup-partners-app.vercel.app'
 
@@ -242,6 +243,19 @@ const templates: Record<string, (data: EmailData) => { subject: string; html: st
   }),
 }
 
+async function getActiveCustomTemplate(): Promise<{ subject: string; htmlContent: string } | null> {
+  try {
+    const adminDb = getAdminDb()
+    if (!adminDb) return null
+    const snap = await adminDb.collection('emailTemplates').where('isActive', '==', true).limit(1).get()
+    if (snap.empty) return null
+    const data = snap.docs[0].data()
+    return { subject: data.subject, htmlContent: data.htmlContent }
+  } catch {
+    return null
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { to, type, data } = await req.json()
@@ -250,14 +264,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid request: missing to, type, or unrecognised template' }, { status: 400 })
     }
 
-    const template = templates[type](data ?? {})
+    // Check for an active custom template in Firestore; fall back to built-in if none
+    const customTemplate = await getActiveCustomTemplate()
+    let subject: string
+    let html: string
 
-    const result = await sendMail({
-      to,
-      subject: template.subject,
-      html: template.html,
-    })
+    if (customTemplate) {
+      const builtIn = templates[type](data ?? {})
+      subject = customTemplate.subject || builtIn.subject
+      // Inject {{name}} placeholder replacement into the custom HTML
+      const name = (data as any)?.name ?? 'Partner'
+      html = customTemplate.htmlContent.replace(/\{\{name\}\}/g, name)
+    } else {
+      const builtIn = templates[type](data ?? {})
+      subject = builtIn.subject
+      html = builtIn.html
+    }
 
+    const result = await sendMail({ to, subject, html })
     return NextResponse.json({ success: true, messageId: result.messageId || null })
   } catch (error) {
     return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })

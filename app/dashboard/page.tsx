@@ -15,7 +15,7 @@ const isBrowser = typeof window !== 'undefined';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { DollarSign, Target, TrendingUp, Award, Plus, BarChart, Users, Heart, Trophy, Medal, Star, Receipt, Banknote, Copy, Crown, Sparkles, CalendarDays, ChevronDown, Download, RefreshCw, Loader2 } from "lucide-react"
+import { DollarSign, Target, TrendingUp, Award, Plus, BarChart, Users, Heart, Trophy, Medal, Star, Receipt, Banknote, Copy, Crown, Sparkles, CalendarDays, ChevronDown, Download, RefreshCw, Loader2, Clock, AlertTriangle } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -55,6 +55,7 @@ function DashboardPage() {
   const [isDownloadingFlier, setIsDownloadingFlier] = useState(false);
   const [isSubmitProjectOpen, setIsSubmitProjectOpen] = useState(false);
   const [paymentSettings, setPaymentSettings] = useState<{ accountNumber: string; bankName: string; accountName: string; bankDetails: string } | null>(null);
+  const [approachingProjects, setApproachingProjects] = useState<{ id: string; title: string; dueDate: Date; daysLeft: number; currentFunding: number; fundingGoal: number }[]>([]);
   const partnerFlierRef = useRef<HTMLDivElement>(null);
 
   const copyAccountNumber = () => {
@@ -137,6 +138,46 @@ function DashboardPage() {
 
     loadPaymentSettings()
   }, []);
+
+  useEffect(() => {
+    if (!isBrowser || !user || !db) return;
+    const now = new Date();
+    const in30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const projectsQuery = query(
+      collection(db, "projects"),
+      where("status", "in", ["open", "approved"])
+    );
+    const unsub = onSnapshot(projectsQuery, (snapshot) => {
+      const approaching: typeof approachingProjects = [];
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        if (!d.dueDate) return;
+        let dueDate: Date;
+        if (typeof d.dueDate.toDate === "function") {
+          dueDate = d.dueDate.toDate();
+        } else if (d.dueDate instanceof Date) {
+          dueDate = d.dueDate;
+        } else {
+          dueDate = new Date(d.dueDate);
+        }
+        if (isNaN(dueDate.getTime())) return;
+        if (dueDate > now && dueDate <= in30Days) {
+          const daysLeft = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+          approaching.push({
+            id: doc.id,
+            title: d.title || "Untitled Project",
+            dueDate,
+            daysLeft,
+            currentFunding: d.currentFunding || 0,
+            fundingGoal: d.fundingGoal || 0,
+          });
+        }
+      });
+      approaching.sort((a, b) => a.daysLeft - b.daysLeft);
+      setApproachingProjects(approaching);
+    });
+    return () => unsub();
+  }, [user]);
 
   const refreshTrends = async () => {
     if (!isBrowser || !user || !db) return;
@@ -573,6 +614,60 @@ function DashboardPage() {
                       )}
                     </CardContent>
                   </Card>
+
+                  {/* Approaching Project Deadlines */}
+                  {approachingProjects.length > 0 && (
+                    <Card className="relative overflow-hidden border-amber-200 dark:border-amber-800">
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 to-orange-400" />
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2.5 rounded-xl bg-amber-100 dark:bg-amber-900/40">
+                            <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base">Approaching Deadlines</CardTitle>
+                            <CardDescription>Projects closing within the next 30 days</CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {approachingProjects.map(p => {
+                            const pct = p.fundingGoal > 0 ? Math.min(100, Math.round((p.currentFunding / p.fundingGoal) * 100)) : 0;
+                            const isUrgent = p.daysLeft <= 7;
+                            return (
+                              <Link key={p.id} href="/projects">
+                                <div className={`flex items-center justify-between gap-4 p-3 rounded-xl border transition-colors hover:bg-muted/50 ${isUrgent ? "border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10" : "border-amber-100 dark:border-amber-900 bg-amber-50/40 dark:bg-amber-900/10"}`}>
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    {isUrgent ? (
+                                      <AlertTriangle className="h-4 w-4 text-red-500 shrink-0" />
+                                    ) : (
+                                      <CalendarDays className="h-4 w-4 text-amber-500 shrink-0" />
+                                    )}
+                                    <div className="min-w-0">
+                                      <p className="text-sm font-medium truncate">{p.title}</p>
+                                      <p className="text-xs text-muted-foreground">
+                                        {p.dueDate.toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-3 shrink-0">
+                                    <div className="text-right hidden sm:block">
+                                      <p className="text-xs text-muted-foreground">Funded</p>
+                                      <p className="text-xs font-semibold">{pct}%</p>
+                                    </div>
+                                    <span className={`text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap ${isUrgent ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300" : "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300"}`}>
+                                      {p.daysLeft === 1 ? "1 day left" : `${p.daysLeft} days left`}
+                                    </span>
+                                  </div>
+                                </div>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
 
                   {/* Grid of Action Cards */}
                   <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">

@@ -984,3 +984,197 @@ exports.testPushNotification = https.onRequest(async (req, res) => {
   }
 });
 
+/**
+ * Scheduled Cloud Function: Send project deadline reminder emails
+ * Runs daily at 9 AM Lagos time.
+ * Notifies contributors and project owners whose projects have a deadline
+ * within the next 14 days — only for users with emailEnabled.
+ */
+exports.sendProjectDeadlineReminders = functions.pubsub
+  .schedule("0 9 * * *")
+  .timeZone("Africa/Lagos")
+  .onRun(async (_context) => {
+    console.log("Running project deadline reminder job...");
+
+    const now = new Date();
+    const in14Days = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+    // Fetch open/approved projects with a dueDate within the next 14 days
+    const projectsSnap = await db
+      .collection("projects")
+      .where("status", "in", ["open", "approved"])
+      .get();
+
+    const approachingProjects = [];
+    projectsSnap.forEach((doc) => {
+      const data = doc.data();
+      if (!data.dueDate) return;
+      let dueDate;
+      if (typeof data.dueDate.toDate === "function") {
+        dueDate = data.dueDate.toDate();
+      } else {
+        dueDate = new Date(data.dueDate);
+      }
+      if (isNaN(dueDate.getTime())) return;
+      if (dueDate > now && dueDate <= in14Days) {
+        const daysLeft = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        approachingProjects.push({
+          id: doc.id,
+          title: data.title || "Untitled Project",
+          dueDate,
+          daysLeft,
+          submittedBy: data.submittedBy || null,
+          submittedByEmail: data.submittedByEmail || null,
+          submittedByName: data.submittedByName || null,
+          currentFunding: data.currentFunding || 0,
+          fundingGoal: data.fundingGoal || 0,
+        });
+      }
+    });
+
+    if (approachingProjects.length === 0) {
+      console.log("No approaching project deadlines found.");
+      return null;
+    }
+
+    console.log(`Found ${approachingProjects.length} approaching project(s).`);
+
+    // Collect unique user IDs that need to be notified:
+    // project owners + contributors (approved payments) for each project
+    const projectIds = approachingProjects.map((p) => p.id);
+    const notifyUsers = new Map(); // userId -> { email, name, projects: [] }
+
+    // Add project owners
+    for (const project of approachingProjects) {
+      if (project.submittedBy && project.submittedByEmail) {
+        if (!notifyUsers.has(project.submittedBy)) {
+          notifyUsers.set(project.submittedBy, {
+            email: project.submittedByEmail,
+            name: project.submittedByName || "Partner",
+            projects: [],
+          });
+        }
+        notifyUsers.get(project.submittedBy).projects.push(project);
+      }
+    }
+
+    // Add contributors — query payments in batches of 10 (Firestore 'in' limit)
+    for (let i = 0; i < projectIds.length; i += 10) {
+      const batch = projectIds.slice(i, i + 10);
+      const paymentsSnap = await db
+        .collection("payments")
+        .where("projectId", "in", batch)
+        .where("status", "==", "approved")
+        .get();
+
+      for (const payDoc of paymentsSnap.docs) {
+        const pay = payDoc.data();
+        if (!pay.userId || !pay.userEmail) continue;
+        const project = approachingProjects.find((p) => p.id === pay.projectId);
+        if (!project) continue;
+        if (!notifyUsers.has(pay.userId)) {
+          notifyUsers.set(pay.userId, {
+            email: pay.userEmail,
+            name: pay.userFullName || "Partner",
+            projects: [],
+          });
+        }
+        const existing = notifyUsers.get(pay.userId);
+        if (!existing.projects.find((p) => p.id === project.id)) {
+          existing.projects.push(project);
+        }
+      }
+    }
+
+    let emailsSent = 0;
+
+    for (const [userId, info] of notifyUsers.entries()) {
+      // Check email preferences
+      const prefsDoc = await db.collection("notificationPreferences").doc(userId).get();
+      const prefs = prefsDoc.exists ? prefsDoc.data() : { emailEnabled: true };
+      if (prefs.emailEnabled === false) continue;
+
+      for (const project of info.projects) {
+        const dueDateStr = project.dueDate.toLocaleDateString("en-NG", {
+          weekday: "long", day: "numeric", month: "long", year: "numeric",
+        });
+        const fundedPct = project.fundingGoal > 0
+          ? Math.round((project.currentFunding / project.fundingGoal) * 100)
+          : 0;
+        const urgencyLabel = project.daysLeft <= 3 ? "⚠️ URGENT" : "⏰ Reminder";
+
+        const subject = `${urgencyLabel}: "${project.title}" closes in ${project.daysLeft} day${project.daysLeft === 1 ? "" : "s"}`;
+        const html = `
+          <!DOCTYPE html><html>
+          <head><style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background: #f4f4f5; }
+            .wrapper { padding: 32px 16px; }
+            .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+            .header { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 36px 32px; text-align: center; }
+            .header h1 { margin: 0; font-size: 24px; font-weight: 700; }
+            .header p { margin: 8px 0 0; opacity: 0.9; font-size: 15px; }
+            .body { padding: 32px; }
+            .body p { margin: 0 0 16px; color: #444; }
+            .highlight { background: #fffbeb; border-left: 4px solid #f59e0b; border-radius: 4px; padding: 16px; margin: 20px 0; }
+            .highlight strong { color: #92400e; display: block; margin-bottom: 4px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+            .badge { display: inline-block; background: ${project.daysLeft <= 3 ? "#fee2e2" : "#fef3c7"}; color: ${project.daysLeft <= 3 ? "#b91c1c" : "#92400e"}; font-weight: 700; font-size: 20px; padding: 12px 24px; border-radius: 8px; margin: 8px 0 16px; }
+            .btn { display: inline-block; background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff !important; text-decoration: none; padding: 13px 28px; border-radius: 8px; font-weight: 600; font-size: 15px; margin-top: 8px; }
+            .footer { text-align: center; padding: 24px 32px; color: #888; font-size: 13px; border-top: 1px solid #f0f0f0; }
+          </style></head>
+          <body><div class="wrapper"><div class="container">
+            <div class="header">
+              <h1>${project.daysLeft <= 3 ? "⚠️ Urgent Deadline Alert" : "⏰ Project Deadline Approaching"}</h1>
+              <p>A project you're involved with is closing soon</p>
+            </div>
+            <div class="body">
+              <p>Hi ${info.name},</p>
+              <p>This is a reminder that the following project is closing soon:</p>
+              <div class="highlight">
+                <strong>Project</strong>
+                ${project.title}
+              </div>
+              <div class="highlight">
+                <strong>Deadline</strong>
+                ${dueDateStr}
+              </div>
+              <div class="badge">${project.daysLeft} day${project.daysLeft === 1 ? "" : "s"} remaining</div>
+              ${project.fundingGoal > 0 ? `<div class="highlight"><strong>Funding Progress</strong>${fundedPct}% funded (₦${project.currentFunding.toLocaleString()} of ₦${project.fundingGoal.toLocaleString()})</div>` : ""}
+              <p>Make sure to check on this project before the deadline passes!</p>
+              <a href="https://zeroup-partners-app.vercel.app/projects" class="btn">View Project</a>
+            </div>
+            <div class="footer">
+              <p>ZeroUp Partners · Building Dreams Together</p>
+              <p><small><a href="https://zeroup-partners-app.vercel.app/dashboard/profile">Manage notification preferences</a></small></p>
+            </div>
+          </div></div></body></html>
+        `;
+
+        try {
+          await sendEmailWithNodemailer({
+            from: "ZeroUp Partners <onboarding@zeroup.dev>",
+            to: info.email,
+            subject,
+            html,
+          });
+          emailsSent++;
+
+          // Create in-app notification
+          await db.collection("notifications").add({
+            userId,
+            type: "project_deadline_approaching",
+            title: `⏰ "${project.title}" closes in ${project.daysLeft} day${project.daysLeft === 1 ? "" : "s"}`,
+            message: `The project "${project.title}" has a deadline on ${dueDateStr}. Don't miss it!`,
+            read: false,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            link: "/projects",
+          });
+        } catch (err) {
+          console.error(`Failed to send deadline reminder to ${info.email}:`, err);
+        }
+      }
+    }
+
+    console.log(`Project deadline reminder job complete. ${emailsSent} emails sent.`);
+    return null;
+  });
+
