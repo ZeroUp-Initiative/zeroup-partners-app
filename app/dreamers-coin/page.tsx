@@ -7,7 +7,7 @@ import { CoinDropAnimation } from "@/components/coin-drop-animation"
 import { SlotMachineCounter } from "@/components/slot-machine-counter"
 import { LinkDreamerCard } from "@/components/dreamers/link-dreamer-card"
 import { DreamCard } from "@/components/dreamers/dream-card"
-import { getTierStatus, DREAM_TIERS } from "@/lib/dreamers/tiers"
+import { getTierStatus, resolveTierStyle, DEFAULT_DREAM_TIERS, type DreamTierConfig } from "@/lib/dreamers/tiers"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -54,6 +54,14 @@ function DreamersCoinContent() {
   const [data, setData] = useState<DreamerData | null>(null)
   const [loading, setLoading] = useState(true)
   const [showCoinDrop, setShowCoinDrop] = useState(false)
+  const [tiers, setTiers] = useState<DreamTierConfig[]>(DEFAULT_DREAM_TIERS)
+
+  useEffect(() => {
+    fetch("/api/dream-tiers")
+      .then((r) => r.json())
+      .then((d) => { if (Array.isArray(d?.tiers) && d.tiers.length) setTiers(d.tiers) })
+      .catch(() => {})
+  }, [])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -213,8 +221,8 @@ function DreamersCoinContent() {
               <TabsContent value="card" className="space-y-6">
                 {(() => {
                   const partnered = me?.partneredTotal || 0
-                  const status = getTierStatus(partnered)
-                  const tierForCard = status.current || DREAM_TIERS[0]
+                  const status = getTierStatus(partnered, tiers)
+                  const tierForCard = status.current || tiers[0]
                   const locked = !status.current
                   const qrValue = `https://zeroup-partners-app.vercel.app/dreamers-coin?card=${encodeURIComponent((me?.memberNumber || "").replace(/\s/g, ""))}`
                   return (
@@ -235,7 +243,7 @@ function DreamersCoinContent() {
                             memberSince={me?.memberSince || ""}
                             qrValue={qrValue}
                             locked={locked}
-                            unlockHint={`Partner ₦${DREAM_TIERS[0].min.toLocaleString()} with ZeroUp to unlock your Blue Dream Card`}
+                            unlockHint={`Partner ₦${tiers[0].min.toLocaleString()} with ZeroUp to unlock your ${tiers[0].name} Dream Card`}
                           />
                         </CardContent>
                       </Card>
@@ -258,12 +266,12 @@ function DreamersCoinContent() {
                             <p className="text-sm text-muted-foreground">You've reached the highest tier. 🖤</p>
                           )}
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                            {DREAM_TIERS.map((t) => {
+                            {tiers.map((t) => {
                               const reached = partnered >= t.min
                               const isCurrent = status.current?.id === t.id
                               return (
                                 <div key={t.id} className={`rounded-xl p-3 text-center border ${isCurrent ? "border-amber-400 ring-1 ring-amber-400/40" : "border-border"} ${reached ? "" : "opacity-50"}`}>
-                                  <div className="h-8 rounded-md mb-2" style={{ background: t.gradient }} />
+                                  <div className="h-8 rounded-md mb-2" style={{ background: resolveTierStyle(t.style).gradient }} />
                                   <p className="text-xs font-semibold">{t.name}</p>
                                   <p className="text-[10px] text-muted-foreground">₦{t.min.toLocaleString()}+</p>
                                 </div>

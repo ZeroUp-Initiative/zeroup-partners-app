@@ -5,10 +5,10 @@ import html2canvas from 'html2canvas'
 import QRCode from 'qrcode'
 import { Button } from '@/components/ui/button'
 import { Download, Loader2, Lock } from 'lucide-react'
-import type { DreamTier } from '@/lib/dreamers/tiers'
+import { resolveTierStyle, cardNameFor, type DreamTierConfig } from '@/lib/dreamers/tiers'
 
 interface DreamCardProps {
-  tier: DreamTier
+  tier: DreamTierConfig
   name: string
   drBalance: number
   memberNumber: string
@@ -45,10 +45,11 @@ export function DreamCard({ tier, name, drBalance, memberNumber, memberSince, qr
     }
   }
 
-  const text = tier.textOn === 'dark' ? '#141414' : '#ffffff'
-  const sub = tier.textOn === 'dark' ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.7)'
-  const hairline = tier.textOn === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.2)'
-  const faceStyle: CSSProperties = { background: tier.gradient, color: text }
+  const style = resolveTierStyle(tier.style)
+  const text = style.textOn === 'dark' ? '#141414' : '#ffffff'
+  const sub = style.textOn === 'dark' ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.7)'
+  const hairline = style.textOn === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.2)'
+  const faceStyle: CSSProperties = { background: style.gradient, color: text }
   const displayName = (name || 'Dreamer').toUpperCase()
 
   return (
@@ -152,7 +153,7 @@ export function DreamCard({ tier, name, drBalance, memberNumber, memberSince, qr
                   <p style={{ color: sub, fontSize: '0.5rem', letterSpacing: '0.12em', marginTop: '0.25rem' }}>AUTHORIZED SIGNATURE</p>
                 </div>
                 <div>
-                  <p className="font-bold" style={{ fontSize: '0.7rem', letterSpacing: '0.12em' }}>{tier.cardName.toUpperCase()}</p>
+                  <p className="font-bold" style={{ fontSize: '0.7rem', letterSpacing: '0.12em' }}>{cardNameFor(tier).toUpperCase()}</p>
                   <p style={{ color: sub, fontSize: '0.52rem', lineHeight: 1.4 }}>
                     This card certifies active membership in the ZeroUp Dreamers Community. If found, please return to ZeroUp Partners.
                   </p>
