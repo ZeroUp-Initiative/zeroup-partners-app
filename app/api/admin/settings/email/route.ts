@@ -1,21 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAdminDb, getAdminAuth } from '@/lib/firebase/admin'
+import { getAdminDb } from '@/lib/firebase/admin'
 import { invalidateMailerCache, sendMail, type SmtpConfig } from '@/lib/mailer'
-
-async function verifyAdmin(req: NextRequest): Promise<boolean> {
-  const token = req.headers.get('Authorization')?.replace('Bearer ', '')
-  if (!token) return false
-  const adminAuth = getAdminAuth()
-  const adminDb = getAdminDb()
-  if (!adminAuth || !adminDb) return false
-  try {
-    const decoded = await adminAuth.verifyIdToken(token)
-    const userDoc = await adminDb.collection('users').doc(decoded.uid).get()
-    return userDoc.data()?.role === 'admin'
-  } catch {
-    return false
-  }
-}
+import { verifyAdmin } from '@/lib/auth/verify-admin'
 
 export async function GET(req: NextRequest) {
   if (!(await verifyAdmin(req))) {

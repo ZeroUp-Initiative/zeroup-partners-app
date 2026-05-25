@@ -126,9 +126,20 @@ service cloud.firestore {
     match /notificationPreferences/{userId} {
       // Users can read and write their own preferences
       allow read, write: if isOwner(userId);
-      
+
       // Admins can read all preferences
       allow read: if isAdmin();
+    }
+
+    // Email templates - readable by anyone (not sensitive), writable by admins only
+    match /emailTemplates/{templateId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // App settings - admin only
+    match /settings/{settingId} {
+      allow read, write: if isAdmin();
     }
   }
 }

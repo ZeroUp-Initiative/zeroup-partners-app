@@ -67,6 +67,7 @@ function AdminUsersPage() {
   const [users, setUsers] = useState<UserData[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
+  const [roleFilter, setRoleFilter] = useState<"all" | "user" | "admin">("all")
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null)
   const [isChangingRole, setIsChangingRole] = useState(false)
@@ -120,6 +121,8 @@ function AdminUsersPage() {
   }, []);
 
   const filteredUsers = users.filter((u: UserData) => {
+    if (roleFilter === "admin" && u.role !== "admin") return false;
+    if (roleFilter === "user" && u.role === "admin") return false;
     if (!searchQuery) return true;
     const searchLower = searchQuery.toLowerCase();
     return (
@@ -136,7 +139,7 @@ function AdminUsersPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, roleFilter]);
 
   const handleRoleChange = async () => {
     if (!selectedUser || !newRole) return;
@@ -358,7 +361,7 @@ function AdminUsersPage() {
         </Card>
       </div>
 
-      {/* Search + Broadcast */}
+      {/* Search + Filter + Broadcast */}
       <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -369,9 +372,33 @@ function AdminUsersPage() {
             className="pl-9"
           />
         </div>
+
+        {/* Role filter tabs */}
+        <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+          {(["all", "user", "admin"] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setRoleFilter(f)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                roleFilter === f
+                  ? "bg-background shadow-sm text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {f === "admin" && <Shield className="h-3.5 w-3.5" />}
+              {f === "user" && <User className="h-3.5 w-3.5" />}
+              {f === "all" && <Users className="h-3.5 w-3.5" />}
+              <span className="capitalize">{f === "all" ? "All" : f === "admin" ? "Admins" : "Users"}</span>
+              <span className="ml-0.5 text-xs opacity-70">
+                ({f === "all" ? users.length : f === "admin" ? adminCount : userCount})
+              </span>
+            </button>
+          ))}
+        </div>
+
         <Button
           onClick={() => { setBroadcastOpen(true); setBroadcastResult(null) }}
-          className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0 gap-2"
+          className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0 gap-2 sm:ml-auto"
         >
           <Megaphone className="h-4 w-4" />
           Broadcast Email
@@ -381,7 +408,9 @@ function AdminUsersPage() {
       {/* Users Table */}
       <Card>
         <CardHeader>
-          <CardTitle>All Users</CardTitle>
+          <CardTitle>
+            {roleFilter === "admin" ? "Administrators" : roleFilter === "user" ? "Regular Users" : "All Users"}
+          </CardTitle>
           <CardDescription>
             {filteredUsers.length} user{filteredUsers.length !== 1 ? 's' : ''} found
           </CardDescription>

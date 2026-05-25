@@ -5,7 +5,7 @@ const SMTP_PORT = Number(process.env.SMTP_PORT || 587);
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
 const SMTP_SECURE = process.env.SMTP_SECURE === "true";
-const DEFAULT_FROM = process.env.EMAIL_FROM || "ZeroUp Partners <onboarding@zeroup.dev>";
+const DEFAULT_FROM = process.env.EMAIL_FROM || "ZeroUp Partners <onboarding@zeroup.org>";
 
 let transporter = null;
 let usingEthereal = false;
