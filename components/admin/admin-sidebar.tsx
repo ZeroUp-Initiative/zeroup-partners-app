@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, FolderKanban, LogOut, Menu, X, Receipt, Users, Settings, CreditCard, CalendarCheck } from "lucide-react"
+import { LayoutDashboard, FolderKanban, LogOut, Menu, X, Receipt, Users, Settings, CreditCard, CalendarCheck, Vote } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/auth-context"
@@ -39,6 +39,11 @@ const sidebarItems = [
     title: "Events",
     href: "/admin/events",
     icon: CalendarCheck,
+  },
+  {
+    title: "Project Votes",
+    href: "/admin/proposals",
+    icon: Vote,
   },
   {
     title: "Settings",

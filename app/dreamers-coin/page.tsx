@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import {
   Coins, Trophy, Medal, Award, LogOut, Crown, Flame,
-  TrendingUp, Wallet, ShoppingBag, ArrowLeft, Loader2, Check, Lock, Copy, Share2,
+  TrendingUp, Wallet, ShoppingBag, ArrowLeft, Loader2, Check, Lock, Copy, Share2, Heart,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -57,6 +57,40 @@ function DreamersCoinContent() {
   const [showCoinDrop, setShowCoinDrop] = useState(false)
   const [tiers, setTiers] = useState<DreamTierConfig[]>(DEFAULT_DREAM_TIERS)
   const [refCopied, setRefCopied] = useState(false)
+  const [proposals, setProposals] = useState<{ id: string; title: string; description: string; voteCount: number }[]>([])
+  const [myVotes, setMyVotes] = useState<string[]>([])
+  const [votingId, setVotingId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!data?.linked) return
+    ;(async () => {
+      const idToken = await auth?.currentUser?.getIdToken().catch(() => null)
+      const res = await fetch("/api/proposals", { headers: idToken ? { Authorization: `Bearer ${idToken}` } : {} })
+      const d = await res.json()
+      setProposals(d.proposals || [])
+      setMyVotes(d.myVotes || [])
+    })().catch(() => {})
+  }, [data?.linked])
+
+  const toggleVote = async (proposalId: string) => {
+    setVotingId(proposalId)
+    try {
+      const idToken = await auth?.currentUser?.getIdToken()
+      const res = await fetch("/api/proposals/vote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({ proposalId }),
+      })
+      const d = await res.json()
+      if (!res.ok) return
+      setMyVotes((prev) => (d.voted ? [...prev, proposalId] : prev.filter((x) => x !== proposalId)))
+      setProposals((prev) =>
+        prev.map((p) => (p.id === proposalId ? { ...p, voteCount: d.voteCount } : p)).sort((a, b) => b.voteCount - a.voteCount),
+      )
+    } finally {
+      setVotingId(null)
+    }
+  }
 
   useEffect(() => {
     fetch("/api/dream-tiers")
@@ -214,8 +248,9 @@ function DreamersCoinContent() {
 
             {/* Tabs */}
             <Tabs defaultValue="card" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-3 glass-card">
+              <TabsList className="grid w-full grid-cols-4 glass-card">
                 <TabsTrigger value="card">My Card</TabsTrigger>
+                <TabsTrigger value="vote">Vote</TabsTrigger>
                 <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
                 <TabsTrigger value="history">History</TabsTrigger>
               </TabsList>
@@ -356,6 +391,44 @@ function DreamersCoinContent() {
                     </div>
                   )
                 })()}
+              </TabsContent>
+
+              <TabsContent value="vote" className="space-y-4">
+                <Card className="glass-card">
+                  <CardHeader>
+                    <CardTitle>Vote on Projects</CardTitle>
+                    <CardDescription>Support the projects you want ZeroUp to fund next — tap the heart. Ranked by support.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {proposals.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-6">No projects up for voting right now.</p>
+                    ) : (
+                      proposals.map((p) => {
+                        const voted = myVotes.includes(p.id)
+                        return (
+                          <div key={p.id} className="flex items-start gap-3 p-3 rounded-lg border">
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold">{p.title}</p>
+                              {p.description && <p className="text-sm text-muted-foreground">{p.description}</p>}
+                            </div>
+                            <button
+                              onClick={() => toggleVote(p.id)}
+                              disabled={votingId === p.id}
+                              className="flex flex-col items-center gap-0.5 flex-shrink-0 disabled:opacity-50"
+                            >
+                              {votingId === p.id ? (
+                                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                              ) : (
+                                <Heart className={`w-6 h-6 transition-colors ${voted ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+                              )}
+                              <span className="text-xs font-bold">{p.voteCount}</span>
+                            </button>
+                          </div>
+                        )
+                      })
+                    )}
+                  </CardContent>
+                </Card>
               </TabsContent>
 
               <TabsContent value="leaderboard" className="space-y-6">
