@@ -58,6 +58,7 @@ export const DEFAULT_DREAM_TIERS: DreamTierConfig[] = [
       'Discounts at Dreamer partner stores (show your card)',
       'Access to ZeroUp events + earn dream coins for attending',
       'Your personal “partner through me” referral link',
+      'Accommodation & feeding covered by the community when you travel for a ZeroUp event',
     ],
   },
   {
@@ -83,6 +84,7 @@ export const DEFAULT_DREAM_TIERS: DreamTierConfig[] = [
       'Invitations to exclusive galas & demo days',
       'Gift dream coins or sponsor another Dreamer’s tier',
       'A direct line to the ZeroUp team',
+      'Travel covered when you travel for a ZeroUp event — flight/transport, hotel & feeding',
     ],
   },
 ]

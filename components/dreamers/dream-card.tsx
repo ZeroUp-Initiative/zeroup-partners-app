@@ -10,15 +10,15 @@ import { resolveTierStyle, cardNameFor, type DreamTierConfig } from '@/lib/dream
 interface DreamCardProps {
   tier: DreamTierConfig
   name: string
-  drBalance: number
   memberNumber: string
   memberSince: string
   qrValue: string
   locked?: boolean
   unlockHint?: string
+  previewOnly?: boolean // hide download buttons (used in tier preview)
 }
 
-export function DreamCard({ tier, name, drBalance, memberNumber, memberSince, qrValue, locked, unlockHint }: DreamCardProps) {
+export function DreamCard({ tier, name, memberNumber, memberSince, qrValue, locked, unlockHint, previewOnly }: DreamCardProps) {
   const frontRef = useRef<HTMLDivElement>(null)
   const backRef = useRef<HTMLDivElement>(null)
   const [qr, setQr] = useState('')
@@ -63,6 +63,15 @@ export function DreamCard({ tier, name, drBalance, memberNumber, memberSince, qr
         >
           {/* sheen */}
           <div className="absolute inset-0" style={{ background: 'linear-gradient(105deg, rgba(255,255,255,0.18) 0%, transparent 35%, transparent 65%, rgba(255,255,255,0.10) 100%)' }} />
+          {/* ZeroUp logo watermark */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/zeroup-partners-logo.png"
+            alt=""
+            crossOrigin="anonymous"
+            className="absolute pointer-events-none select-none"
+            style={{ left: '10%', top: '50%', transform: 'translateY(-50%)', height: '70%', opacity: 0.08 }}
+          />
           {/* watermark tier name */}
           <div className="absolute -right-2 bottom-2 font-black leading-none select-none" style={{ fontSize: '4.5rem', color: hairline }}>
             {tier.name}
@@ -81,9 +90,8 @@ export function DreamCard({ tier, name, drBalance, memberNumber, memberSince, qr
               </div>
             </div>
 
-            {/* chip + balance */}
-            <div className="flex items-center justify-between">
-              {/* EMV chip */}
+            {/* EMV chip */}
+            <div>
               <div
                 className="rounded-md"
                 style={{
@@ -93,10 +101,6 @@ export function DreamCard({ tier, name, drBalance, memberNumber, memberSince, qr
                   boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.2)',
                 }}
               />
-              <div className="text-right">
-                <p className="font-black leading-none" style={{ fontSize: '1.35rem' }}>{drBalance.toLocaleString()}</p>
-                <p style={{ color: sub, fontSize: '0.55rem', letterSpacing: '0.15em' }}>DREAM COINS</p>
-              </div>
             </div>
 
             {/* card number */}
@@ -124,10 +128,12 @@ export function DreamCard({ tier, name, drBalance, memberNumber, memberSince, qr
             </div>
           )}
         </div>
-        <Button variant="outline" className="w-full" onClick={() => download('front')} disabled={locked || downloading !== null}>
-          {downloading === 'front' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
-          Download front
-        </Button>
+        {!previewOnly && (
+          <Button variant="outline" className="w-full" onClick={() => download('front')} disabled={locked || downloading !== null}>
+            {downloading === 'front' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+            Download front
+          </Button>
+        )}
       </div>
 
       {/* BACK */}
@@ -175,10 +181,12 @@ export function DreamCard({ tier, name, drBalance, memberNumber, memberSince, qr
             </div>
           </div>
         </div>
-        <Button variant="outline" className="w-full" onClick={() => download('back')} disabled={locked || downloading !== null}>
-          {downloading === 'back' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
-          Download back
-        </Button>
+        {!previewOnly && (
+          <Button variant="outline" className="w-full" onClick={() => download('back')} disabled={locked || downloading !== null}>
+            {downloading === 'back' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+            Download back
+          </Button>
+        )}
       </div>
     </div>
   )

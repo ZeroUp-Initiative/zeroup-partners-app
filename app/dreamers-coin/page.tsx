@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import {
   Coins, Trophy, Medal, Award, LogOut, Crown, Flame,
   TrendingUp, Wallet, ShoppingBag, ArrowLeft, Loader2, Check, Lock, Copy, Share2, Heart, Gift,
@@ -65,6 +66,7 @@ function DreamersCoinContent() {
   const [myVotes, setMyVotes] = useState<string[]>([])
   const [votingId, setVotingId] = useState<string | null>(null)
   const [upgradingId, setUpgradingId] = useState<string | null>(null)
+  const [previewTierId, setPreviewTierId] = useState<string | null>(null)
   const [sponsorUsername, setSponsorUsername] = useState("")
   const [sponsorTierId, setSponsorTierId] = useState("")
   const [sponsoring, setSponsoring] = useState(false)
@@ -342,7 +344,6 @@ function DreamersCoinContent() {
                           <DreamCard
                             tier={tierForCard}
                             name={me?.firstName || me?.username || "Dreamer"}
-                            drBalance={me?.balance || 0}
                             memberNumber={me?.memberNumber || ""}
                             memberSince={me?.memberSince || ""}
                             qrValue={qrValue}
@@ -397,11 +398,16 @@ function DreamersCoinContent() {
                               const reached = partnered >= t.min
                               const isCurrent = status.current?.id === t.id
                               return (
-                                <div key={t.id} className={`rounded-xl p-3 text-center border ${isCurrent ? "border-amber-400 ring-1 ring-amber-400/40" : "border-border"} ${reached ? "" : "opacity-50"}`}>
+                                <button
+                                  type="button"
+                                  key={t.id}
+                                  onClick={() => setPreviewTierId(t.id)}
+                                  className={`rounded-xl p-3 text-center border transition hover:scale-[1.03] hover:border-amber-400/60 ${isCurrent ? "border-amber-400 ring-1 ring-amber-400/40" : "border-border"} ${reached ? "" : "opacity-60"}`}
+                                >
                                   <div className="h-8 rounded-md mb-2" style={{ background: resolveTierStyle(t.style).gradient }} />
                                   <p className="text-xs font-semibold">{t.name}</p>
                                   <p className="text-[10px] text-muted-foreground">₦{t.min.toLocaleString()}+</p>
-                                </div>
+                                </button>
                               )
                             })}
                           </div>
@@ -654,6 +660,30 @@ function DreamersCoinContent() {
                 </Card>
               </TabsContent>
             </Tabs>
+
+            {previewTierId && (() => {
+              const t = tiers.find((x) => x.id === previewTierId)
+              if (!t) return null
+              const origin = typeof window !== "undefined" ? window.location.origin : "https://zeroup-partners-app.vercel.app"
+              return (
+                <Dialog open={!!previewTierId} onOpenChange={(o) => { if (!o) setPreviewTierId(null) }}>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>{t.name} Dream Card</DialogTitle>
+                      <DialogDescription>Preview of the {t.name} Dream Card design.</DialogDescription>
+                    </DialogHeader>
+                    <DreamCard
+                      tier={t}
+                      name={me?.firstName || me?.username || "Dreamer"}
+                      memberNumber={me?.memberNumber || ""}
+                      memberSince={me?.memberSince || ""}
+                      qrValue={`${origin}/dreamer/${me?.dreamerId || ""}`}
+                      previewOnly
+                    />
+                  </DialogContent>
+                </Dialog>
+              )
+            })()}
           </motion.div>
         )}
       </main>
