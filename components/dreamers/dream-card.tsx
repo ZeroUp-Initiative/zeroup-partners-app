@@ -15,7 +15,7 @@ interface DreamCardProps {
   qrValue: string
   locked?: boolean
   unlockHint?: string
-  previewOnly?: boolean // hide download buttons (used in tier preview)
+  previewOnly?: boolean
 }
 
 export function DreamCard({ tier, name, memberNumber, memberSince, qrValue, locked, unlockHint, previewOnly }: DreamCardProps) {
@@ -47,83 +47,101 @@ export function DreamCard({ tier, name, memberNumber, memberSince, qrValue, lock
 
   const style = resolveTierStyle(tier.style)
   const text = style.textOn === 'dark' ? '#141414' : '#ffffff'
-  const sub = style.textOn === 'dark' ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.7)'
-  const hairline = style.textOn === 'dark' ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.2)'
-  const faceStyle: CSSProperties = { background: style.gradient, color: text }
+  const sub = style.textOn === 'dark' ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.72)'
+  const hairline = style.textOn === 'dark' ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.16)'
+  const stripText = style.textOn === 'dark' ? '#141414' : '#1f1f1f'
+
+  // containerType makes child cqw units scale to the card's width — perfect on any screen.
+  const faceStyle = { background: style.gradient, color: text, containerType: 'inline-size' } as CSSProperties
+
   const displayName = (name || 'Dreamer').toUpperCase()
+  const tierUpper = tier.name.toUpperCase()
 
   return (
     <div className="grid gap-6 sm:grid-cols-2">
-      {/* FRONT */}
+      {/* ─── FRONT ──────────────────────────────────────────────── */}
       <div className="space-y-2">
         <div
           ref={frontRef}
           className="relative aspect-[856/540] w-full rounded-2xl shadow-2xl overflow-hidden"
           style={faceStyle}
         >
-          {/* sheen */}
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(105deg, rgba(255,255,255,0.18) 0%, transparent 35%, transparent 65%, rgba(255,255,255,0.10) 100%)' }} />
-          {/* ZeroUp Partners wordmark watermark */}
+          {/* subtle sheen */}
           <div
-            className="absolute pointer-events-none select-none font-black"
-            style={{ left: '6%', top: '52%', transform: 'translateY(-50%)', color: hairline, lineHeight: 0.85 }}
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: 'linear-gradient(105deg, rgba(255,255,255,0.16) 0%, transparent 35%, transparent 65%, rgba(255,255,255,0.08) 100%)' }}
+          />
+          {/* tier-name decoration (only big background element) */}
+          <div
+            className="absolute font-black leading-none select-none pointer-events-none whitespace-nowrap"
+            style={{ right: '-2cqw', bottom: '-3cqw', fontSize: '26cqw', color: hairline, letterSpacing: '-0.04em' }}
           >
-            <div style={{ fontSize: '1.9rem', letterSpacing: '-0.03em' }}>ZEROUP</div>
-            <div style={{ fontSize: '1.05rem', letterSpacing: '0.35em', fontWeight: 700 }}>PARTNERS</div>
-          </div>
-          {/* watermark tier name */}
-          <div className="absolute -right-2 bottom-2 font-black leading-none select-none" style={{ fontSize: '4.5rem', color: hairline }}>
-            {tier.name}
+            {tierUpper}
           </div>
 
-          <div className="relative h-full w-full p-[5.5%] flex flex-col justify-between">
-            {/* top row */}
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="font-bold tracking-[0.2em]" style={{ fontSize: '0.72rem' }}>ZEROUP DREAM CARD</p>
-                <p style={{ color: sub, fontSize: '0.6rem', letterSpacing: '0.15em' }}>DREAMERS COMMUNITY</p>
+          {/* content */}
+          <div className="relative h-full w-full flex flex-col justify-between" style={{ padding: '6cqw' }}>
+            {/* top row — brand & tier */}
+            <div className="flex items-start justify-between" style={{ gap: '4cqw' }}>
+              <div className="min-w-0">
+                <p className="font-extrabold leading-none" style={{ fontSize: '4cqw', letterSpacing: '0.15em' }}>
+                  ZEROUP PARTNERS
+                </p>
+                <p style={{ color: sub, fontSize: '2.4cqw', letterSpacing: '0.22em', marginTop: '1cqw' }}>
+                  DREAMERS COMMUNITY
+                </p>
               </div>
-              <div className="text-right">
-                <p className="font-extrabold" style={{ fontSize: '0.9rem' }}>{tier.name.toUpperCase()}</p>
-                <p style={{ color: sub, fontSize: '0.55rem', letterSpacing: '0.15em' }}>MEMBER</p>
+              <div className="text-right flex-shrink-0">
+                <p className="font-extrabold leading-none" style={{ fontSize: '5cqw' }}>{tierUpper}</p>
+                <p style={{ color: sub, fontSize: '2.2cqw', letterSpacing: '0.22em', marginTop: '1cqw' }}>MEMBER</p>
               </div>
             </div>
 
             {/* EMV chip */}
-            <div>
-              <div
-                className="rounded-md"
-                style={{
-                  width: '13%',
-                  aspectRatio: '4 / 3',
-                  background: 'linear-gradient(135deg, #f7e7a6, #c8a93a 60%, #9c7d1f)',
-                  boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.2)',
-                }}
-              />
-            </div>
+            <div
+              className="rounded-md"
+              style={{
+                width: '13cqw',
+                aspectRatio: '4 / 3',
+                background: 'linear-gradient(135deg, #f7e7a6, #c8a93a 60%, #9c7d1f)',
+                boxShadow: 'inset 0 0 0 0.3cqw rgba(0,0,0,0.2)',
+              }}
+            />
 
             {/* card number */}
-            <p className="font-mono" style={{ fontSize: '1.05rem', letterSpacing: '0.12em', textShadow: '0 1px 1px rgba(0,0,0,0.25)' }}>
+            <p
+              className="font-mono leading-none"
+              style={{
+                fontSize: '5cqw',
+                letterSpacing: '0.08em',
+                textShadow: '0 0.3cqw 0.3cqw rgba(0,0,0,0.25)',
+              }}
+            >
               {memberNumber}
             </p>
 
             {/* bottom row */}
-            <div className="flex items-end justify-between">
-              <div>
-                <p style={{ color: sub, fontSize: '0.5rem', letterSpacing: '0.15em' }}>CARD HOLDER</p>
-                <p className="font-semibold" style={{ fontSize: '0.8rem', letterSpacing: '0.05em' }}>{displayName}</p>
+            <div className="flex items-end justify-between" style={{ gap: '4cqw' }}>
+              <div className="min-w-0">
+                <p style={{ color: sub, fontSize: '2.1cqw', letterSpacing: '0.22em' }}>CARD HOLDER</p>
+                <p className="font-semibold truncate" style={{ fontSize: '3.8cqw', letterSpacing: '0.04em', marginTop: '0.6cqw' }}>
+                  {displayName}
+                </p>
               </div>
-              <div className="text-right">
-                <p style={{ color: sub, fontSize: '0.5rem', letterSpacing: '0.15em' }}>MEMBER SINCE</p>
-                <p className="font-semibold" style={{ fontSize: '0.75rem' }}>{memberSince || '—'}</p>
+              <div className="text-right flex-shrink-0">
+                <p style={{ color: sub, fontSize: '2.1cqw', letterSpacing: '0.22em' }}>MEMBER SINCE</p>
+                <p className="font-semibold" style={{ fontSize: '3.4cqw', marginTop: '0.6cqw' }}>{memberSince || '—'}</p>
               </div>
             </div>
           </div>
 
           {locked && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center gap-2 px-6" style={{ background: 'rgba(0,0,0,0.55)', color: '#fff' }}>
+            <div
+              className="absolute inset-0 flex flex-col items-center justify-center text-center"
+              style={{ background: 'rgba(0,0,0,0.55)', color: '#fff', gap: '1cqw', padding: '5cqw' }}
+            >
               <Lock className="w-7 h-7" />
-              <p className="font-semibold text-sm">{unlockHint || 'Partner with ZeroUp to unlock'}</p>
+              <p className="font-semibold" style={{ fontSize: '3cqw' }}>{unlockHint || 'Partner with ZeroUp to unlock'}</p>
             </div>
           )}
         </div>
@@ -135,47 +153,58 @@ export function DreamCard({ tier, name, memberNumber, memberSince, qrValue, lock
         )}
       </div>
 
-      {/* BACK */}
+      {/* ─── BACK ───────────────────────────────────────────────── */}
       <div className="space-y-2">
         <div
           ref={backRef}
           className="relative aspect-[856/540] w-full rounded-2xl shadow-2xl overflow-hidden"
           style={faceStyle}
         >
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(105deg, rgba(255,255,255,0.12) 0%, transparent 40%, rgba(255,255,255,0.08) 100%)' }} />
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: 'linear-gradient(105deg, rgba(255,255,255,0.12) 0%, transparent 40%, rgba(255,255,255,0.06) 100%)' }}
+          />
           <div className="relative h-full w-full flex flex-col">
             {/* magnetic stripe */}
-            <div className="mt-[6%] h-[18%] w-full" style={{ background: '#0b0b0b' }} />
+            <div style={{ marginTop: '5cqw', height: '17cqw', width: '100%', background: '#0b0b0b' }} />
 
-            <div className="flex-1 px-[5.5%] py-[4%] flex gap-4">
-              {/* left: signature + info */}
-              <div className="flex-1 flex flex-col justify-between">
+            <div className="flex-1 flex min-h-0" style={{ padding: '5cqw', gap: '4cqw' }}>
+              {/* left: signature + tier name + fine print */}
+              <div className="flex-1 flex flex-col justify-between min-w-0">
                 <div>
-                  {/* signature strip */}
-                  <div className="rounded-sm px-2 py-1" style={{ background: '#f4f4f5' }}>
-                    <p className="italic" style={{ color: '#333', fontSize: '0.85rem', fontFamily: 'cursive' }}>{name || 'Dreamer'}</p>
+                  <div className="rounded-sm" style={{ background: '#f4f4f5', padding: '1cqw 2cqw' }}>
+                    <p
+                      className="italic truncate"
+                      style={{ color: stripText, fontSize: '3.6cqw', fontFamily: 'cursive', fontWeight: 600 }}
+                    >
+                      {name || 'Dreamer'}
+                    </p>
                   </div>
-                  <p style={{ color: sub, fontSize: '0.5rem', letterSpacing: '0.12em', marginTop: '0.25rem' }}>AUTHORIZED SIGNATURE</p>
+                  <p style={{ color: sub, fontSize: '2cqw', letterSpacing: '0.2em', marginTop: '1cqw' }}>
+                    AUTHORIZED SIGNATURE
+                  </p>
                 </div>
                 <div>
-                  <p className="font-bold" style={{ fontSize: '0.7rem', letterSpacing: '0.12em' }}>{cardNameFor(tier).toUpperCase()}</p>
-                  <p style={{ color: sub, fontSize: '0.52rem', lineHeight: 1.4 }}>
-                    This card certifies active membership in the ZeroUp Dreamers Community. If found, please return to ZeroUp Partners.
+                  <p className="font-bold" style={{ fontSize: '2.8cqw', letterSpacing: '0.2em' }}>
+                    {cardNameFor(tier).toUpperCase()}
+                  </p>
+                  <p style={{ color: sub, fontSize: '2.1cqw', lineHeight: 1.4, marginTop: '0.6cqw' }}>
+                    Certifies active membership in the ZeroUp Dreamers Community.
                   </p>
                 </div>
               </div>
 
               {/* right: QR */}
-              <div className="flex flex-col items-center justify-center">
-                <div className="rounded-md p-1.5" style={{ background: '#ffffff' }}>
+              <div className="flex flex-col items-center justify-center flex-shrink-0">
+                <div className="rounded-md" style={{ background: '#ffffff', padding: '1.2cqw' }}>
                   {qr ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={qr} alt="QR" style={{ width: '4.2rem', height: '4.2rem', display: 'block' }} />
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={qr} alt="QR" style={{ width: '20cqw', height: '20cqw', display: 'block' }} />
                   ) : (
-                    <div style={{ width: '4.2rem', height: '4.2rem' }} />
+                    <div style={{ width: '20cqw', height: '20cqw' }} />
                   )}
                 </div>
-                <p style={{ color: sub, fontSize: '0.5rem', letterSpacing: '0.1em', marginTop: '0.3rem' }}>SCAN TO VERIFY</p>
+                <p style={{ color: sub, fontSize: '2cqw', letterSpacing: '0.18em', marginTop: '1cqw' }}>SCAN TO VERIFY</p>
               </div>
             </div>
           </div>
