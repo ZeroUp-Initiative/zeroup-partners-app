@@ -63,15 +63,14 @@ export function DreamCard({ tier, name, memberNumber, memberSince, qrValue, lock
         >
           {/* sheen */}
           <div className="absolute inset-0" style={{ background: 'linear-gradient(105deg, rgba(255,255,255,0.18) 0%, transparent 35%, transparent 65%, rgba(255,255,255,0.10) 100%)' }} />
-          {/* ZeroUp logo watermark */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/zeroup-partners-logo.png"
-            alt=""
-            crossOrigin="anonymous"
-            className="absolute pointer-events-none select-none"
-            style={{ left: '10%', top: '50%', transform: 'translateY(-50%)', height: '70%', opacity: 0.08 }}
-          />
+          {/* ZeroUp Partners wordmark watermark */}
+          <div
+            className="absolute pointer-events-none select-none font-black"
+            style={{ left: '6%', top: '52%', transform: 'translateY(-50%)', color: hairline, lineHeight: 0.85 }}
+          >
+            <div style={{ fontSize: '1.9rem', letterSpacing: '-0.03em' }}>ZEROUP</div>
+            <div style={{ fontSize: '1.05rem', letterSpacing: '0.35em', fontWeight: 700 }}>PARTNERS</div>
+          </div>
           {/* watermark tier name */}
           <div className="absolute -right-2 bottom-2 font-black leading-none select-none" style={{ fontSize: '4.5rem', color: hairline }}>
             {tier.name}

@@ -67,6 +67,7 @@ function DreamersCoinContent() {
   const [votingId, setVotingId] = useState<string | null>(null)
   const [upgradingId, setUpgradingId] = useState<string | null>(null)
   const [previewTierId, setPreviewTierId] = useState<string | null>(null)
+  const [activeTierId, setActiveTierId] = useState<string | null>(null)
   const [sponsorUsername, setSponsorUsername] = useState("")
   const [sponsorTierId, setSponsorTierId] = useState("")
   const [sponsoring, setSponsoring] = useState(false)
@@ -173,6 +174,7 @@ function DreamersCoinContent() {
       const res = await fetch("/api/dreamers/me", { headers: { Authorization: `Bearer ${idToken}` } })
       const json = await res.json()
       setData(res.ok ? json : { linked: false })
+      setActiveTierId(null)
     } catch {
       setData({ linked: false })
     } finally {
@@ -212,15 +214,16 @@ function DreamersCoinContent() {
                 <Image src="/images/zeroup-partners-logo.png" alt="ZeroUp Partners" fill className="object-contain" />
               </div>
             </Link>
-            <div>
-              <h1 className="text-xl font-bold text-foreground">Dreamers Coin</h1>
-              <p className="text-sm text-muted-foreground">Your rewards wallet</p>
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-xl font-bold text-foreground truncate">Dreamers Coin</h1>
+              <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">Your rewards wallet</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
             <ThemeToggle />
             <Button variant="outline" size="sm" onClick={logout} className="bg-transparent">
-              <LogOut className="w-4 h-4 mr-2" /> Logout
+              <LogOut className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Logout</span>
             </Button>
           </div>
         </div>
@@ -315,10 +318,10 @@ function DreamersCoinContent() {
             {/* Tabs */}
             <Tabs defaultValue="card" className="space-y-6">
               <TabsList className="grid w-full grid-cols-4 glass-card">
-                <TabsTrigger value="card">My Card</TabsTrigger>
-                <TabsTrigger value="vote">Vote</TabsTrigger>
-                <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
-                <TabsTrigger value="history">History</TabsTrigger>
+                <TabsTrigger value="card" className="text-xs sm:text-sm">Card</TabsTrigger>
+                <TabsTrigger value="vote" className="text-xs sm:text-sm">Vote</TabsTrigger>
+                <TabsTrigger value="leaderboard" className="text-xs sm:text-sm">Top</TabsTrigger>
+                <TabsTrigger value="history" className="text-xs sm:text-sm">History</TabsTrigger>
               </TabsList>
 
               <TabsContent value="card" className="space-y-6">
@@ -327,8 +330,10 @@ function DreamersCoinContent() {
                   const status = getEffectiveTierStatus(partnered, me?.grantedTierId, tiers)
                   const balance = me?.balance || 0
                   const upgradable = tiers.filter((t) => t.drCost > 0 && (!status.current || t.min > status.current.min))
-                  const tierForCard = status.current || tiers[0]
+                  const explicitActiveTier = activeTierId ? tiers.find((t) => t.id === activeTierId) || null : null
+                  const tierForCard = explicitActiveTier || status.current || tiers[0]
                   const locked = !status.current
+                  const viewingOther = !!explicitActiveTier && explicitActiveTier.id !== status.current?.id
                   const origin = typeof window !== "undefined" ? window.location.origin : "https://zeroup-partners-app.vercel.app"
                   const qrValue = `${origin}/dreamer/${me?.dreamerId || ""}`
                   return (
@@ -341,6 +346,12 @@ function DreamersCoinContent() {
                           </CardDescription>
                         </CardHeader>
                         <CardContent>
+                          {viewingOther && (
+                            <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg bg-muted/50 text-sm">
+                              <span className="text-muted-foreground">Viewing your <span className="text-foreground font-semibold">{explicitActiveTier!.name} Dream Card</span></span>
+                              <Button variant="link" size="sm" className="h-auto p-0 self-start sm:self-auto" onClick={() => setActiveTierId(null)}>← Back to your {status.current?.name} card</Button>
+                            </div>
+                          )}
                           <DreamCard
                             tier={tierForCard}
                             name={me?.firstName || me?.username || "Dreamer"}
@@ -395,14 +406,14 @@ function DreamersCoinContent() {
                           )}
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
                             {tiers.map((t) => {
-                              const reached = partnered >= t.min
+                              const reached = !!status.current && status.current.min >= t.min
                               const isCurrent = status.current?.id === t.id
                               return (
                                 <button
                                   type="button"
                                   key={t.id}
-                                  onClick={() => setPreviewTierId(t.id)}
-                                  className={`rounded-xl p-3 text-center border transition hover:scale-[1.03] hover:border-amber-400/60 ${isCurrent ? "border-amber-400 ring-1 ring-amber-400/40" : "border-border"} ${reached ? "" : "opacity-60"}`}
+                                  onClick={() => { if (reached) setActiveTierId(t.id); else setPreviewTierId(t.id) }}
+                                  className={`rounded-xl p-3 text-center border transition hover:scale-[1.03] hover:border-amber-400/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/50 ${isCurrent ? "border-amber-400 ring-1 ring-amber-400/40" : "border-border"} ${reached ? "" : "opacity-60"}`}
                                 >
                                   <div className="h-8 rounded-md mb-2" style={{ background: resolveTierStyle(t.style).gradient }} />
                                   <p className="text-xs font-semibold">{t.name}</p>
@@ -667,10 +678,10 @@ function DreamersCoinContent() {
               const origin = typeof window !== "undefined" ? window.location.origin : "https://zeroup-partners-app.vercel.app"
               return (
                 <Dialog open={!!previewTierId} onOpenChange={(o) => { if (!o) setPreviewTierId(null) }}>
-                  <DialogContent className="max-w-md">
+                  <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle>{t.name} Dream Card</DialogTitle>
-                      <DialogDescription>Preview of the {t.name} Dream Card design.</DialogDescription>
+                      <DialogDescription>Preview of the {t.name} Dream Card design. Reach this tier to download.</DialogDescription>
                     </DialogHeader>
                     <DreamCard
                       tier={t}
