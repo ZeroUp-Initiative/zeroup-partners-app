@@ -3,16 +3,18 @@
 import { useState } from 'react'
 import { useAuth } from '@/contexts/auth-context'
 import { sendEmailVerification } from 'firebase/auth'
-import { auth } from '@/lib/firebase/client'
+import { doc, setDoc } from 'firebase/firestore'
+import { auth, db } from '@/lib/firebase/client'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Mail, X, RefreshCw, CheckCircle } from 'lucide-react'
-import Link from 'next/link'
+import toast from 'react-hot-toast'
 
 export function EmailVerificationBanner() {
   const { user } = useAuth()
   const [dismissed, setDismissed] = useState(false)
   const [isResending, setIsResending] = useState(false)
+  const [isChecking, setIsChecking] = useState(false)
   const [resendSuccess, setResendSuccess] = useState(false)
 
   // Don't show if no user, already verified, or dismissed
@@ -22,16 +24,36 @@ export function EmailVerificationBanner() {
 
   const handleResend = async () => {
     if (!auth.currentUser) return
-    
     setIsResending(true)
     try {
       await sendEmailVerification(auth.currentUser)
       setResendSuccess(true)
       setTimeout(() => setResendSuccess(false), 5000)
-    } catch (err) {
-      // Silent fail - user can try again
+    } catch {
+      // silent fail
     } finally {
       setIsResending(false)
+    }
+  }
+
+  const handleCheckVerified = async () => {
+    if (!auth.currentUser) return
+    setIsChecking(true)
+    try {
+      // Force-refresh the Firebase Auth token to pick up the latest emailVerified status
+      await auth.currentUser.reload()
+      if (auth.currentUser.emailVerified) {
+        // Sync to Firestore and dismiss
+        await setDoc(doc(db, 'users', auth.currentUser.uid), { emailVerified: true }, { merge: true })
+        setDismissed(true)
+        toast.success('Email verified! Welcome aboard.')
+      } else {
+        toast.error("Not verified yet — please click the link in your email first.")
+      }
+    } catch {
+      toast.error("Couldn't check verification status. Please try again.")
+    } finally {
+      setIsChecking(false)
     }
   }
 
@@ -53,7 +75,7 @@ export function EmailVerificationBanner() {
               size="sm"
               className="h-auto p-0 text-amber-700 dark:text-amber-300 underline"
               onClick={handleResend}
-              disabled={isResending}
+              disabled={isResending || isChecking}
             >
               {isResending ? (
                 <>
@@ -61,16 +83,26 @@ export function EmailVerificationBanner() {
                   Sending...
                 </>
               ) : (
-                "Resend email"
+                'Resend email'
               )}
             </Button>
           )}
-          <Link 
-            href="/verify-email" 
-            className="text-amber-700 dark:text-amber-300 underline text-sm hover:text-amber-900 dark:hover:text-amber-100"
+          <Button
+            variant="link"
+            size="sm"
+            className="h-auto p-0 text-amber-700 dark:text-amber-300 underline"
+            onClick={handleCheckVerified}
+            disabled={isChecking || isResending}
           >
-            Learn more
-          </Link>
+            {isChecking ? (
+              <>
+                <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                Checking...
+              </>
+            ) : (
+              "I've verified my email"
+            )}
+          </Button>
         </div>
         <Button
           variant="ghost"

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { onAuthStateChanged, User as FirebaseUser, signOut } from 'firebase/auth';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase/client';
 
 // Check if we're in browser environment
@@ -64,12 +64,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         const userDocRef = doc(db, 'users', firebaseUser.uid);
-        const unsubscribeFirestore = onSnapshot(userDocRef, 
-          (doc) => {
-            const userProfile = (doc.exists() ? doc.data() : {}) as UserProfile;
-            setUser({ ...firebaseUser, ...userProfile });
+        const unsubscribeFirestore = onSnapshot(userDocRef,
+          (snap) => {
+            const userProfile = (snap.exists() ? snap.data() : {}) as UserProfile;
+            // Firebase Auth is the source of truth for emailVerified — never let
+            // Firestore's stale field (set false at signup) override it.
+            setUser({ ...firebaseUser, ...userProfile, emailVerified: firebaseUser.emailVerified });
             setIsLoading(false);
             setError(null);
+            // Sync verified status back to Firestore so it stays up to date
+            if (firebaseUser.emailVerified && !userProfile.emailVerified) {
+              setDoc(userDocRef, { emailVerified: true }, { merge: true }).catch(() => {});
+            }
           },
           (error) => {
             console.error("Error fetching user profile:", error);

@@ -66,6 +66,18 @@ export default function SignupPage() {
       })
 
       await sendEmailVerification(firebaseUser)
+
+      // Send welcome email (fire-and-forget, don't block signup flow)
+      fetch('/api/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: email,
+          type: 'welcome',
+          data: { name: firstName },
+        }),
+      }).catch(() => {})
+
       toast.success("Account created! Check your email to verify your account.")
     } catch (err: any) {
       let errorMessage = "Signup failed. Please try again."
