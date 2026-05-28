@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from "firebase/auth"
 import { auth, db } from "@/lib/firebase/client"
+import { verifyEmailActionCodeSettings } from "@/lib/firebase/action-code-settings"
 import { doc, setDoc, serverTimestamp } from "firebase/firestore"
 import Link from "next/link"
 import Image from "next/image"
@@ -65,7 +66,7 @@ export default function SignupPage() {
         displayName: `${firstName} ${lastName}`.trim(),
       })
 
-      await sendEmailVerification(firebaseUser)
+      await sendEmailVerification(firebaseUser, verifyEmailActionCodeSettings)
 
       // Send welcome email (fire-and-forget, don't block signup flow)
       fetch('/api/email', {

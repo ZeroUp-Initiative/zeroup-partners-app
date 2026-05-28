@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/auth-context'
 import { sendEmailVerification } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
 import { auth, db } from '@/lib/firebase/client'
+import { verifyEmailActionCodeSettings } from '@/lib/firebase/action-code-settings'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Mail, X, RefreshCw, CheckCircle } from 'lucide-react'
@@ -26,7 +27,7 @@ export function EmailVerificationBanner() {
     if (!auth.currentUser) return
     setIsResending(true)
     try {
-      await sendEmailVerification(auth.currentUser)
+      await sendEmailVerification(auth.currentUser, verifyEmailActionCodeSettings)
       setResendSuccess(true)
       setTimeout(() => setResendSuccess(false), 5000)
     } catch {

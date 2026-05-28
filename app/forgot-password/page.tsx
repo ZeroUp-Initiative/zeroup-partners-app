@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { sendPasswordResetEmail } from "firebase/auth"
 import { auth } from "@/lib/firebase/client"
+import { resetPasswordActionCodeSettings } from "@/lib/firebase/action-code-settings"
 
 // UI Components
 import { Button } from "@/components/ui/button"
@@ -46,7 +47,7 @@ export default function ForgotPasswordPage() {
     setSuccess(false)
 
     try {
-      await sendPasswordResetEmail(auth, email)
+      await sendPasswordResetEmail(auth, email, resetPasswordActionCodeSettings)
       setSuccess(true)
     } catch (err: any) {
       let errorMessage = "Failed to send password reset email. Please try again."
