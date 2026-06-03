@@ -140,6 +140,7 @@ function ProjectsPage() {
             userFirstName: user?.firstName,
             userLastName: user?.lastName,
             userFullName: `${user?.firstName} ${user?.lastName}`,
+            userEmail: user?.email || '',
             status: 'pending',
             proofURL: receiptUrl,
             referrerDreamerId: getStoredRef() || null,
