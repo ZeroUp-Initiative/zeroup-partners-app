@@ -80,7 +80,34 @@ function AdminDashboard() {
   const handleApproval = async (paymentId: string, newStatus: "approved" | "rejected") => {
     try {
       const paymentRef = doc(db, "payments", paymentId)
+      const paymentSnap = await getDocs(query(collection(db, "payments"), where("__name__", "==", paymentId)))
+      
+      // Get payment details for email
+      const paymentDoc = pendingPayments.find(p => p.id === paymentId)
+      
       await updateDoc(paymentRef, { status: newStatus, reviewedAt: Timestamp.now() })
+      
+      // Send approval email to user
+      if (paymentDoc && newStatus === "approved") {
+        try {
+          await fetch('/api/email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: paymentDoc.userEmail,
+              type: 'contribution_approved',
+              data: {
+                name: paymentDoc.userFirstName || 'Partner',
+                amount: paymentDoc.amount?.toLocaleString() || '0',
+                projectTitle: paymentDoc.projectTitle,
+              },
+            }),
+          });
+        } catch (err) {
+          console.error('Failed to send approval email:', err);
+        }
+      }
+      
       await fetchPayments() 
     } catch (error) {
       console.error(`Error approving payment:`, error)
@@ -95,11 +122,38 @@ function AdminDashboard() {
     if (!isRejecting || !rejectionReason) return
     try {
       const paymentRef = doc(db, "payments", isRejecting)
+      
+      // Get payment details for email
+      const paymentDoc = pendingPayments.find(p => p.id === isRejecting)
+      
       await updateDoc(paymentRef, {
         status: "rejected",
         rejectionReason: rejectionReason,
         reviewedAt: Timestamp.now(),
       })
+      
+      // Send rejection email to user
+      if (paymentDoc) {
+        try {
+          await fetch('/api/email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: paymentDoc.userEmail,
+              type: 'contribution_rejected',
+              data: {
+                name: paymentDoc.userFirstName || 'Partner',
+                amount: paymentDoc.amount?.toLocaleString() || '0',
+                projectTitle: paymentDoc.projectTitle,
+                rejectionReason: rejectionReason,
+              },
+            }),
+          });
+        } catch (err) {
+          console.error('Failed to send rejection email:', err);
+        }
+      }
+      
       await fetchPayments()
     } catch (error) {
       console.error(`Error rejecting payment:`, error)

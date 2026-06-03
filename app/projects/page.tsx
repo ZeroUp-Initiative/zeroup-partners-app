@@ -132,7 +132,7 @@ function ProjectsPage() {
         setIsUploading(false);
 
         // Create pending payment instead of auto-approving
-        await addDoc(collection(db, "payments"), {
+        const paymentRef = await addDoc(collection(db, "payments"), {
             amount: amount,
             projectId: selectedProject.id === "general" ? "general" : selectedProject.id,
             projectTitle: selectedProject.id === "general" ? "General Contribution" : selectedProject.title,
@@ -148,6 +148,26 @@ function ProjectsPage() {
             date: new Date(),
             description: selectedProject.id === "general" ? "General contribution" : `Contribution to project: ${selectedProject.title}`,
         });
+        
+        // Send confirmation email to user
+        try {
+            await fetch('/api/email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    to: user?.email,
+                    type: 'contribution_submitted',
+                    data: {
+                        name: user?.firstName || 'Partner',
+                        amount: amount.toLocaleString(),
+                        description: selectedProject.id === "general" ? "General contribution" : `Contribution to project: ${selectedProject.title}`,
+                        date: new Date().toLocaleDateString(),
+                    },
+                }),
+            });
+        } catch (err) {
+            console.error('Failed to send confirmation email:', err);
+        }
         
         setSelectedProject(null);
         setReceiptFile(null);
