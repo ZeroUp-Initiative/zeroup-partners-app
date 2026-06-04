@@ -16,10 +16,8 @@ function getApp(): admin.app.App | undefined {
     if (key) {
       const serviceAccount = JSON.parse(Buffer.from(key, 'base64').toString('utf8'))
       _app = admin.initializeApp({ credential: admin.credential.cert(serviceAccount) })
-    } else if (projectId) {
-      _app = admin.initializeApp({ projectId })
     } else {
-      console.warn('[firebase-admin] No FIREBASE_SERVICE_ACCOUNT_KEY or NEXT_PUBLIC_FIREBASE_PROJECT_ID set — server-side Firestore disabled.')
+      console.warn('[firebase-admin] FIREBASE_SERVICE_ACCOUNT_KEY not set — server-side Firestore disabled.')
     }
   } catch (err) {
     console.error('[firebase-admin] Init failed:', err)

@@ -241,6 +241,32 @@ const templates: Record<string, (data: EmailData) => { subject: string; html: st
       </div></div></body></html>
     `,
   }),
+
+  contribution_rejected: ({ name, amount, projectTitle, rejectionReason }) => ({
+    subject: `Update on Your Contribution — ₦${Number(amount).toLocaleString()}`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header" style="background: linear-gradient(135deg, #64748b, #475569);">
+          <h1>Contribution Review Update</h1>
+          <p>We've reviewed your contribution.</p>
+        </div>
+        <div class="body">
+          <p>Hi ${name},</p>
+          <p>Thank you for your contribution. After careful review, we were unable to approve it at this time.</p>
+          <div class="highlight">
+            <strong>Amount</strong>
+            ₦${Number(amount).toLocaleString()}
+          </div>
+          ${projectTitle ? `<div class="highlight"><strong>Project</strong>${projectTitle}</div>` : ''}
+          ${rejectionReason ? `<div class="highlight"><strong>Reason</strong>${rejectionReason}</div>` : `<p>If you'd like more information about this decision, please reach out to our team directly.</p>`}
+          <p>We appreciate your support and encourage you to try contributing again or explore other ways to make an impact!</p>
+          <a href="${BASE_URL}/projects" class="btn">View More Projects</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
 }
 
 async function getActiveCustomTemplate(): Promise<{ subject: string; htmlContent: string } | null> {
