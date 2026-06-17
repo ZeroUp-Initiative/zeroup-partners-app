@@ -88,6 +88,21 @@ function AdminTransactionsPage() {
     }
   }
 
+  // Format a Firestore timestamp / Date / string into a readable receipt date.
+  function formatReceiptDate(ts: any): string {
+    try {
+      const d = ts?.toDate ? ts.toDate() : ts ? new Date(ts) : new Date();
+      return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+    } catch {
+      return "";
+    }
+  }
+
+  // Build a human-friendly receipt reference from the payment id, e.g. ZUP-LBHAXPKQ.
+  function receiptNumber(transaction: Transaction): string {
+    return `ZUP-${transaction.id.slice(0, 8).toUpperCase()}`;
+  }
+
   // Send a contribution email and surface failures via toast instead of
   // swallowing them, so the admin knows if the contributor wasn't notified.
   async function sendContributionEmail(
@@ -163,6 +178,8 @@ function AdminTransactionsPage() {
         name: selectedTransaction.userFullName?.split(' ')[0] || 'Partner',
         amount: selectedTransaction.amount,
         projectTitle: selectedTransaction.projectTitle,
+        date: formatReceiptDate(selectedTransaction.createdAt),
+        receiptNo: receiptNumber(selectedTransaction),
       })
 
       // Award dream coins (only credits linked Dreamers contributing to ZeroUp-owned targets)

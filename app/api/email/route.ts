@@ -17,6 +17,16 @@ const sharedStyles = `
   .highlight strong { color: #7030b0; display: block; margin-bottom: 4px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
   .btn { display: inline-block; background: linear-gradient(135deg, #8d44d1, #7030b0); color: #ffffff !important; text-decoration: none; padding: 13px 28px; border-radius: 8px; font-weight: 600; font-size: 15px; margin-top: 8px; }
   .footer { text-align: center; padding: 24px 32px; color: #888; font-size: 13px; border-top: 1px solid #f0f0f0; }
+  .receipt { border: 1px solid #e5d6f5; border-radius: 10px; padding: 18px 22px; margin: 24px 0; background: #faf7ff; }
+  .receipt-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: #8d44d1; font-weight: 700; margin-bottom: 12px; text-align: center; }
+  .receipt table { width: 100%; border-collapse: collapse; }
+  .receipt td { padding: 7px 0; font-size: 14px; color: #444; vertical-align: middle; border-bottom: 1px solid #efe6fb; }
+  .receipt tr:last-child td { border-bottom: none; }
+  .receipt td.label { color: #999; }
+  .receipt td.value { text-align: right; font-weight: 600; color: #333; }
+  .receipt .amount-row td { font-size: 19px; color: #7030b0; font-weight: 700; }
+  .receipt .status { color: #16a34a; font-weight: 700; }
+  .signoff { margin-top: 24px; color: #444; }
 `
 
 type EmailData = Record<string, string | undefined>
@@ -135,27 +145,35 @@ const templates: Record<string, (data: EmailData) => { subject: string; html: st
     `,
   }),
 
-  contribution_approved: ({ name, amount, projectTitle }) => ({
-    subject: `✅ Your Contribution Has Been Confirmed — ₦${Number(amount).toLocaleString()}`,
+  contribution_approved: ({ name, amount, projectTitle, date, receiptNo }) => ({
+    subject: `✅ Your ₦${Number(amount || 0).toLocaleString()} contribution to education is confirmed`,
     html: `
       <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
       <body><div class="wrapper"><div class="container">
         <div class="header">
-          <h1>✅ Contribution Confirmed!</h1>
-          <p>Your payment has been verified and approved.</p>
+          <h1>Thank you for investing in education</h1>
+          <p>Your contribution has been verified and confirmed.</p>
         </div>
         <div class="body">
           <p>Hi ${name},</p>
-          <p>Great news! Your contribution has been reviewed and <strong>confirmed</strong> by our team. Thank you for your continued support.</p>
-          <div class="highlight">
-            <strong>Confirmed Amount</strong>
-            ₦${Number(amount).toLocaleString()}
+          <p>Your contribution has been verified and <strong>confirmed</strong>. On behalf of every learner whose future you're helping build — thank you.</p>
+          <p>You haven't simply made a donation; you've made an <strong>investment in education</strong> — and in the belief that opportunity should reach further than circumstance allows. That conviction is exactly what moves this mission forward, and we're honoured to have you as a partner in it.</p>
+          <div class="receipt">
+            <div class="receipt-title">Receipt</div>
+            <table>
+              ${receiptNo ? `<tr><td class="label">Receipt No.</td><td class="value">${receiptNo}</td></tr>` : ''}
+              <tr class="amount-row"><td class="label">Amount</td><td class="value">₦${Number(amount || 0).toLocaleString()}</td></tr>
+              ${projectTitle ? `<tr><td class="label">Project</td><td class="value">${projectTitle}</td></tr>` : ''}
+              ${date ? `<tr><td class="label">Date</td><td class="value">${date}</td></tr>` : ''}
+              <tr><td class="label">Status</td><td class="value status">Confirmed &#10003;</td></tr>
+            </table>
           </div>
-          ${projectTitle ? `<div class="highlight"><strong>Project</strong>${projectTitle}</div>` : ''}
-          <p>Your generosity is making a real difference. Keep an eye on your dashboard to track your impact.</p>
+          <p>Every naira you entrust to us is held and disbursed <strong>custodially through PACSDA</strong>, so your funds reach the cause exactly as intended — fully accounted for, every step of the way.</p>
+          <p>You can track your impact, watch your partnership grow, and earn Dreamers rewards anytime from your dashboard.</p>
           <a href="${BASE_URL}/dashboard" class="btn">View My Dashboard</a>
+          <p class="signoff">With gratitude,<br /><strong>The ZeroUp Partners Team</strong></p>
         </div>
-        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+        <div class="footer"><p>ZeroUp Partners · Investing in Education, Together</p></div>
       </div></div></body></html>
     `,
   }),
