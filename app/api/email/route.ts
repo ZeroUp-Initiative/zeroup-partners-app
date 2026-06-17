@@ -31,6 +31,17 @@ const sharedStyles = `
 
 type EmailData = Record<string, string | undefined>
 
+// Format a value as Naira without ever producing "NaN". Accepts numbers,
+// numeric strings, comma-formatted strings ("1,000"), or "₦1,000" — anything
+// non-numeric falls back to 0.
+function formatNaira(value: unknown): string {
+  const n =
+    typeof value === 'number'
+      ? value
+      : parseFloat(String(value ?? '').replace(/[^0-9.]/g, ''))
+  return `₦${(Number.isFinite(n) ? n : 0).toLocaleString()}`
+}
+
 const templates: Record<string, (data: EmailData) => { subject: string; html: string }> = {
   custom: ({ name, subject: _subject, body }) => ({
     subject: _subject ?? 'A message from ZeroUp Partners',
@@ -99,7 +110,7 @@ const templates: Record<string, (data: EmailData) => { subject: string; html: st
   }),
 
   contribution_submitted: ({ name, amount, description, date }) => ({
-    subject: `📬 Contribution Received — ₦${Number(amount).toLocaleString()}`,
+    subject: `📬 Contribution Received — ${formatNaira(amount)}`,
     html: `
       <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
       <body><div class="wrapper"><div class="container">
@@ -112,7 +123,7 @@ const templates: Record<string, (data: EmailData) => { subject: string; html: st
           <p>Thank you! Your contribution has been logged and is now pending verification by our team. You'll receive another email once it's approved.</p>
           <div class="highlight">
             <strong>Amount</strong>
-            ₦${Number(amount).toLocaleString()}
+            ${formatNaira(amount)}
           </div>
           ${description ? `<div class="highlight"><strong>Description</strong>${description}</div>` : ''}
           ${date ? `<div class="highlight"><strong>Date</strong>${date}</div>` : ''}
@@ -146,7 +157,7 @@ const templates: Record<string, (data: EmailData) => { subject: string; html: st
   }),
 
   contribution_approved: ({ name, amount, projectTitle, date, receiptNo }) => ({
-    subject: `✅ Your ₦${Number(amount || 0).toLocaleString()} contribution to education is confirmed`,
+    subject: `✅ Your ${formatNaira(amount)} contribution to education is confirmed`,
     html: `
       <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
       <body><div class="wrapper"><div class="container">
@@ -162,7 +173,7 @@ const templates: Record<string, (data: EmailData) => { subject: string; html: st
             <div class="receipt-title">Receipt</div>
             <table>
               ${receiptNo ? `<tr><td class="label">Receipt No.</td><td class="value">${receiptNo}</td></tr>` : ''}
-              <tr class="amount-row"><td class="label">Amount</td><td class="value">₦${Number(amount || 0).toLocaleString()}</td></tr>
+              <tr class="amount-row"><td class="label">Amount</td><td class="value">${formatNaira(amount)}</td></tr>
               ${projectTitle ? `<tr><td class="label">Project</td><td class="value">${projectTitle}</td></tr>` : ''}
               ${date ? `<tr><td class="label">Date</td><td class="value">${date}</td></tr>` : ''}
               <tr><td class="label">Status</td><td class="value status">Confirmed &#10003;</td></tr>
@@ -208,7 +219,7 @@ const templates: Record<string, (data: EmailData) => { subject: string; html: st
   }),
 
   admin_contribution_submitted: ({ partnerName, partnerEmail, amount, projectTitle, date }) => ({
-    subject: `💰 New Contribution Logged — ₦${Number(amount).toLocaleString()}`,
+    subject: `💰 New Contribution Logged — ${formatNaira(amount)}`,
     html: `
       <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
       <body><div class="wrapper"><div class="container">
@@ -220,7 +231,7 @@ const templates: Record<string, (data: EmailData) => { subject: string; html: st
           <p>A new contribution has been submitted and is pending your approval.</p>
           <div class="highlight">
             <strong>Amount</strong>
-            ₦${Number(amount).toLocaleString()}
+            ${formatNaira(amount)}
           </div>
           ${projectTitle ? `<div class="highlight"><strong>Project</strong>${projectTitle}</div>` : ''}
           ${date ? `<div class="highlight"><strong>Date</strong>${date}</div>` : ''}
@@ -261,7 +272,7 @@ const templates: Record<string, (data: EmailData) => { subject: string; html: st
   }),
 
   contribution_rejected: ({ name, amount, projectTitle, rejectionReason }) => ({
-    subject: `Update on Your Contribution — ₦${Number(amount).toLocaleString()}`,
+    subject: `Update on Your Contribution — ${formatNaira(amount)}`,
     html: `
       <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
       <body><div class="wrapper"><div class="container">
@@ -274,7 +285,7 @@ const templates: Record<string, (data: EmailData) => { subject: string; html: st
           <p>Thank you for your contribution. After careful review, we were unable to approve it at this time.</p>
           <div class="highlight">
             <strong>Amount</strong>
-            ₦${Number(amount).toLocaleString()}
+            ${formatNaira(amount)}
           </div>
           ${projectTitle ? `<div class="highlight"><strong>Project</strong>${projectTitle}</div>` : ''}
           ${rejectionReason ? `<div class="highlight"><strong>Reason</strong>${rejectionReason}</div>` : `<p>If you'd like more information about this decision, please reach out to our team directly.</p>`}
