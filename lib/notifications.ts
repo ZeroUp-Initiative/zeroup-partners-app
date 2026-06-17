@@ -1,6 +1,5 @@
-import app, { db } from '@/lib/firebase/client';
-import { getFunctions, httpsCallable } from 'firebase/functions';
-import { 
+import { db } from '@/lib/firebase/client';
+import {
   collection, 
   addDoc, 
   query, 
@@ -18,12 +17,6 @@ import {
   DocumentData,
   QueryDocumentSnapshot
 } from 'firebase/firestore';
-
-// Get functions instance (lazily)
-function getFirebaseFunctions() {
-  if (!app) return null;
-  return getFunctions(app);
-}
 
 export interface Notification {
   id: string;
@@ -163,22 +156,11 @@ export const NotificationHelpers = {
       ? `Your contribution of ₦${amount.toLocaleString()} to "${projectName}" has been verified.`
       : `Your contribution of ₦${amount.toLocaleString()} has been verified.`;
     
-    // Create in-app notification
-    const notificationId = await createNotification(userId, 'contribution_approved', title, message, '/contributions');
-    
-    // Call Cloud Function to send email and push notification
-    try {
-      const functions = getFirebaseFunctions();
-      if (functions) {
-        const onContributionApproved = httpsCallable(functions, 'onContributionApproved');
-        await onContributionApproved({ userId, amount, projectName });
-      }
-    } catch (error) {
-      console.error('Failed to send email/push notification:', error);
-      // Don't throw - the in-app notification was still created
-    }
-    
-    return notificationId;
+    // In-app notification only. The confirmation email is sent separately via
+    // /api/email (see the admin transactions page). The legacy
+    // onContributionApproved Cloud Function is intentionally NOT called — it
+    // would send a second, duplicate email and in-app notification.
+    return createNotification(userId, 'contribution_approved', title, message, '/contributions');
   },
 
   contributionRejected: async (userId: string, amount: number, reason?: string) => {
@@ -187,22 +169,11 @@ export const NotificationHelpers = {
       ? `Your contribution of ₦${amount.toLocaleString()} was not approved. Reason: ${reason}`
       : `Your contribution of ₦${amount.toLocaleString()} was not approved. Please contact support.`;
     
-    // Create in-app notification
-    const notificationId = await createNotification(userId, 'contribution_rejected', title, message, '/contributions');
-    
-    // Call Cloud Function to send email and push notification
-    try {
-      const functions = getFirebaseFunctions();
-      if (functions) {
-        const onContributionRejected = httpsCallable(functions, 'onContributionRejected');
-        await onContributionRejected({ userId, amount, reason });
-      }
-    } catch (error) {
-      console.error('Failed to send email/push notification:', error);
-      // Don't throw - the in-app notification was still created
-    }
-    
-    return notificationId;
+    // In-app notification only. The rejection email is sent separately via
+    // /api/email (see the admin transactions page). The legacy
+    // onContributionRejected Cloud Function is intentionally NOT called — it
+    // would send a second, duplicate email and in-app notification.
+    return createNotification(userId, 'contribution_rejected', title, message, '/contributions');
   },
 
   newProject: (userId: string, projectTitle: string) => {
