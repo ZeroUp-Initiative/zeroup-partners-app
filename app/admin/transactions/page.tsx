@@ -74,6 +74,47 @@ function AdminTransactionsPage() {
     return () => unsubscribe();
   }, []);
 
+  // Resolve a contributor's email — prefer the value stored on the payment,
+  // otherwise look it up from the user's profile document.
+  async function resolveContributorEmail(transaction: Transaction): Promise<string | null> {
+    if (transaction.userEmail) return transaction.userEmail;
+    if (!transaction.userId) return null;
+    try {
+      const snap = await getDoc(doc(db, "users", transaction.userId));
+      const email = snap.exists() ? (snap.data().email as string | undefined) : undefined;
+      return email || null;
+    } catch {
+      return null;
+    }
+  }
+
+  // Send a contribution email and surface failures via toast instead of
+  // swallowing them, so the admin knows if the contributor wasn't notified.
+  async function sendContributionEmail(
+    type: "contribution_approved" | "contribution_rejected",
+    transaction: Transaction,
+    data: Record<string, unknown>
+  ) {
+    const to = await resolveContributorEmail(transaction);
+    if (!to) {
+      toast.error("Status updated, but no email was found for this contributor — they weren't notified by email.");
+      return;
+    }
+    try {
+      const res = await fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to, type, data }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "send failed");
+      }
+    } catch {
+      toast.error("Status updated, but the notification email could not be sent.");
+    }
+  }
+
   const handleApprove = async () => {
     if (!selectedTransaction) return;
 
@@ -117,22 +158,12 @@ function AdminTransactionsPage() {
         selectedTransaction.projectTitle
       );
 
-      // Send approval confirmation email to contributor (fire-and-forget)
-      if (selectedTransaction.userEmail) {
-        fetch('/api/email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: selectedTransaction.userEmail,
-            type: 'contribution_approved',
-            data: {
-              name: selectedTransaction.userFullName?.split(' ')[0] || 'Partner',
-              amount: selectedTransaction.amount,
-              projectTitle: selectedTransaction.projectTitle,
-            },
-          }),
-        }).catch(() => {})
-      }
+      // Send approval confirmation email to contributor
+      await sendContributionEmail('contribution_approved', selectedTransaction, {
+        name: selectedTransaction.userFullName?.split(' ')[0] || 'Partner',
+        amount: selectedTransaction.amount,
+        projectTitle: selectedTransaction.projectTitle,
+      })
 
       // Award dream coins (only credits linked Dreamers contributing to ZeroUp-owned targets)
       try {
@@ -183,6 +214,14 @@ function AdminTransactionsPage() {
         selectedTransaction.amount,
         adminDescription || undefined
       );
+
+      // Send rejection email to contributor
+      await sendContributionEmail('contribution_rejected', selectedTransaction, {
+        name: selectedTransaction.userFullName?.split(' ')[0] || 'Partner',
+        amount: selectedTransaction.amount,
+        projectTitle: selectedTransaction.projectTitle,
+        rejectionReason: adminDescription || undefined,
+      })
 
       setSelectedTransaction(null);
       setAdminDescription("");
