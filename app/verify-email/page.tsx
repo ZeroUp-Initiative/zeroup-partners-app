@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { sendEmailVerification } from "firebase/auth"
 import { auth } from "@/lib/firebase/client"
+import { verifyEmailActionCodeSettings } from "@/lib/firebase/action-code-settings"
 
 // UI Components
 import { Button } from "@/components/ui/button"
@@ -52,7 +53,7 @@ export default function VerifyEmailPage() {
     setResendSuccess(false)
 
     try {
-      await sendEmailVerification(auth.currentUser)
+      await sendEmailVerification(auth.currentUser, verifyEmailActionCodeSettings)
       setResendSuccess(true)
     } catch (err: any) {
       if (err.code === "auth/too-many-requests") {
