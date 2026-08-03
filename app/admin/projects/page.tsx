@@ -359,9 +359,7 @@ function AdminProjectsPage() {
                       <div className="flex items-center gap-1 flex-shrink-0">
                         {statusBadge(project.status)}
                         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEditClick(project)}><Pencil className="h-3.5 w-3.5" /></Button>
-                        {(!project.submittedBy || project.submittedBy === user?.uid) && (
-                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => { setProjectToDelete(project); setIsDeleteModalOpen(true) }}><Trash2 className="h-3.5 w-3.5" /></Button>
-                        )}
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => { setProjectToDelete(project); setIsDeleteModalOpen(true) }}><Trash2 className="h-3.5 w-3.5" /></Button>
                       </div>
                     </div>
                     <CardDescription className="line-clamp-2">{project.description}</CardDescription>
@@ -447,9 +445,7 @@ function AdminProjectsPage() {
                         {statusBadge(project.status)}
                         <CardTitle className="text-base mt-1">{project.title}</CardTitle>
                       </div>
-                      {(!project.submittedBy || project.submittedBy === user?.uid) && (
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { setProjectToDelete(project); setIsDeleteModalOpen(true) }}><Trash2 className="h-3.5 w-3.5" /></Button>
-                      )}
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { setProjectToDelete(project); setIsDeleteModalOpen(true) }}><Trash2 className="h-3.5 w-3.5" /></Button>
                     </div>
                     {project.adminNotes && <p className="text-xs text-muted-foreground mt-2 italic">Notes: {project.adminNotes}</p>}
                   </CardHeader>
