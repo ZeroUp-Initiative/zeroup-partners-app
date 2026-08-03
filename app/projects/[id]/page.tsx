@@ -85,7 +85,7 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
   const isFullyFunded = project.status === 'fully-funded'
   const isClosed = project.status === 'closed'
   const canContribute = project.status === 'open'
-  const canDelete = !!user?.uid && project.submittedBy === user.uid
+  const canDelete = !!user?.uid && (project.submittedBy === user.uid || (user as any)?.role === 'admin')
 
   const handleConfirmDelete = async () => {
     setIsDeleting(true)

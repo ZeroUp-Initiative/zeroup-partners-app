@@ -86,8 +86,8 @@ service cloud.firestore {
         isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','adminNotes','reviewedAt','reviewedBy','story','videoUrl','gallery','timeline','budgetPhases'])
       );
 
-      // Deletes: only the original submitter (owner) may delete their project.
-      allow delete: if isAuthenticated() && resource.data.submittedBy == request.auth.uid;
+      // Deletes: the original submitter (owner) or any admin may delete a project.
+      allow delete: if isAuthenticated() && (resource.data.submittedBy == request.auth.uid || isAdmin());
     }
     
     // Notifications collection
