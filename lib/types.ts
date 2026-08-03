@@ -71,26 +71,70 @@ export interface PaymentFormData {
 // Project Types
 // ==========================================
 
-export type ProjectStatus = "open" | "fully-funded" | "closed"
+export type ProjectStatus = "pending" | "open" | "fully-funded" | "closed" | "rejected"
+
+/** A single milestone on a project's public timeline. */
+export interface ProjectTimelineItem {
+  id: string
+  title: string
+  /** Free text, not a strict date — some milestones are "TBD". */
+  date?: string
+  description?: string
+  status: "completed" | "in-progress" | "upcoming"
+}
+
+/** A single line item in a project's public, structured budget-per-phase breakdown. */
+export interface ProjectBudgetPhase {
+  id: string
+  name: string
+  amount: number
+  description?: string
+}
 
 export interface Project {
   id: string
   title: string
+  /** Short public summary shown on cards/lists. */
   description: string
-  targetAmount: number
-  currentAmount: number
+  fundingGoal: number
+  currentFunding: number
   status: ProjectStatus
   imageUrl?: string
   category?: string
-  createdAt: Timestamp | Date
-  updatedAt?: Timestamp | Date
-  createdBy?: string
+  location?: string
+  /** Current lifecycle stage (idea/planning/pilot/active) — distinct from budgetPhases below. */
+  phase?: string
+  dueDate?: any
+  // Private fields (submission/review only)
+  background?: string
+  fundingBreakdown?: string
+  expectedBeneficiaries?: string
+  expectedOutcomes?: string
+  previousFunding?: string
+  contactName?: string
+  contactEmail?: string
+  contactPhone?: string
+  organizationName?: string
+  submittedBy?: string
+  submittedByName?: string
+  submittedByEmail?: string
+  adminNotes?: string
+  ownedByZeroUp?: boolean
+  // Rich content (public, added post-approval)
+  story?: string
+  videoUrl?: string
+  gallery?: string[]
+  timeline?: ProjectTimelineItem[]
+  /** Structured, public spend-by-milestone breakdown — distinct from the private freeform fundingBreakdown. */
+  budgetPhases?: ProjectBudgetPhase[]
+  createdAt?: any
+  updatedAt?: any
 }
 
 export interface ProjectFormData {
   title: string
   description: string
-  targetAmount: number
+  fundingGoal: number
   category?: string
   imageUrl?: string
 }
