@@ -1,37 +1,29 @@
-import * as admin from 'firebase-admin'
+import { hasServiceAccount } from './sa-token'
+import { FirestoreRestDb } from './firestore-admin-rest'
+import { AuthRest } from './auth-admin-rest'
 
-let _app: admin.app.App | undefined
+// getAdminDb()/getAdminAuth() are backed by the Firestore/Auth REST API (see
+// firestore-admin-rest.ts, auth-admin-rest.ts, sa-token.ts) rather than the
+// firebase-admin package. firebase-admin's Firestore client pulls in
+// protobufjs, which generates JS from strings at module load and crashes on
+// Cloudflare Workers (https://github.com/opennextjs/opennextjs-cloudflare/issues/1301).
+// The public interface here is kept identical to the old Admin-SDK-backed
+// version so every call site is unchanged.
 
-function getApp(): admin.app.App | undefined {
-  if (_app) return _app
-  if (admin.apps.length > 0) {
-    _app = admin.apps[0]!
-    return _app
+let _db: FirestoreRestDb | undefined
+let _auth: AuthRest | undefined
+
+export function getAdminDb(): FirestoreRestDb | null {
+  if (!hasServiceAccount()) {
+    console.warn('[firebase-admin] FIREBASE_SERVICE_ACCOUNT_KEY not set — server-side Firestore disabled.')
+    return null
   }
-
-  const key = process.env.FIREBASE_SERVICE_ACCOUNT_KEY
-  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
-
-  try {
-    if (key) {
-      const serviceAccount = JSON.parse(Buffer.from(key, 'base64').toString('utf8'))
-      _app = admin.initializeApp({ credential: admin.credential.cert(serviceAccount) })
-    } else {
-      console.warn('[firebase-admin] FIREBASE_SERVICE_ACCOUNT_KEY not set — server-side Firestore disabled.')
-    }
-  } catch (err) {
-    console.error('[firebase-admin] Init failed:', err)
-  }
-
-  return _app
+  if (!_db) _db = new FirestoreRestDb()
+  return _db
 }
 
-export function getAdminDb(): admin.firestore.Firestore | null {
-  const app = getApp()
-  return app ? admin.firestore(app) : null
-}
-
-export function getAdminAuth(): admin.auth.Auth | null {
-  const app = getApp()
-  return app ? admin.auth(app) : null
+export function getAdminAuth(): AuthRest | null {
+  if (!hasServiceAccount()) return null
+  if (!_auth) _auth = new AuthRest()
+  return _auth
 }
