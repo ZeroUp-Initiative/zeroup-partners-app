@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { doc, onSnapshot } from 'firebase/firestore'
+import { useRouter } from 'next/navigation'
+import { doc, onSnapshot, deleteDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase/client'
 import ProtectedRoute from '@/components/auth/protected-route'
+import { useAuth } from '@/contexts/auth-context'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Loader2, Sparkles, MapPin, Tag } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { ArrowLeft, Loader2, Sparkles, MapPin, Tag, Trash2 } from 'lucide-react'
 import type { Project } from '@/lib/types'
 import { VideoEmbed, parseVideoUrl } from '@/components/projects/video-embed'
 import { ProjectTimeline } from '@/components/projects/project-timeline'
@@ -19,10 +22,14 @@ import { ContributeDialog } from '@/components/projects/contribute-dialog'
 const VISIBLE_STATUSES = new Set(['open', 'fully-funded', 'closed'])
 
 function ProjectDetailPage({ params }: { params: { id: string } }) {
+  const { user } = useAuth()
+  const router = useRouter()
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [contributeOpen, setContributeOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -78,6 +85,18 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
   const isFullyFunded = project.status === 'fully-funded'
   const isClosed = project.status === 'closed'
   const canContribute = project.status === 'open'
+  const canDelete = !!user?.uid && project.submittedBy === user.uid
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true)
+    try {
+      await deleteDoc(doc(db, 'projects', project.id))
+      router.push('/projects')
+    } catch (err) {
+      console.error('Failed to delete project:', err)
+      setIsDeleting(false)
+    }
+  }
 
   const FundingWidget = (
     <div className="rounded-2xl border bg-card p-5 space-y-4">
@@ -99,6 +118,15 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
       >
         {isFullyFunded ? 'Goal Reached' : isClosed ? 'Closed' : 'Contribute to This Project'}
       </Button>
+      {canDelete && (
+        <Button
+          variant="outline"
+          className="w-full text-destructive hover:text-destructive"
+          onClick={() => setDeleteOpen(true)}
+        >
+          <Trash2 className="w-4 h-4 mr-2" /> Delete Project
+        </Button>
+      )}
     </div>
   )
 
@@ -237,6 +265,25 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
       </div>
 
       <ContributeDialog project={project} open={contributeOpen} onOpenChange={setContributeOpen} />
+
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Project?</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{project.title}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteOpen(false)} disabled={isDeleting}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDelete} disabled={isDeleting}>
+              {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

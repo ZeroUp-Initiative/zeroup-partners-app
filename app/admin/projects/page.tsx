@@ -25,6 +25,14 @@ import type { Project } from "@/lib/types"
 
 const EMPTY_RICH_CONTENT: RichContentValue = { story: '', videoUrl: '', gallery: [], timeline: [], budgetPhases: [] }
 
+function notifyNewProject(projectId: string, title: string) {
+  fetch('/api/email/notify-project', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'new_project_announcement', data: { title, projectId } }),
+  }).catch(() => {})
+}
+
 function AdminProjectsPage() {
   const { user } = useAuth()
   const [projects, setProjects] = useState<Project[]>([])
@@ -127,7 +135,7 @@ function AdminProjectsPage() {
         imageUrl = await uploadImage(newProject.imageFile)
         setIsUploading(false)
       }
-      await addDoc(collection(db, "projects"), {
+      const newDoc = await addDoc(collection(db, "projects"), {
         title: newProject.title, description: newProject.description,
         fundingGoal: Number(newProject.fundingGoal), currentFunding: 0,
         status: 'open', imageUrl,
@@ -144,6 +152,7 @@ function AdminProjectsPage() {
         budgetPhases: newProjectRich.budgetPhases || [],
         createdAt: serverTimestamp(),
       })
+      notifyNewProject(newDoc.id, newProject.title)
       setNewProject({ title: "", description: "", fundingGoal: "", dueDate: "", imageFile: null, ownedByZeroUp: true })
       setNewProjectRich(EMPTY_RICH_CONTENT)
       setIsCreateModalOpen(false)
@@ -237,6 +246,7 @@ function AdminProjectsPage() {
         reviewedBy: user?.uid || '',
       })
       sendProjectEmail('project_approved', reviewProject, adminNotes.trim() || undefined)
+      notifyNewProject(reviewProject.id, reviewProject.title)
       toast.success("Project approved and published!")
       setIsReviewOpen(false)
       setReviewProject(null)

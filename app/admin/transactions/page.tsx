@@ -150,22 +150,47 @@ function AdminTransactionsPage() {
 
       // Update project funding
       const projectRef = doc(db, "projects", selectedTransaction.projectId);
-      
+
       // Get current project data to update funding
       const projectSnapshot = await getDoc(projectRef);
+      let crossedPhaseName: string | null = null
+      let newFunding = 0
       if (projectSnapshot.exists()) {
         const projectData = projectSnapshot.data();
-        const newFunding = (projectData.currentFunding || 0) + selectedTransaction.amount;
+        const oldFunding = projectData.currentFunding || 0
+        newFunding = oldFunding + selectedTransaction.amount;
         const newStatus = newFunding >= projectData.fundingGoal ? 'fully-funded' : 'open';
-        
+
         batch.update(projectRef, {
           currentFunding: newFunding,
           status: newStatus
         });
+
+        // Detect whether this approval pushed funding past a budget-phase
+        // threshold, so we can announce it. If a single contribution
+        // crosses multiple phases at once, only the last (most advanced)
+        // one is announced.
+        const budgetPhases = projectData.budgetPhases || []
+        let cumulative = 0
+        for (const phase of budgetPhases) {
+          cumulative += phase.amount || 0
+          if (oldFunding < cumulative && newFunding >= cumulative) crossedPhaseName = phase.name
+        }
       }
 
       await batch.commit();
-      
+
+      if (crossedPhaseName) {
+        fetch('/api/email/notify-project', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'project_phase_unlocked',
+            data: { title: selectedTransaction.projectTitle, projectId: selectedTransaction.projectId, phaseName: crossedPhaseName },
+          }),
+        }).catch(() => {})
+      }
+
       // Send in-app notification
       await NotificationHelpers.contributionApproved(
         selectedTransaction.userId,
