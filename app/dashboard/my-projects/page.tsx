@@ -20,34 +20,8 @@ import { uploadImage, validateImageFile } from '@/lib/image-upload'
 import toast from 'react-hot-toast'
 import Header from '@/components/layout/header'
 import { SubmitProjectModal } from '@/components/projects/submit-project-modal'
-
-interface Project {
-  id: string
-  title: string
-  description: string
-  fundingGoal: number
-  currentFunding: number
-  status: 'pending' | 'open' | 'fully-funded' | 'closed' | 'rejected'
-  imageUrl?: string
-  dueDate?: any
-  category?: string
-  location?: string
-  phase?: string
-  background?: string
-  fundingBreakdown?: string
-  expectedBeneficiaries?: string
-  expectedOutcomes?: string
-  previousFunding?: string
-  contactName?: string
-  contactEmail?: string
-  contactPhone?: string
-  organizationName?: string
-  submittedByName?: string
-  submittedByEmail?: string
-  submittedBy?: string
-  adminNotes?: string
-  createdAt?: any
-}
+import { RichContentFields } from '@/components/projects/rich-content-fields'
+import type { Project } from '@/lib/types'
 
 const CATEGORIES = [
   'Education', 'Healthcare', 'Technology', 'Environment',
@@ -110,6 +84,11 @@ function MyProjectsPage() {
           submittedByEmail: p.submittedByEmail,
           submittedBy: p.submittedBy,
           adminNotes: p.adminNotes,
+          story: p.story,
+          videoUrl: p.videoUrl,
+          gallery: p.gallery,
+          timeline: p.timeline,
+          budgetPhases: p.budgetPhases,
           createdAt: p.createdAt,
         })
       })
@@ -171,6 +150,11 @@ function MyProjectsPage() {
         contactPhone: editForm.contactPhone?.trim(),
         organizationName: editForm.organizationName?.trim(),
         imageUrl,
+        story: editForm.story?.trim() || '',
+        videoUrl: editForm.videoUrl?.trim() || '',
+        gallery: editForm.gallery || [],
+        timeline: editForm.timeline || [],
+        budgetPhases: editForm.budgetPhases || [],
         updatedAt: serverTimestamp(),
       })
 
@@ -552,6 +536,24 @@ function MyProjectsPage() {
               <Input
                 value={editForm.contactPhone || ''}
                 onChange={(e) => setEditForm({ ...editForm, contactPhone: e.target.value })}
+              />
+            </div>
+
+            <div className="pt-4 border-t space-y-1">
+              <h3 className="font-semibold">Rich Content</h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                Add a full story, timeline, budget breakdown, video, and gallery to make your project page more detailed and convincing.
+              </p>
+              <RichContentFields
+                value={{
+                  story: editForm.story,
+                  videoUrl: editForm.videoUrl,
+                  gallery: editForm.gallery,
+                  timeline: editForm.timeline,
+                  budgetPhases: editForm.budgetPhases,
+                }}
+                onChange={(next) => setEditForm((prev) => ({ ...prev, ...next }))}
+                fundingGoal={Number(editForm.fundingGoal) || 0}
               />
             </div>
           </div>

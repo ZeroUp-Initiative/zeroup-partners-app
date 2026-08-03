@@ -77,11 +77,13 @@ service cloud.firestore {
       );
 
       // Updates: owners can update their own projects fully.
-      // Admins may only modify review-related fields (status, adminNotes, reviewedAt, reviewedBy).
+      // Admins may only modify review-related fields (status, adminNotes, reviewedAt, reviewedBy)
+      // plus the public rich-content fields (story, videoUrl, gallery, timeline, budgetPhases),
+      // so they can add cinematic content to a project without being its original submitter.
       allow update: if (
         isAuthenticated() && resource.data.submittedBy == request.auth.uid
       ) || (
-        isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','adminNotes','reviewedAt','reviewedBy'])
+        isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','adminNotes','reviewedAt','reviewedBy','story','videoUrl','gallery','timeline','budgetPhases'])
       );
 
       // Deletes: only the original submitter (owner) may delete their project.

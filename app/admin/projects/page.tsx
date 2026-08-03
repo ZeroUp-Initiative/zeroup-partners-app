@@ -20,41 +20,16 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Upload, Loader2, DollarSign, Target, PieChart, Plus, Search, Pencil, Trash2, Clock, CheckCircle, XCircle, Eye, Phone, Mail, User, Building2, Users, Banknote, Calendar } from "lucide-react"
 import toast from "react-hot-toast"
+import { RichContentFields, type RichContentValue } from "@/components/projects/rich-content-fields"
+import type { Project } from "@/lib/types"
 
-interface Project {
-  id: string
-  title: string
-  description: string
-  fundingGoal: number
-  currentFunding: number
-  status: string
-  imageUrl?: string
-  dueDate?: any
-  category?: string
-  location?: string
-  phase?: string
-  // Private fields
-  background?: string
-  fundingBreakdown?: string
-  expectedBeneficiaries?: string
-  expectedOutcomes?: string
-  previousFunding?: string
-  contactName?: string
-  contactEmail?: string
-  contactPhone?: string
-  organizationName?: string
-  submittedByName?: string
-  submittedByEmail?: string
-  submittedBy?: string
-  adminNotes?: string
-  ownedByZeroUp?: boolean
-  createdAt?: any
-}
+const EMPTY_RICH_CONTENT: RichContentValue = { story: '', videoUrl: '', gallery: [], timeline: [], budgetPhases: [] }
 
 function AdminProjectsPage() {
   const { user } = useAuth()
   const [projects, setProjects] = useState<Project[]>([])
   const [newProject, setNewProject] = useState({ title: "", description: "", fundingGoal: "", dueDate: "", imageFile: null as File | null, ownedByZeroUp: true })
+  const [newProjectRich, setNewProjectRich] = useState<RichContentValue>(EMPTY_RICH_CONTENT)
   const [stats, setStats] = useState({ totalProjects: 0, totalGoal: 0, totalRaised: 0, pendingCount: 0 })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -65,6 +40,7 @@ function AdminProjectsPage() {
   // Edit
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [editFormData, setEditFormData] = useState({ id: "", title: "", description: "", fundingGoal: "", dueDate: "", imageUrl: "", imageFile: null as File | null, ownedByZeroUp: true })
+  const [editRich, setEditRich] = useState<RichContentValue>(EMPTY_RICH_CONTENT)
 
   // Delete
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -108,6 +84,11 @@ function AdminProjectsPage() {
           submittedBy: p.submittedBy,
           adminNotes: p.adminNotes,
           ownedByZeroUp: p.ownedByZeroUp,
+          story: p.story,
+          videoUrl: p.videoUrl,
+          gallery: p.gallery,
+          timeline: p.timeline,
+          budgetPhases: p.budgetPhases,
           createdAt: p.createdAt,
         })
       })
@@ -156,9 +137,15 @@ function AdminProjectsPage() {
         submittedBy: user?.uid || '',
         submittedByName: (user as any)?.firstName ? `${(user as any).firstName} ${(user as any).lastName || ''}`.trim() : (user as any)?.displayName || '',
         submittedByEmail: (user as any)?.email || '',
+        story: newProjectRich.story?.trim() || '',
+        videoUrl: newProjectRich.videoUrl?.trim() || '',
+        gallery: newProjectRich.gallery || [],
+        timeline: newProjectRich.timeline || [],
+        budgetPhases: newProjectRich.budgetPhases || [],
         createdAt: serverTimestamp(),
       })
       setNewProject({ title: "", description: "", fundingGoal: "", dueDate: "", imageFile: null, ownedByZeroUp: true })
+      setNewProjectRich(EMPTY_RICH_CONTENT)
       setIsCreateModalOpen(false)
       toast.success("Project created.")
     } catch { setError("Failed to create project.") }
@@ -168,6 +155,7 @@ function AdminProjectsPage() {
   // Edit
   const handleEditClick = (p: Project) => {
     setEditFormData({ id: p.id, title: p.title, description: p.description, fundingGoal: p.fundingGoal.toString(), dueDate: p.dueDate ? new Date(p.dueDate).toISOString().split('T')[0] : "", imageUrl: p.imageUrl || "", imageFile: null, ownedByZeroUp: p.ownedByZeroUp ?? false })
+    setEditRich({ story: p.story || '', videoUrl: p.videoUrl || '', gallery: p.gallery || [], timeline: p.timeline || [], budgetPhases: p.budgetPhases || [] })
     setIsEditModalOpen(true)
   }
 
@@ -183,14 +171,36 @@ function AdminProjectsPage() {
         imageUrl = await uploadImage(editFormData.imageFile)
         setIsUploading(false)
       }
-      await updateDoc(doc(db, "projects", editFormData.id), {
+      // Two separate writes: Firestore rules only let an admin who ISN'T the
+      // original submitter touch the rich-content fields, not the core pitch
+      // fields (title/description/fundingGoal/etc). Splitting the write means
+      // rich content still saves even when the core-fields write is rejected
+      // for a project this admin didn't create.
+      const coreUpdate = updateDoc(doc(db, "projects", editFormData.id), {
         title: editFormData.title, description: editFormData.description,
         fundingGoal: Number(editFormData.fundingGoal), imageUrl,
         ownedByZeroUp: editFormData.ownedByZeroUp,
         dueDate: editFormData.dueDate ? new Date(editFormData.dueDate) : null,
-      })
-      setIsEditModalOpen(false)
-      toast.success("Project updated.")
+      }).then(() => true).catch((err) => { console.error('Core field update failed:', err); return false })
+
+      const richUpdate = updateDoc(doc(db, "projects", editFormData.id), {
+        story: editRich.story?.trim() || '',
+        videoUrl: editRich.videoUrl?.trim() || '',
+        gallery: editRich.gallery || [],
+        timeline: editRich.timeline || [],
+        budgetPhases: editRich.budgetPhases || [],
+      }).then(() => true).catch((err) => { console.error('Rich content update failed:', err); return false })
+
+      const [coreOk, richOk] = await Promise.all([coreUpdate, richUpdate])
+      if (!coreOk && !richOk) {
+        setError("Failed to update project.")
+      } else if (!coreOk) {
+        toast.error("Rich content saved, but core details couldn't be updated (you may not be this project's original submitter).")
+        setIsEditModalOpen(false)
+      } else {
+        setIsEditModalOpen(false)
+        toast.success("Project updated.")
+      }
     } catch { setError("Failed to update project.") }
     finally { setIsLoading(false); setIsUploading(false) }
   }
@@ -546,6 +556,19 @@ function AdminProjectsPage() {
                 <span className="block text-xs text-muted-foreground">Dreamers earn dream coins (100 DR per ₦1,000) for supporting this project.</span>
               </Label>
             </div>
+
+            <div className="pt-4 border-t space-y-1">
+              <h3 className="font-semibold">Rich Content (optional)</h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                Add a full story, timeline, budget breakdown, video, and gallery for a more detailed project page.
+              </p>
+              <RichContentFields
+                value={newProjectRich}
+                onChange={setNewProjectRich}
+                fundingGoal={Number(newProject.fundingGoal) || 0}
+              />
+            </div>
+
             {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancel</Button>
@@ -584,6 +607,19 @@ function AdminProjectsPage() {
                 <span className="block text-xs text-muted-foreground">Dreamers earn dream coins (100 DR per ₦1,000) for supporting this project.</span>
               </Label>
             </div>
+
+            <div className="pt-4 border-t space-y-1">
+              <h3 className="font-semibold">Rich Content</h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                Add a full story, timeline, budget breakdown, video, and gallery for a more detailed project page.
+              </p>
+              <RichContentFields
+                value={editRich}
+                onChange={setEditRich}
+                fundingGoal={Number(editFormData.fundingGoal) || 0}
+              />
+            </div>
+
             {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
