@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "zeroup-partners-app",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    "NEXT_PUBLIC_FIREBASE_API_KEY": "AIzaSyAcpEr3RseZdfekkRJcMZ69y_QSusI21gs",
+    "NEXT_PUBLIC_FIREBASE_APP_ID": "1:71869767739:web:0c7ffdfc110b4bceb5bc1e",
+    "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN": "zeroup-partners-hub-5404-34b69.firebaseapp.com",
+    "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "71869767739",
+    "NEXT_PUBLIC_FIREBASE_PROJECT_ID": "zeroup-partners-hub-5404-34b69",
+    "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET": "zeroup-partners-hub-5404-34b69.firebasestorage.app",
+    "NEXT_PUBLIC_FIREBASE_VAPID_KEY": "BFAEYSTcdxJTvquJKSE7SyGeHN4TW8EmxST6LFCIW2HimH_CqD063ux7R3ipEql-3WRmCNgj9h2rTMAhguJRhQ4"
+  }
+}
