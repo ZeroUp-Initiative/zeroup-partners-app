@@ -268,7 +268,6 @@ function DashboardPage() {
 
     let total = 0;
     const monthlyContributions: Record<string, { amount: number, name: string }> = {};
-    const allTimeContributions: Record<string, { amount: number, name: string }> = {};
     const monthlyTrendData: Record<string, number> = {};
     // Track contributions per month per user for historic top partners
     const perMonthContributions: Record<string, Record<string, { amount: number, name: string, id: string }>> = {};
@@ -333,14 +332,6 @@ function DashboardPage() {
         }
       }
 
-      // Collect all-time contributions for other top contributors
-      if (data.userId) {
-        if (!allTimeContributions[data.userId]) {
-          allTimeContributions[data.userId] = { amount: 0, name: data.userFullName || 'Unknown User' };
-        }
-        allTimeContributions[data.userId].amount += data.amount;
-        if (data.userFullName) allTimeContributions[data.userId].name = data.userFullName;
-      }
     });
     setTotalContributions(total);
 
@@ -376,8 +367,8 @@ function DashboardPage() {
     });
     setTopPartner(top);
 
-    // Find other top contributors (all-time, excluding current top partner) with photoURLs
-    const sortedContributors = Object.entries(allTimeContributions)
+    // Find other top contributors (this month, excluding current top partner) with photoURLs
+    const sortedContributors = Object.entries(monthlyContributions)
       .map(([id, p]) => {
         const userData = usersMap.get(id);
         
@@ -965,7 +956,7 @@ function DashboardPage() {
                                 </div>
                                 <div>
                                     <CardTitle>Top Contributors</CardTitle>
-                                    <CardDescription>All-time leaderboard rankings</CardDescription>
+                                    <CardDescription>This month's leaderboard rankings</CardDescription>
                                 </div>
                             </div>
                         </CardHeader>
@@ -1016,7 +1007,7 @@ function DashboardPage() {
                                                 </div>
                                                 <div className="text-right flex-shrink-0">
                                                     <p className="font-bold text-xs sm:text-sm">₦{contributor.amount.toLocaleString()}</p>
-                                                    <p className="text-xs text-muted-foreground hidden sm:block">Total</p>
+                                                    <p className="text-xs text-muted-foreground hidden sm:block">This Month</p>
                                                 </div>
                                             </div>
                                         );
