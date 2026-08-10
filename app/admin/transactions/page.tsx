@@ -235,22 +235,34 @@ function AdminTransactionsPage() {
         receiptNo: receiptNumber(selectedTransaction),
       })
 
-      // Award dream coins (only credits linked Dreamers contributing to ZeroUp-owned targets)
+      // Award dream coins (only credits linked Dreamers contributing to ZeroUp-owned targets).
+      // Failures here must be visible to the admin — this silently failed for months in the
+      // past because errors only went to console.error, which nobody was watching.
       try {
         const idToken = await auth?.currentUser?.getIdToken()
-        if (idToken) {
+        if (!idToken) {
+          toast.error("Couldn't award dream coins: no auth token available. Try refreshing and approving again.")
+        } else {
           const res = await fetch('/api/dreamers/award', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
             body: JSON.stringify({ paymentId: selectedTransaction.id }),
           })
           const data = await res.json().catch(() => ({}))
-          if (res.ok && data.awarded > 0) {
+          if (!res.ok) {
+            toast.error(`Dream coin award failed: ${data.error || res.status}`)
+          } else if (data.awarded > 0) {
             toast.success(`Awarded ${Number(data.awarded).toLocaleString()} dream coins to this Dreamer`)
+          } else if (data.already) {
+            // Already awarded (re-approval edge case) — not an error, no toast needed.
+          } else if (data.reason && data.reason !== 'not_a_dreamer' && data.reason !== 'not_zeroup_owned' && data.reason !== 'amount_too_small') {
+            // Only surface unexpected skip reasons — the three above are normal, expected outcomes.
+            toast.error(`Dream coin award skipped: ${data.reason}`)
           }
         }
       } catch (awardErr) {
         console.error("Dream coin award failed:", awardErr)
+        toast.error("Dream coin award failed unexpectedly — check console for details.")
       }
 
       setSelectedTransaction(null);
