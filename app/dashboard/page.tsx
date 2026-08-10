@@ -48,6 +48,10 @@ function DashboardPage() {
   const [usersMap, setUsersMap] = useState<Map<string, any>>(new Map());
   const [paymentsData, setPaymentsData] = useState<any[]>([]);
   const [monthlyTopPartners, setMonthlyTopPartners] = useState<Map<string, {name: string, amount: number, id: string, photoURL?: string, month: string, year: number}>>(new Map());
+  // Full ranked contributor list per month (key = "year-monthIndex"), so the
+  // "Top Contributors" card can show any of the last 12 months, not just the
+  // current one. Rank #1 of a given month equals monthlyTopPartners.get(key).
+  const [monthlyLeaderboards, setMonthlyLeaderboards] = useState<Map<string, {id: string, name: string, amount: number, photoURL?: string}[]>>(new Map());
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
     const now = new Date();
     return `${now.getFullYear()}-${now.getMonth()}`;
@@ -455,6 +459,32 @@ function DashboardPage() {
     
     setMonthlyTopPartners(topPartnersMap);
 
+    // Full ranked contributor list per month, for the "Top Contributors" card's
+    // month selector (mirrors the display-name/photo resolution used above).
+    const leaderboardsMap = new Map<string, {id: string, name: string, amount: number, photoURL?: string}[]>();
+    Object.entries(perMonthContributions).forEach(([monthKey, contributions]) => {
+      const ranked = Object.entries(contributions)
+        .map(([userId, data]) => {
+          const userData = usersMap.get(userId);
+          let displayName = data.name || 'Partner';
+          if (userId === user?.uid) {
+            if (user.firstName && user.lastName) displayName = `${user.firstName} ${user.lastName}`;
+            else if (user.displayName) displayName = user.displayName;
+          } else if (userData?.firstName && userData?.lastName) {
+            displayName = `${userData.firstName} ${userData.lastName}`;
+          } else if (userData?.displayName) {
+            displayName = userData.displayName;
+          } else if (userData?.email) {
+            displayName = userData.email.split('@')[0];
+          }
+          const photoURL = userId === user?.uid ? (user?.photoURL || userData?.photoURL) : userData?.photoURL;
+          return { id: userId, name: displayName, amount: data.amount, photoURL };
+        })
+        .sort((a, b) => b.amount - a.amount);
+      leaderboardsMap.set(monthKey, ranked);
+    });
+    setMonthlyLeaderboards(leaderboardsMap);
+
     // Set monthly trend data (only last 6 months for display)
     const trendArray: MonthlyData[] = Object.entries(monthlyTrendData)
       .map(([key, value]) => {
@@ -473,6 +503,11 @@ function DashboardPage() {
     setMonthlyTrend(trendArray);
     setIsLoading(false);
   }, [paymentsData, usersMap, user]);
+
+  // Ranked contributors for the currently-selected month, rank #2 onward
+  // (rank #1 is shown separately in the "Partner of the Month" card above).
+  const selectedMonthLeaderboard = monthlyLeaderboards.get(selectedMonth) || [];
+  const selectedMonthOtherContributors = selectedMonthLeaderboard.slice(1, 6);
 
   return (
     <div className="min-h-screen bg-background">
@@ -950,14 +985,42 @@ function DashboardPage() {
                     <Card className="relative overflow-hidden">
                         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8d44d1] to-[#7030b0]" />
                         <CardHeader>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-between gap-3 flex-wrap">
+                              <div className="flex items-center gap-3">
                                 <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20">
                                     <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                                 </div>
                                 <div>
                                     <CardTitle>Top Contributors</CardTitle>
-                                    <CardDescription>This month's leaderboard rankings</CardDescription>
+                                    <CardDescription>
+                                      {(() => {
+                                        const [y, m] = selectedMonth.split('-').map(Number);
+                                        return new Date(y, m).toLocaleString('default', { month: 'long', year: 'numeric' });
+                                      })()} leaderboard rankings
+                                    </CardDescription>
                                 </div>
+                              </div>
+                              <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                                <SelectTrigger className="w-[140px] text-xs sm:text-sm h-8 sm:h-9">
+                                  <CalendarDays className="w-3.5 h-3.5 mr-1.5 opacity-70" />
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {Array.from(monthlyLeaderboards.keys()).sort((a, b) => {
+                                    const [yearA, monthA] = a.split('-').map(Number);
+                                    const [yearB, monthB] = b.split('-').map(Number);
+                                    return (yearB * 12 + monthB) - (yearA * 12 + monthA);
+                                  }).map((key) => {
+                                    const [year, month] = key.split('-').map(Number);
+                                    const date = new Date(year, month);
+                                    return (
+                                      <SelectItem key={key} value={key}>
+                                        {date.toLocaleString('default', { month: 'short', year: 'numeric' })}
+                                      </SelectItem>
+                                    );
+                                  })}
+                                </SelectContent>
+                              </Select>
                             </div>
                         </CardHeader>
                         <CardContent>
@@ -965,9 +1028,9 @@ function DashboardPage() {
                                 <div className="flex items-center justify-center h-48 text-muted-foreground">
                                     <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
                                 </div>
-                            ) : otherTopContributors.length > 0 ? (
+                            ) : selectedMonthOtherContributors.length > 0 ? (
                                 <div className="space-y-3 overflow-hidden">
-                                    {otherTopContributors.map((contributor, index) => {
+                                    {selectedMonthOtherContributors.map((contributor, index) => {
                                         const rankColors = [
                                             "from-slate-400 to-slate-500", // 2nd
                                             "from-amber-600 to-amber-700", // 3rd
@@ -1007,7 +1070,12 @@ function DashboardPage() {
                                                 </div>
                                                 <div className="text-right flex-shrink-0">
                                                     <p className="font-bold text-xs sm:text-sm">₦{contributor.amount.toLocaleString()}</p>
-                                                    <p className="text-xs text-muted-foreground hidden sm:block">This Month</p>
+                                                    <p className="text-xs text-muted-foreground hidden sm:block">
+                                                      {(() => {
+                                                        const [y, m] = selectedMonth.split('-').map(Number);
+                                                        return new Date(y, m).toLocaleString('default', { month: 'short' });
+                                                      })()}
+                                                    </p>
                                                 </div>
                                             </div>
                                         );
