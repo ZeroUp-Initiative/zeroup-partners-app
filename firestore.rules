@@ -104,6 +104,23 @@ service cloud.firestore {
       // Users can delete their own notifications
       allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
+
+    // Community-wide milestones (₦ funding / partner count thresholds reached).
+    // Written only by the server (service account bypasses these rules) when a
+    // threshold is crossed — see app/api/milestones/*.
+    match /milestones/{milestoneId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Per-partner badges awarded when a milestone is reached. Claiming (which
+    // also credits DR for linked Dreamers) happens server-side via
+    // /api/badges/claim, not directly from the client — so no client write here.
+    match /badges/{badgeId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow read: if isAdmin();
+      allow write: if false;
+    }
     
     // Gamification/Coins collection (future use)
     match /userCoins/{userId} {

@@ -165,6 +165,52 @@ export interface Notification {
 }
 
 // ==========================================
+// Milestone & Badge Types
+// ==========================================
+
+/** What kind of community-wide milestone this is. */
+export type MilestoneType = "funding" | "partners"
+
+/**
+ * A community-wide milestone that has been reached (e.g. ₦1,000,000 total
+ * funding, or the 100th registered partner). One doc per threshold crossed —
+ * written once, server-side only, when the threshold is first crossed.
+ */
+export interface Milestone {
+  id: string
+  type: MilestoneType
+  /** The threshold value reached, e.g. 1000000 (naira) or 100 (partner count). */
+  threshold: number
+  /** Human label shown in emails/UI, e.g. "₦1,000,000 in Partnership" or "100 Partners". */
+  label: string
+  /** Number of distinct qualifying partners at the moment this was reached. */
+  recipientCount: number
+  reachedAt: Timestamp | Date | any
+}
+
+export type PartnerBadgeStatus = "pending" | "claimed"
+
+/**
+ * One badge awarded to one partner for one milestone. Created (status:
+ * "pending") for every qualifying partner when a Milestone is reached.
+ * Claiming (via /api/badges/claim) flips status to "claimed" and, if
+ * isDreamerEligible, credits drAmount DR to the partner's linked Dreamer Dash wallet.
+ */
+export interface PartnerBadge {
+  id: string
+  userId: string
+  milestoneId: string
+  type: MilestoneType
+  threshold: number
+  label: string
+  status: PartnerBadgeStatus
+  isDreamerEligible: boolean
+  drAmount: number
+  createdAt: Timestamp | Date | any
+  claimedAt?: Timestamp | Date | any
+}
+
+// ==========================================
 // Analytics Types
 // ==========================================
 

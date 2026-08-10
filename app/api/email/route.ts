@@ -296,6 +296,30 @@ const templates: Record<string, (data: EmailData) => { subject: string; html: st
       </div></div></body></html>
     `,
   }),
+
+  milestone_reached: ({ name, milestoneLabel, contributorCount, isDreamer, drAmount, claimUrl }) => ({
+    subject: `🎉 Milestone Hit: ${milestoneLabel}!`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header">
+          <h1>🎉 We Just Hit ${milestoneLabel}!</h1>
+          <p>And you're one of the partners who made it happen.</p>
+        </div>
+        <div class="body">
+          <p>Hi ${name},</p>
+          <p>Thanks to ${contributorCount ? `<strong>${contributorCount} partners</strong> like you` : 'partners like you'}, ZeroUp Partners just crossed <strong>${milestoneLabel}</strong>. This wouldn't have happened without your support.</p>
+          <div class="highlight">
+            <strong>Your reward</strong>
+            ${isDreamer === 'true' ? `A milestone badge + ${Number(drAmount || 0).toLocaleString()} DR in your Dreamer Dash wallet` : 'A milestone badge'}
+          </div>
+          <p>Head over and claim it — it only takes a second.</p>
+          <a href="${claimUrl ?? `${BASE_URL}/badges`}" class="btn">Claim Your Badge</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
 }
 
 async function getActiveCustomTemplate(): Promise<{ subject: string; htmlContent: string } | null> {

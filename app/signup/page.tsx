@@ -79,6 +79,15 @@ export default function SignupPage() {
         }),
       }).catch(() => {})
 
+      // Check whether this signup just crossed a new 100-partner milestone
+      // (fire-and-forget — worst case it's caught on the next signup instead).
+      firebaseUser.getIdToken().then((idToken) => {
+        fetch('/api/milestones/check-partners', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+        }).catch(() => {})
+      }).catch(() => {})
+
       toast.success("Account created! Check your email to verify your account.")
     } catch (err: any) {
       let errorMessage = "Signup failed. Please try again."

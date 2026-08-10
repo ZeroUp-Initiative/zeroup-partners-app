@@ -265,6 +265,25 @@ function AdminTransactionsPage() {
         toast.error("Dream coin award failed unexpectedly — check console for details.")
       }
 
+      // Check whether this approval just pushed community-wide funding past a
+      // new ₦1,000,000 milestone. Fire-and-forget: worst case a milestone is
+      // detected on the next approval instead, nothing is lost.
+      try {
+        const idToken = await auth?.currentUser?.getIdToken()
+        if (idToken) {
+          const res = await fetch('/api/milestones/check-funding', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+          })
+          const data = await res.json().catch(() => ({}))
+          if (res.ok && data.fired) {
+            toast.success(`🎉 Funding milestone reached: ₦${data.thresholds[data.thresholds.length - 1].toLocaleString()}! Badges sent to ${data.recipientCount} partners.`)
+          }
+        }
+      } catch (milestoneErr) {
+        console.error("Funding milestone check failed:", milestoneErr)
+      }
+
       setSelectedTransaction(null);
       setAdminDescription("");
     } catch (err) {
