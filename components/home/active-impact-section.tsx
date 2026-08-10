@@ -208,7 +208,7 @@ export function ActiveImpactSection({ projects, isDark = true }: ActiveImpactSec
 
                       {/* CTAs */}
                       <div className="flex gap-3 pt-2">
-                        <Link href={`/projects?id=${project.id}`} className="flex-1">
+                        <Link href={`/projects/${project.id}`} className="flex-1">
                           <Button 
                             variant="outline" 
                             size="sm" 

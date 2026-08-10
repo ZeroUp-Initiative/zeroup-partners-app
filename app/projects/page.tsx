@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore"
 import { db } from "@/lib/firebase/client"
 import ProtectedRoute from "@/components/auth/protected-route"
@@ -14,6 +15,7 @@ import { ContributeDialog } from "@/components/projects/contribute-dialog"
 import type { Project } from "@/lib/types"
 
 function ProjectsPage() {
+  const router = useRouter()
   const [projects, setProjects] = useState<Project[]>([])
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
 
@@ -78,7 +80,11 @@ function ProjectsPage() {
         {projects.map((project) => {
           const progress = (project.currentFunding / project.fundingGoal) * 100;
           return (
-            <Card key={project.id} className="flex flex-col">
+            <Card
+              key={project.id}
+              className="flex flex-col cursor-pointer transition-shadow hover:shadow-lg"
+              onClick={() => router.push(`/projects/${project.id}`)}
+            >
               <Link href={`/projects/${project.id}`}>
                 {project.imageUrl && (
                   <div className="aspect-video w-full overflow-hidden rounded-t-lg">
@@ -115,7 +121,10 @@ function ProjectsPage() {
               </CardContent>
               <CardFooter className="flex justify-between items-center">
                  <Badge variant={project.status === 'fully-funded' ? 'secondary' : 'default'}>{project.status.toUpperCase()}</Badge>
-                <Button onClick={() => handleContributeClick(project)} disabled={project.status !== 'open'}>
+                <Button
+                  onClick={(e) => { e.stopPropagation(); handleContributeClick(project) }}
+                  disabled={project.status !== 'open'}
+                >
                   {project.status === 'fully-funded' ? 'Goal Reached' : 'Contribute'}
                 </Button>
               </CardFooter>
