@@ -227,6 +227,17 @@ export function RichContentFields({ value, onChange, fundingGoal }: RichContentF
                   onChange={(e) => updateBudgetPhase(phase.id, { amount: Number(e.target.value) })}
                 />
               </div>
+              <div className="space-y-1">
+                <Input
+                  type="number"
+                  placeholder="Raised so far (₦) — usually set automatically when approving a transaction"
+                  value={phase.currentAmount || ''}
+                  onChange={(e) => updateBudgetPhase(phase.id, { currentAmount: Number(e.target.value) })}
+                />
+                <p className="text-xs text-muted-foreground">
+                  This fills the progress bar on the public project page. Normally set automatically when you allocate an approved contribution to this item in Admin → Transactions — edit here only to correct it manually.
+                </p>
+              </div>
               <Textarea
                 placeholder="Description (optional)"
                 value={phase.description || ''}

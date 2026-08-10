@@ -16,8 +16,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2, CheckCircle, XCircle, Eye, ChevronLeft, ChevronRight, Search, Download } from "lucide-react"
 import { NotificationHelpers } from "@/lib/notifications"
+import type { ProjectBudgetPhase } from "@/lib/types"
+
+const UNALLOCATED = "__unallocated__"
 
 interface Transaction {
   id: string;
@@ -40,6 +44,8 @@ function AdminTransactionsPage() {
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
   const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null)
   const [adminDescription, setAdminDescription] = useState("")
+  const [budgetPhases, setBudgetPhases] = useState<ProjectBudgetPhase[]>([])
+  const [allocatedItemId, setAllocatedItemId] = useState<string>(UNALLOCATED)
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState("")
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'declined'>('pending')
@@ -73,6 +79,16 @@ function AdminTransactionsPage() {
 
     return () => unsubscribe();
   }, []);
+
+  // Load the selected transaction's project budget phases, so the admin can
+  // optionally allocate this contribution to a specific line item.
+  useEffect(() => {
+    setAllocatedItemId(UNALLOCATED)
+    if (!selectedTransaction) { setBudgetPhases([]); return }
+    getDoc(doc(db, "projects", selectedTransaction.projectId)).then((snap) => {
+      setBudgetPhases(snap.exists() ? (snap.data().budgetPhases || []) : [])
+    }).catch(() => setBudgetPhases([]))
+  }, [selectedTransaction?.id, selectedTransaction?.projectId]);
 
   // Resolve a contributor's email — prefer the value stored on the payment,
   // otherwise look it up from the user's profile document.
@@ -161,18 +177,30 @@ function AdminTransactionsPage() {
         newFunding = oldFunding + selectedTransaction.amount;
         const newStatus = newFunding >= projectData.fundingGoal ? 'fully-funded' : 'open';
 
-        batch.update(projectRef, {
+        const projectUpdate: Record<string, unknown> = {
           currentFunding: newFunding,
           status: newStatus
-        });
+        }
+
+        // If the admin allocated this contribution to a specific budget line
+        // item, add it to that item's raised amount so its progress bar fills.
+        const existingPhases: ProjectBudgetPhase[] = projectData.budgetPhases || []
+        if (allocatedItemId !== UNALLOCATED && existingPhases.some(p => p.id === allocatedItemId)) {
+          projectUpdate.budgetPhases = existingPhases.map(p =>
+            p.id === allocatedItemId
+              ? { ...p, currentAmount: (p.currentAmount || 0) + selectedTransaction.amount }
+              : p
+          )
+        }
+
+        batch.update(projectRef, projectUpdate);
 
         // Detect whether this approval pushed funding past a budget-phase
         // threshold, so we can announce it. If a single contribution
         // crosses multiple phases at once, only the last (most advanced)
         // one is announced.
-        const budgetPhases = projectData.budgetPhases || []
         let cumulative = 0
-        for (const phase of budgetPhases) {
+        for (const phase of existingPhases) {
           cumulative += phase.amount || 0
           if (oldFunding < cumulative && newFunding >= cumulative) crossedPhaseName = phase.name
         }
@@ -562,6 +590,26 @@ function AdminTransactionsPage() {
                   onChange={(e) => setAdminDescription(e.target.value)}
                 />
               </div>
+
+              {budgetPhases.length > 0 && (
+                <div className="space-y-2">
+                  <Label htmlFor="allocateTo">Allocate to a budget line item (optional)</Label>
+                  <Select value={allocatedItemId} onValueChange={setAllocatedItemId}>
+                    <SelectTrigger id="allocateTo"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={UNALLOCATED}>General project funding (not tied to a specific cost)</SelectItem>
+                      {budgetPhases.map((phase) => (
+                        <SelectItem key={phase.id} value={phase.id}>
+                          {phase.name} — ₦{(phase.currentAmount || 0).toLocaleString()} of ₦{(phase.amount || 0).toLocaleString()} raised
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    If this contribution was meant to cover a specific cost, pick it here — approving will add ₦{selectedTransaction.amount.toLocaleString()} to that item's progress on the public project page.
+                  </p>
+                </div>
+              )}
 
               {error && <p className="text-sm text-red-500">{error}</p>}
             </div>

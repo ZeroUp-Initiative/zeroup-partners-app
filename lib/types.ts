@@ -88,6 +88,8 @@ export interface ProjectBudgetPhase {
   id: string
   name: string
   amount: number
+  /** Amount admins have allocated toward this specific line item so far (from approved contributions). */
+  currentAmount?: number
   description?: string
 }
 
