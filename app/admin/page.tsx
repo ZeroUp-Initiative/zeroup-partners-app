@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from "react"
-import { collection, query, where, getDocs, doc, updateDoc, Timestamp, orderBy } from "firebase/firestore"
+import { collection, query, where, getDocs, Timestamp, orderBy } from "firebase/firestore"
 import { db } from "@/lib/firebase/client"
 import ProtectedRoute from "@/components/auth/protected-route"
 import { Button } from "@/components/ui/button"
@@ -9,17 +9,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useAuth } from "@/contexts/auth-context"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import Link from "next/link"
-import { DollarSign, Activity, FolderOpen, ChevronLeft, ChevronRight } from "lucide-react"
+import { DollarSign, Activity, FolderOpen, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react"
 
 function AdminDashboard() {
   const [pendingPayments, setPendingPayments] = useState<any[]>([])
   const [processedPayments, setProcessedPayments] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [rejectionReason, setRejectionReason] = useState("")
-  const [isRejecting, setIsRejecting] = useState<string | null>(null)
   const [stats, setStats] = useState({ totalFunds: 0, activeProjects: 0, pendingCount: 0 })
   const [viewingProof, setViewingProof] = useState<string | null>(null)
   const [historyPage, setHistoryPage] = useState(1)
@@ -76,92 +73,6 @@ function AdminDashboard() {
       fetchPayments()
     }
   }, [user])
-
-  const handleApproval = async (paymentId: string, newStatus: "approved" | "rejected") => {
-    try {
-      const paymentRef = doc(db, "payments", paymentId)
-      const paymentSnap = await getDocs(query(collection(db, "payments"), where("__name__", "==", paymentId)))
-      
-      // Get payment details for email
-      const paymentDoc = pendingPayments.find(p => p.id === paymentId)
-      
-      await updateDoc(paymentRef, { status: newStatus, reviewedAt: Timestamp.now() })
-      
-      // Send approval email to user
-      if (paymentDoc && newStatus === "approved") {
-        try {
-          await fetch('/api/email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              to: paymentDoc.userEmail,
-              type: 'contribution_approved',
-              data: {
-                name: paymentDoc.userFirstName || 'Partner',
-                amount: paymentDoc.amount?.toLocaleString() || '0',
-                projectTitle: paymentDoc.projectTitle,
-              },
-            }),
-          });
-        } catch (err) {
-          console.error('Failed to send approval email:', err);
-        }
-      }
-      
-      await fetchPayments() 
-    } catch (error) {
-      console.error(`Error approving payment:`, error)
-    }
-  }
-
-  const openRejectDialog = (paymentId: string) => {
-    setIsRejecting(paymentId)
-  }
-
-  const handleRejection = async () => {
-    if (!isRejecting || !rejectionReason) return
-    try {
-      const paymentRef = doc(db, "payments", isRejecting)
-      
-      // Get payment details for email
-      const paymentDoc = pendingPayments.find(p => p.id === isRejecting)
-      
-      await updateDoc(paymentRef, {
-        status: "rejected",
-        rejectionReason: rejectionReason,
-        reviewedAt: Timestamp.now(),
-      })
-      
-      // Send rejection email to user
-      if (paymentDoc) {
-        try {
-          await fetch('/api/email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              to: paymentDoc.userEmail,
-              type: 'contribution_rejected',
-              data: {
-                name: paymentDoc.userFirstName || 'Partner',
-                amount: paymentDoc.amount?.toLocaleString() || '0',
-                projectTitle: paymentDoc.projectTitle,
-                rejectionReason: rejectionReason,
-              },
-            }),
-          });
-        } catch (err) {
-          console.error('Failed to send rejection email:', err);
-        }
-      }
-      
-      await fetchPayments()
-    } catch (error) {
-      console.error(`Error rejecting payment:`, error)
-    } finally {
-      setIsRejecting(null)
-      setRejectionReason("")
-    }
-  }
 
   if (isLoading) {
     return <div className="flex items-center justify-center h-64">Loading...</div>
@@ -225,7 +136,9 @@ function AdminDashboard() {
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>Pending Contributions</CardTitle>
-          <CardDescription>There are {pendingPayments.length} contributions awaiting approval.</CardDescription>
+          <CardDescription>
+            There are {pendingPayments.length} contributions awaiting approval. Approve or reject them in Transactions, which also updates project funding, dream coin awards, and milestones.
+          </CardDescription>
         </CardHeader>
         <CardContent className="overflow-x-auto">
           <Table>
@@ -249,9 +162,12 @@ function AdminDashboard() {
                       View
                     </Button>
                   </TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button size="sm" onClick={() => handleApproval(payment.id, "approved")}>Approve</Button>
-                    <Button size="sm" variant="destructive" onClick={() => openRejectDialog(payment.id)}>Reject</Button>
+                  <TableCell className="text-right">
+                    <Button size="sm" variant="outline" asChild>
+                      <Link href="/admin/transactions">
+                        Review <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                      </Link>
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -371,25 +287,6 @@ function AdminDashboard() {
         )
       })()}
       
-      {/* Rejection Dialog */}
-      <Dialog open={isRejecting !== null} onOpenChange={() => setIsRejecting(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Reject Contribution</DialogTitle>
-            <DialogDescription>Please provide a reason for rejecting this contribution. This will be shown to the user.</DialogDescription>
-          </DialogHeader>
-          <Textarea
-            placeholder="e.g., Unclear proof of payment, incorrect amount..."
-            value={rejectionReason}
-            onChange={(e) => setRejectionReason(e.target.value)}
-          />
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsRejecting(null)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleRejection}>Confirm Rejection</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
       {/* View Proof Dialog */}
       <Dialog open={viewingProof !== null} onOpenChange={() => setViewingProof(null)}>
         <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0 overflow-hidden bg-transparent border-none shadow-none">
