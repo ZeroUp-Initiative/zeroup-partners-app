@@ -203,9 +203,12 @@ function CommunityContent() {
       const diff = Math.floor((now.getTime() - pDate.getTime()) / (1000 * 60 * 60))
       const timeStr = diff < 1 ? "Just now" : diff < 24 ? `${diff} hours ago` : `${Math.floor(diff/24)} days ago`
       
+      const isGeneral = !p.projectId || p.projectId === 'general'
       return {
         user: p.userFullName || "Partner",
-        action: `contributed ₦${p.amount.toLocaleString()}`,
+        action: isGeneral
+          ? `contributed ₦${p.amount.toLocaleString()}`
+          : `partnered ₦${p.amount.toLocaleString()} with ${p.projectTitle || 'a project'}`,
         time: timeStr,
         type: "contribution"
       }

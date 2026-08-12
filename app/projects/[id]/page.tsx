@@ -17,6 +17,7 @@ import { VideoEmbed, parseVideoUrl } from '@/components/projects/video-embed'
 import { ProjectTimeline } from '@/components/projects/project-timeline'
 import { ProjectBudgetBreakdown } from '@/components/projects/project-budget-breakdown'
 import { ProjectGallery } from '@/components/projects/project-gallery'
+import { ProjectPartners } from '@/components/projects/project-partners'
 import { ContributeDialog } from '@/components/projects/contribute-dialog'
 
 const VISIBLE_STATUSES = new Set(['open', 'fully-funded', 'closed'])
@@ -215,6 +216,8 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
                 <ProjectBudgetBreakdown phases={project.budgetPhases!} fundingGoal={project.fundingGoal} />
               </section>
             )}
+
+            <ProjectPartners projectId={project.id} />
 
             {hasGallery && (
               <section>

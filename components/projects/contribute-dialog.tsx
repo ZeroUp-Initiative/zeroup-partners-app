@@ -8,9 +8,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Upload, Loader2, Copy, Banknote } from 'lucide-react'
+import { Textarea } from '@/components/ui/textarea'
+import { Upload, Loader2, Copy, Banknote, PartyPopper } from 'lucide-react'
 import { uploadImage, validateImageFile } from '@/lib/image-upload'
 import { getStoredRef } from '@/lib/referral'
+import { PartnerFlierCard } from '@/components/partner-flier-card'
 import toast from 'react-hot-toast'
 
 interface ContributeProject {
@@ -28,11 +30,13 @@ interface ContributeDialogProps {
 export function ContributeDialog({ project, open, onOpenChange, onSuccess }: ContributeDialogProps) {
   const { user } = useAuth()
   const [contributionAmount, setContributionAmount] = useState('')
+  const [message, setMessage] = useState('')
   const [receiptFile, setReceiptFile] = useState<File | null>(null)
   const [isContributing, setIsContributing] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState('')
   const [paymentSettings, setPaymentSettings] = useState<{ accountNumber: string; bankName: string; accountName: string; bankDetails: string } | null>(null)
+  const [justContributed, setJustContributed] = useState<{ amount: number } | null>(null)
 
   useEffect(() => {
     const loadPaymentSettings = async () => {
@@ -59,7 +63,9 @@ export function ContributeDialog({ project, open, onOpenChange, onSuccess }: Con
     if (open) {
       setError('')
       setContributionAmount('')
+      setMessage('')
       setReceiptFile(null)
+      setJustContributed(null)
     }
   }, [open])
 
@@ -119,6 +125,7 @@ export function ContributeDialog({ project, open, onOpenChange, onSuccess }: Con
         createdAt: new Date(),
         date: new Date(),
         description: project.id === 'general' ? 'General contribution' : `Contribution to project: ${project.title}`,
+        message: message.trim() || null,
       })
 
       try {
@@ -141,7 +148,7 @@ export function ContributeDialog({ project, open, onOpenChange, onSuccess }: Con
       }
 
       setReceiptFile(null)
-      onOpenChange(false)
+      setJustContributed({ amount })
       onSuccess?.()
     } catch (err) {
       console.error('Contribution failed:', err)
@@ -150,6 +157,34 @@ export function ContributeDialog({ project, open, onOpenChange, onSuccess }: Con
       setIsContributing(false)
       setIsUploading(false)
     }
+  }
+
+  if (justContributed && project) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-md p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <PartyPopper className="w-5 h-5 text-[#8d44d1]" /> Thank you for partnering!
+            </DialogTitle>
+            <DialogDescription>
+              Your contribution is submitted and pending review. Here's a card to share the moment.
+            </DialogDescription>
+          </DialogHeader>
+          <PartnerFlierCard
+            variant="regular"
+            name={`${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Partner'}
+            amount={justContributed.amount}
+            photoURL={user?.photoURL || undefined}
+            month={new Date().toLocaleString('default', { month: 'long' })}
+            year={new Date().getFullYear()}
+            customMessage={project.id === 'general' ? "I just partnered with ZeroUp!" : `I just partnered with ${project.title}!`}
+            showDownload={true}
+          />
+          <Button variant="outline" className="w-full" onClick={() => onOpenChange(false)}>Close</Button>
+        </DialogContent>
+      </Dialog>
+    )
   }
 
   return (
@@ -212,6 +247,18 @@ export function ContributeDialog({ project, open, onOpenChange, onSuccess }: Con
               value={contributionAmount}
               onChange={(e) => setContributionAmount(e.target.value)}
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="message">Leave a public message (optional)</Label>
+            <Textarea
+              id="message"
+              placeholder="e.g., Proud to support this!"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              rows={2}
+              maxLength={200}
+            />
+            <p className="text-xs text-muted-foreground">Shown alongside your name on this project's partner wall once approved.</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="receipt">Upload Receipt</Label>

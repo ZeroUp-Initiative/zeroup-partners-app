@@ -29,6 +29,7 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
     amount: "",
     date: new Date().toISOString().split("T")[0],
     description: "",
+    message: "",
     proofFile: null as File | null,
     projectId: "",
     projectTitle: "",
@@ -165,6 +166,7 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
         status: "pending",
         referrerDreamerId: getStoredRef() || null,
         createdAt: serverTimestamp(),
+        message: formData.message.trim() || null,
       })
 
       // Send confirmation email to contributor (fire-and-forget)
@@ -217,6 +219,7 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
             amount: "",
             date: new Date().toISOString().split("T")[0],
             description: "",
+            message: "",
             proofFile: null,
             projectId: "",
             projectTitle: "",
@@ -387,6 +390,20 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
                     required 
                     disabled={isLoading}
                 />
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="message">Leave a public message (optional)</Label>
+                <Textarea
+                    id="message"
+                    placeholder="e.g., Proud to support this!"
+                    value={formData.message}
+                    onChange={(e) => handleInputChange("message", e.target.value)}
+                    rows={2}
+                    maxLength={200}
+                    disabled={isLoading}
+                />
+                <p className="text-xs text-muted-foreground">Shown alongside your name on the project's partner wall once approved.</p>
             </div>
 
             <div className="space-y-2">

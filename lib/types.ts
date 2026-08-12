@@ -48,6 +48,8 @@ export interface Payment {
   receiptUrl?: string
   paymentMethod?: string
   note?: string
+  /** Optional public message the partner leaves, shown on the project's partner wall once approved. */
+  message?: string
   createdAt: Timestamp | Date
   date?: Timestamp | Date
   approvedAt?: Timestamp | Date
