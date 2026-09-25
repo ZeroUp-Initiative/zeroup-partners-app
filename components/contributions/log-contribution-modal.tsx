@@ -273,10 +273,11 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
                                 type="button"
                                 variant="ghost"
                                 size="sm"
+                                aria-label="Copy account number"
                                 onClick={copyAccountNumber}
-                                className="h-6 w-6 p-0 text-slate-400 hover:text-[#8d44d1] hover:bg-[#8d44d1]/10 dark:text-white/30 dark:hover:text-white/60"
+                                className="h-8 w-8 min-h-[32px] min-w-[32px] p-0 flex items-center justify-center text-slate-400 hover:text-[#8d44d1] hover:bg-[#8d44d1]/10 dark:text-white/30 dark:hover:text-white/60"
                             >
-                                <Copy className="w-3 h-3" />
+                                <Copy className="w-3.5 h-3.5" />
                             </Button>
                         </div>
                     </div>
@@ -319,24 +320,24 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
 
             <div className="space-y-2">
                 <Label>Contribution Type</Label>
-                <div className="space-y-2">
-                    <label className="flex items-center space-x-2 cursor-pointer">
+                <div className="space-y-1">
+                    <label className="flex items-center space-x-2.5 cursor-pointer py-1.5 min-h-[36px]">
                         <input
                             type="radio"
                             name="contributionType"
                             checked={!formData.isGeneralContribution}
                             onChange={() => handleInputChange("isGeneralContribution", false)}
-                            className="text-primary"
+                            className="text-primary size-4"
                         />
                         <span className="text-sm">Contribute to a specific project</span>
                     </label>
-                    <label className="flex items-center space-x-2 cursor-pointer">
+                    <label className="flex items-center space-x-2.5 cursor-pointer py-1.5 min-h-[36px]">
                         <input
                             type="radio"
                             name="contributionType"
                             checked={formData.isGeneralContribution}
                             onChange={() => handleInputChange("isGeneralContribution", true)}
-                            className="text-primary"
+                            className="text-primary size-4"
                         />
                         <span className="text-sm">General contribution (no specific project)</span>
                     </label>
@@ -351,7 +352,7 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
                             id="project"
                             value={formData.projectId}
                             onChange={(e) => handleInputChange("projectId", e.target.value)}
-                            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             required={!formData.isGeneralContribution}
                             disabled={isLoading}
                         >

@@ -167,7 +167,7 @@ function ScannerPage() {
 
   return (
     <div className="space-y-6 max-w-md mx-auto">
-      <Link href="/admin/events" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary">
+      <Link href="/admin/events" className="inline-flex items-center min-h-[44px] py-2 text-sm text-muted-foreground hover:text-primary">
         <ArrowLeft className="w-4 h-4 mr-2" /> Back to Events
       </Link>
 
@@ -183,7 +183,7 @@ function ScannerPage() {
           <select
             value={eventId}
             onChange={(e) => setEventId(e.target.value)}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm"
           >
             <option value="">Select an active event…</option>
             {events.map((e) => (
@@ -200,7 +200,7 @@ function ScannerPage() {
           <CardContent className="pt-6 text-center space-y-4">
             {camError && <p className="text-sm text-destructive">{camError}</p>}
             <Camera className="w-12 h-12 mx-auto text-muted-foreground" />
-            <Button className="w-full" disabled={!eventId} onClick={() => { setCamError(""); setMode("scanning") }}>
+            <Button className="w-full min-h-[44px]" disabled={!eventId} onClick={() => { setCamError(""); setMode("scanning") }}>
               Start scanning
             </Button>
             {!eventId && <p className="text-xs text-muted-foreground">Select an event to begin.</p>}
@@ -213,7 +213,7 @@ function ScannerPage() {
           <CardHeader><CardTitle className="text-base">Point at the card's QR</CardTitle><CardDescription>{selectedEvent?.title}</CardDescription></CardHeader>
           <CardContent>
             <div id="qr-reader" className="w-full overflow-hidden rounded-lg" />
-            <Button variant="outline" className="w-full mt-4" onClick={() => { stopScanner(); setMode("idle") }}>Cancel</Button>
+            <Button variant="outline" className="w-full mt-4 min-h-[44px]" onClick={() => { stopScanner(); setMode("idle") }}>Cancel</Button>
           </CardContent>
         </Card>
       )}
@@ -238,11 +238,11 @@ function ScannerPage() {
           <CardContent className="pt-4 space-y-3">
             <div className="flex justify-between text-sm"><span className="text-muted-foreground">Total partnered</span><span className="font-semibold">₦{profile.partneredTotal.toLocaleString()}</span></div>
             <div className="flex justify-between text-sm"><span className="text-muted-foreground">Member since</span><span className="font-semibold">{profile.memberSince || "—"}</span></div>
-            <Button className="w-full" onClick={checkIn} disabled={checkingIn}>
+            <Button className="w-full min-h-[44px]" onClick={checkIn} disabled={checkingIn}>
               {checkingIn ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CheckCircle2 className="w-4 h-4 mr-2" />}
               Check in to {selectedEvent?.title}
             </Button>
-            <Button variant="ghost" className="w-full" onClick={reset}>Cancel</Button>
+            <Button variant="ghost" className="w-full min-h-[44px]" onClick={reset}>Cancel</Button>
           </CardContent>
         </Card>
       )}
@@ -252,7 +252,7 @@ function ScannerPage() {
           <CardContent className="pt-6 text-center space-y-4">
             {result.ok ? <CheckCircle2 className="w-14 h-14 mx-auto text-green-500" /> : <XCircle className="w-14 h-14 mx-auto text-destructive" />}
             <p className="font-semibold text-lg">{result.message}</p>
-            <Button className="w-full" onClick={reset}><RotateCcw className="w-4 h-4 mr-2" /> Scan next</Button>
+            <Button className="w-full min-h-[44px]" onClick={reset}><RotateCcw className="w-4 h-4 mr-2" /> Scan next</Button>
           </CardContent>
         </Card>
       )}

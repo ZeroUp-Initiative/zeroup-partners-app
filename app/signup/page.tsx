@@ -150,7 +150,7 @@ export default function SignupPage() {
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl border border-white/8 bg-[#1e1040]/60 backdrop-blur-xl shadow-2xl shadow-black/40 p-8">
+        <div className="rounded-2xl border border-white/8 bg-[#1e1040]/60 backdrop-blur-xl shadow-2xl shadow-black/40 p-5 sm:p-8">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-white">Create Account</h2>
             <p className="text-sm text-white/50 mt-1">Join the network and start making a difference</p>
@@ -222,7 +222,8 @@ export default function SignupPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isLoading}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center text-white/40 hover:text-white/70 transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>

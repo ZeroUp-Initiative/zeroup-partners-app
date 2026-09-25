@@ -103,8 +103,8 @@ export default function AuthActionPage() {
                 <p className="text-sm text-red-600">{message}</p>
                 <p className="text-sm text-muted-foreground">{error}</p>
                 <div className="flex flex-col gap-2">
-                  <Link href="/login" className="text-primary underline">Return to login</Link>
-                  <Link href="/forgot-password" className="text-primary underline">Request a new reset link</Link>
+                  <Link href="/login" className="text-primary underline inline-flex items-center min-h-[36px] py-1">Return to login</Link>
+                  <Link href="/forgot-password" className="text-primary underline inline-flex items-center min-h-[36px] py-1">Request a new reset link</Link>
                 </div>
               </div>
             )}
@@ -119,14 +119,14 @@ export default function AuthActionPage() {
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     required
-                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary focus:outline-none"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base md:text-sm shadow-sm focus:border-primary focus:outline-none"
                   />
                 </div>
 
                 {error && <p className="text-sm text-red-600">{error}</p>}
                 {success && <p className="text-sm text-green-600">Email sign-in completed. Redirecting...</p>}
 
-                <Button type="submit" className="w-full" disabled={isProcessing}>
+                <Button type="submit" className="w-full min-h-[44px]" disabled={isProcessing}>
                   {isProcessing ? 'Completing sign-in...' : 'Continue with email link'}
                 </Button>
 

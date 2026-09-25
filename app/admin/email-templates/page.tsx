@@ -227,7 +227,7 @@ function EmailTemplatesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Email Templates</h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -237,7 +237,7 @@ function EmailTemplatesPage() {
         {!isEditing && templates.length < 4 && (
           <Button
             onClick={startCreate}
-            className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
+            className="w-full sm:w-auto min-h-[40px] bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
           >
             <Plus className="w-4 h-4 mr-2" />
             New Template
@@ -280,12 +280,13 @@ function EmailTemplatesPage() {
                         </div>
                         <p className="text-xs text-muted-foreground mt-1 truncate">Subject: {t.subject}</p>
                       </div>
-                      <div className="flex items-center gap-1 shrink-0">
+                      <div className="flex items-center gap-1 shrink-0 flex-wrap">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8"
+                          className="h-9 w-9 min-h-[36px] min-w-[36px] flex items-center justify-center"
                           title="Preview"
+                          aria-label="Preview template"
                           onClick={() => setPreviewId(previewId === t.id ? null : t.id)}
                         >
                           <Eye className="w-4 h-4" />
@@ -293,8 +294,9 @@ function EmailTemplatesPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8"
+                          className="h-9 w-9 min-h-[36px] min-w-[36px] flex items-center justify-center"
                           title="Edit"
+                          aria-label="Edit template"
                           onClick={() => startEdit(t)}
                         >
                           <Pencil className="w-4 h-4" />
@@ -303,8 +305,9 @@ function EmailTemplatesPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-muted-foreground"
+                            className="h-9 w-9 min-h-[36px] min-w-[36px] text-muted-foreground flex items-center justify-center"
                             title="Deactivate"
+                            aria-label="Deactivate template"
                             onClick={() => handleDeactivate(t.id)}
                           >
                             <X className="w-4 h-4" />
@@ -313,8 +316,9 @@ function EmailTemplatesPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-green-600"
+                            className="h-9 w-9 min-h-[36px] min-w-[36px] text-green-600 flex items-center justify-center"
                             title="Set as Active"
+                            aria-label="Set template as active"
                             onClick={() => handleSetActive(t.id)}
                           >
                             <CheckCircle2 className="w-4 h-4" />
@@ -323,8 +327,9 @@ function EmailTemplatesPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          className="h-9 w-9 min-h-[36px] min-w-[36px] text-destructive hover:text-destructive flex items-center justify-center"
                           title="Delete"
+                          aria-label="Delete template"
                           onClick={() => handleDelete(t.id)}
                         >
                           <Trash2 className="w-4 h-4" />
@@ -347,7 +352,7 @@ function EmailTemplatesPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1.5">
                         <Label className="text-xs">Template Name</Label>
                         <Input
@@ -390,15 +395,15 @@ function EmailTemplatesPage() {
                         The preview on the right updates as you type.
                       </p>
                     </div>
-                    <div className="flex gap-2 pt-1">
+                    <div className="flex flex-col sm:flex-row gap-2 pt-1">
                       <Button
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
+                        className="w-full sm:w-auto min-h-[40px] bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
                       >
                         {isSaving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving…</> : <><Save className="w-4 h-4 mr-2" />Save Template</>}
                       </Button>
-                      <Button variant="outline" onClick={cancelEdit} disabled={isSaving}>
+                      <Button variant="outline" onClick={cancelEdit} disabled={isSaving} className="w-full sm:w-auto min-h-[40px]">
                         Cancel
                       </Button>
                     </div>

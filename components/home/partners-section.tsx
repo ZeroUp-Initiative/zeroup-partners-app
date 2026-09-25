@@ -63,7 +63,7 @@ export function PartnersSection({ isDark = true }: PartnersSectionProps) {
         </motion.div>
 
         {/* Partner Grid - Minimal, elegant */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto">
           {partners.map((partner, index) => (
             <motion.div
               key={partner.name}
@@ -72,11 +72,12 @@ export function PartnersSection({ isDark = true }: PartnersSectionProps) {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
-              className="relative group"
+              onClick={() => setHoveredIndex(hoveredIndex === index ? null : index)}
+              className="relative group cursor-pointer"
             >
               <div className={`
                 h-32 md:h-40 rounded-2xl border transition-all duration-500
-                flex items-center justify-center cursor-default
+                flex items-center justify-center
                 ${hoveredIndex === index 
                   ? 'bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border-blue-500/30' 
                   : isDark 
@@ -127,7 +128,7 @@ export function PartnersSection({ isDark = true }: PartnersSectionProps) {
           </p>
           <a 
             href="mailto:partners@zeroup.org" 
-            className="inline-flex items-center gap-2 bg-[#833dc6] text-white p-2 px-3 rounded-full hover:bg-[#833dc6]/80 transition-colors font-medium"
+            className="inline-flex items-center justify-center gap-2 bg-[#833dc6] text-white py-2.5 px-5 min-h-[44px] rounded-full hover:bg-[#833dc6]/80 transition-colors font-medium"
           >
             Get in touch
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

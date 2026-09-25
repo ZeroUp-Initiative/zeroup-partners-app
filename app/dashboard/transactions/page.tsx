@@ -163,7 +163,7 @@ function TransactionHistoryPage() {
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <Table>
+                  <Table className="min-w-[600px]">
                     <TableHeader>
                       <TableRow>
                         <TableHead>Date</TableHead>
@@ -177,7 +177,7 @@ function TransactionHistoryPage() {
                     <TableBody>
                       {filteredTransactions.map((transaction) => (
                         <TableRow key={transaction.id}>
-                          <TableCell className="font-medium">
+                          <TableCell className="font-medium whitespace-nowrap">
                             {transaction.createdAt?.toDate ? 
                               transaction.createdAt.toDate().toLocaleDateString() : 
                               'N/A'
@@ -200,7 +200,7 @@ function TransactionHistoryPage() {
                               </p>
                             </div>
                           </TableCell>
-                          <TableCell className="text-right font-semibold">
+                          <TableCell className="text-right font-semibold whitespace-nowrap">
                             ₦{transaction.amount.toLocaleString()}
                           </TableCell>
                           <TableCell>
@@ -216,10 +216,11 @@ function TransactionHistoryPage() {
                               <Button
                                 variant="outline"
                                 size="sm"
+                                aria-label="View transaction receipt"
                                 onClick={() => setSelectedReceipt(transaction.receiptUrl!)}
-                                className="h-8 px-2"
+                                className="h-8 px-2.5 min-h-[32px] min-w-[32px] inline-flex items-center"
                               >
-                                <Eye className="w-3 h-3 mr-1" />
+                                <Eye className="w-3.5 h-3.5 mr-1" />
                                 <span className="hidden sm:inline">View</span>
                               </Button>
                             )}

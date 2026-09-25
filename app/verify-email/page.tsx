@@ -129,7 +129,7 @@ export default function VerifyEmailPage() {
 
               <Button 
                 onClick={handleCheckVerification} 
-                className="w-full"
+                className="w-full min-h-[44px]"
                 disabled={isChecking}
               >
                 {isChecking ? (
@@ -148,7 +148,7 @@ export default function VerifyEmailPage() {
               <Button 
                 variant="outline" 
                 onClick={handleResendEmail} 
-                className="w-full"
+                className="w-full min-h-[44px]"
                 disabled={isResending}
               >
                 {isResending ? (
@@ -168,7 +168,7 @@ export default function VerifyEmailPage() {
             <div className="pt-4 border-t">
               <p className="text-sm text-muted-foreground text-center">
                 Want to continue without verifying?{" "}
-                <Link href="/dashboard" className="text-primary hover:underline">
+                <Link href="/dashboard" className="text-primary hover:underline inline-flex items-center min-h-[36px] py-1">
                   Skip for now
                   <ArrowRight className="inline ml-1 h-3 w-3" />
                 </Link>

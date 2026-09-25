@@ -424,7 +424,7 @@ function AdminUsersPage() {
           ) : (
             <>
               <div className="overflow-x-auto -mx-6 px-6">
-                <Table>
+                <Table className="min-w-[700px]">
                 <TableHeader>
                   <TableRow>
                     <TableHead>User</TableHead>
@@ -486,7 +486,7 @@ function AdminUsersPage() {
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="flex items-center gap-1.5 h-8 px-3">
+                            <Button variant="outline" size="sm" className="flex items-center gap-1.5 h-8 px-3 min-h-[32px] min-w-[32px]">
                               <MoreHorizontal className="h-3.5 w-3.5" />
                               <span className="text-xs">Actions</span>
                             </Button>
@@ -556,6 +556,7 @@ function AdminUsersPage() {
                       size="sm"
                       onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
+                      className="min-h-[36px]"
                     >
                       <ChevronLeft className="h-4 w-4" />
                       Previous
@@ -565,6 +566,7 @@ function AdminUsersPage() {
                       size="sm"
                       onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
+                      className="min-h-[36px]"
                     >
                       Next
                       <ChevronRight className="h-4 w-4" />

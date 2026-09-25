@@ -149,7 +149,8 @@ export function Navbar({ isDark, isLoggedIn, user }: NavbarProps) {
 
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`p-2 rounded-lg transition-colors ${
+              aria-label="Toggle navigation menu"
+              className={`p-2 min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg transition-colors ${
                 isDark
                   ? "text-white/70 hover:text-white hover:bg-white/5"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -176,7 +177,7 @@ export function Navbar({ isDark, isLoggedIn, user }: NavbarProps) {
             <nav className="flex flex-col p-3 gap-1">
               <Link
                 href="/projects"
-                className={`px-4 py-2.5 rounded-xl text-sm transition-colors ${
+                className={`px-4 py-3 min-h-[44px] flex items-center rounded-xl text-sm transition-colors ${
                   isDark
                     ? "text-white/80 hover:text-white hover:bg-white/5"
                     : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
@@ -188,7 +189,7 @@ export function Navbar({ isDark, isLoggedIn, user }: NavbarProps) {
 
               <Link
                 href="/community"
-                className={`px-4 py-2.5 rounded-xl text-sm transition-colors ${
+                className={`px-4 py-3 min-h-[44px] flex items-center rounded-xl text-sm transition-colors ${
                   isDark
                     ? "text-white/80 hover:text-white hover:bg-white/5"
                     : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
@@ -202,7 +203,7 @@ export function Navbar({ isDark, isLoggedIn, user }: NavbarProps) {
                 <>
                   <Link
                     href="/dashboard"
-                    className={`px-4 py-2.5 rounded-xl text-sm transition-colors ${
+                    className={`px-4 py-3 min-h-[44px] flex items-center rounded-xl text-sm transition-colors ${
                       isDark
                         ? "text-white/80 hover:text-white hover:bg-white/5"
                         : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
@@ -214,7 +215,7 @@ export function Navbar({ isDark, isLoggedIn, user }: NavbarProps) {
 
                   <Link
                     href="/dashboard/profile"
-                    className={`px-4 py-2.5 rounded-xl text-sm transition-colors ${
+                    className={`px-4 py-3 min-h-[44px] flex items-center rounded-xl text-sm transition-colors ${
                       isDark
                         ? "text-white/80 hover:text-white hover:bg-white/5"
                         : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
@@ -227,7 +228,7 @@ export function Navbar({ isDark, isLoggedIn, user }: NavbarProps) {
                   {user?.role === 'admin' && (
                     <Link
                       href="/admin"
-                      className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                      className={`px-4 py-3 min-h-[44px] flex items-center rounded-xl text-sm font-semibold transition-colors ${
                         isDark
                           ? "text-[#a05cd4] hover:text-white hover:bg-[#8d44d1]/20"
                           : "text-[#7030b0] hover:text-[#5e1a94] hover:bg-[#f5ecff]"
@@ -242,7 +243,7 @@ export function Navbar({ isDark, isLoggedIn, user }: NavbarProps) {
                 <>
                   <Link
                     href="/login"
-                    className={`px-4 py-2.5 rounded-xl text-sm transition-colors ${
+                    className={`px-4 py-3 min-h-[44px] flex items-center rounded-xl text-sm transition-colors ${
                       isDark
                         ? "text-white/80 hover:text-white hover:bg-white/5"
                         : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
@@ -254,7 +255,7 @@ export function Navbar({ isDark, isLoggedIn, user }: NavbarProps) {
 
                   <Link
                     href="/signup"
-                    className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                    className={`px-4 py-3 min-h-[44px] flex items-center rounded-xl text-sm font-medium transition-colors ${
                       isDark
                         ? "text-[#a05cd4] hover:text-[#c084f5] hover:bg-[#8d44d1]/10"
                         : "text-[#7030b0] hover:text-[#5e1a94] hover:bg-[#f5ecff]"

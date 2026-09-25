@@ -270,7 +270,7 @@ function AdminSettingsPage() {
                 <Button
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
+                  className="w-full sm:w-auto min-h-[40px] bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
                 >
                   {isSaving
                     ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving…</>
@@ -363,7 +363,7 @@ function AdminSettingsPage() {
                 </p>
               </div>
 
-              <label className="flex items-center gap-2 text-sm">
+              <label className="flex items-center gap-2 text-sm py-1 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={smtp.secure}
@@ -386,7 +386,7 @@ function AdminSettingsPage() {
                     variant="outline"
                     onClick={handleTestSmtp}
                     disabled={isTesting}
-                    className="shrink-0"
+                    className="w-full sm:w-auto min-h-[40px] shrink-0"
                   >
                     {isTesting
                       ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Sending…</>
@@ -402,7 +402,7 @@ function AdminSettingsPage() {
                 <Button
                   onClick={handleSaveSmtp}
                   disabled={isSavingSmtp}
-                  className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
+                  className="w-full sm:w-auto min-h-[40px] bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
                 >
                   {isSavingSmtp
                     ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving…</>

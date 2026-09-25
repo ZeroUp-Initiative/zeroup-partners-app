@@ -101,17 +101,17 @@ export function NotificationBell() {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80">
+      <DropdownMenuContent align="end" className="w-[calc(100vw-2rem)] max-w-xs sm:w-80">
         <div className="flex items-center justify-between px-2">
           <DropdownMenuLabel>Notifications</DropdownMenuLabel>
           {unreadCount > 0 && (
             <Button 
               variant="ghost" 
               size="sm" 
-              className="h-6 text-xs"
+              className="h-8 px-2 text-xs"
               onClick={handleMarkAllAsRead}
             >
-              <CheckCheck className="w-3 h-3 mr-1" />
+              <CheckCheck className="w-3.5 h-3.5 mr-1" />
               Mark all read
             </Button>
           )}
@@ -152,10 +152,10 @@ export function NotificationBell() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-6 w-6 p-0 shrink-0"
+                      className="h-8 w-8 min-h-[32px] min-w-[32px] p-0 shrink-0 flex items-center justify-center"
                       onClick={(e) => handleMarkAsRead(notification.id, e)}
                     >
-                      <Check className="w-3 h-3" />
+                      <Check className="w-3.5 h-3.5" />
                     </Button>
                   )}
                 </Link>

@@ -150,7 +150,7 @@ export default function MerchantVerifyPage() {
         {(mode === "idle") && (
           <Card><CardContent className="pt-6 text-center space-y-4">
             <Camera className="w-12 h-12 mx-auto text-muted-foreground" />
-            <Button className="w-full" disabled={!code.trim()} onClick={() => { setError(""); setMode("scanning") }}>Start scanning</Button>
+            <Button className="w-full min-h-[44px]" disabled={!code.trim()} onClick={() => { setError(""); setMode("scanning") }}>Start scanning</Button>
             {!code.trim() && <p className="text-xs text-muted-foreground">Enter your merchant code to begin.</p>}
           </CardContent></Card>
         )}
@@ -160,7 +160,7 @@ export default function MerchantVerifyPage() {
             <CardHeader><CardTitle className="text-base">Point at the card's QR</CardTitle></CardHeader>
             <CardContent>
               <div id="merchant-qr" className="w-full overflow-hidden rounded-lg" />
-              <Button variant="outline" className="w-full mt-4" onClick={() => { stopScanner(); setMode("idle") }}>Cancel</Button>
+              <Button variant="outline" className="w-full mt-4 min-h-[44px]" onClick={() => { stopScanner(); setMode("idle") }}>Cancel</Button>
             </CardContent>
           </Card>
         )}
@@ -176,7 +176,7 @@ export default function MerchantVerifyPage() {
                 <>
                   <CheckCircle2 className="w-12 h-12 mx-auto text-green-500" />
                   <p className="font-semibold text-green-600">Eligible — {result.discount}</p>
-                  <Button className="w-full" onClick={redeem} disabled={redeeming}>
+                  <Button className="w-full min-h-[44px]" onClick={redeem} disabled={redeeming}>
                     {redeeming ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <BadgePercent className="w-4 h-4 mr-2" />}
                     Apply {result.discount}
                   </Button>
@@ -187,7 +187,7 @@ export default function MerchantVerifyPage() {
                   <p className="text-muted-foreground">Not eligible — requires {result.requiredTierName} tier or higher.</p>
                 </>
               )}
-              <Button variant="ghost" className="w-full" onClick={reset}>Scan next</Button>
+              <Button variant="ghost" className="w-full min-h-[44px]" onClick={reset}>Scan next</Button>
             </CardContent>
           </Card>
         )}
@@ -196,7 +196,7 @@ export default function MerchantVerifyPage() {
           <Card><CardContent className="pt-6 text-center space-y-4">
             <CheckCircle2 className="w-14 h-14 mx-auto text-green-500" />
             <p className="font-semibold text-lg">{doneMsg}</p>
-            <Button className="w-full" onClick={reset}><RotateCcw className="w-4 h-4 mr-2" /> Scan next</Button>
+            <Button className="w-full min-h-[44px]" onClick={reset}><RotateCcw className="w-4 h-4 mr-2" /> Scan next</Button>
           </CardContent></Card>
         )}
       </div>
