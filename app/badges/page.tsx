@@ -96,9 +96,9 @@ function BadgesContent() {
                 <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Ready to Claim</h2>
                 {pending.map((badge) => (
                   <Card key={badge.id} className="border-amber-500/30 bg-amber-500/5">
-                    <CardContent className="flex items-center justify-between gap-4 py-5">
+                    <CardContent className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-5">
                       <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-lg">
+                        <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-lg shrink-0">
                           <Trophy className="w-5 h-5" />
                         </div>
                         <div>
@@ -113,7 +113,7 @@ function BadgesContent() {
                       <Button
                         onClick={() => claim(badge)}
                         disabled={claimingId === badge.id}
-                        className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shrink-0"
+                        className="w-full sm:w-auto min-h-[40px] bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shrink-0"
                       >
                         {claimingId === badge.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Sparkles className="w-4 h-4 mr-1.5" /> Claim</>}
                       </Button>

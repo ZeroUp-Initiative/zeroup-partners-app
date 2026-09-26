@@ -127,7 +127,7 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
           transition={{ duration: 0.8, delay: 0.2 }}
           className="max-w-4xl mx-auto"
         >
-          <div className={`relative backdrop-blur-sm rounded-3xl border p-8 md:p-12 lg:p-16 ${
+          <div className={`relative backdrop-blur-sm rounded-3xl border p-5 sm:p-8 md:p-12 lg:p-16 ${
             isDark 
               ? 'bg-[#1e1040]/50 border-white/5' 
               : 'bg-white/90 border-amber-200 shadow-xl'
@@ -172,7 +172,9 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
                   </div>
 
                   {/* Optional audio button */}
-                  <button className={`ml-auto p-3 rounded-full transition-colors group hidden md:flex ${
+                  <button 
+                    aria-label="Play audio testimonial"
+                    className={`ml-auto p-3 rounded-full transition-colors group hidden md:flex ${
                     isDark ? 'bg-white/5 hover:bg-white/10' : 'bg-slate-100 hover:bg-slate-200'
                   }`}>
                     <Volume2 className={`w-5 h-5 ${isDark ? 'text-white/40 group-hover:text-white/60' : 'text-slate-400 group-hover:text-slate-600'}`} />
@@ -184,7 +186,7 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
             {/* Navigation */}
             <div className={`flex items-center justify-between mt-8 md:mt-12 pt-8 border-t ${isDark ? 'border-white/5' : 'border-slate-200'}`}>
               {/* Dots */}
-              <div className="flex gap-2">
+              <div className="flex items-center gap-1">
                 {testimonials.map((_, index) => (
                   <button
                     key={index}
@@ -192,20 +194,26 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
                       setAutoPlay(false)
                       setCurrentIndex(index)
                     }}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      index === currentIndex 
-                        ? 'w-8 bg-gradient-to-r from-[#a05cd4] to-[#8d44d1]' 
-                        : isDark ? 'bg-white/20 hover:bg-white/40' : 'bg-slate-300 hover:bg-slate-400'
-                    }`}
-                  />
+                    aria-label={`Go to testimonial ${index + 1}`}
+                    className="p-2 min-h-[40px] min-w-[32px] flex items-center justify-center cursor-pointer"
+                  >
+                    <span
+                      className={`h-2 rounded-full transition-all duration-300 block ${
+                        index === currentIndex 
+                          ? 'w-8 bg-gradient-to-r from-[#a05cd4] to-[#8d44d1]' 
+                          : `w-2 ${isDark ? 'bg-white/20 hover:bg-white/40' : 'bg-slate-300 hover:bg-slate-400'}`
+                      }`}
+                    />
+                  </button>
                 ))}
               </div>
 
               {/* Arrows */}
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={goToPrev}
-                  className={`p-2 rounded-full transition-colors ${
+                  aria-label="Previous testimonial"
+                  className={`p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full transition-colors ${
                     isDark ? 'bg-white/5 hover:bg-white/10' : 'bg-slate-100 hover:bg-slate-200'
                   }`}
                 >
@@ -213,7 +221,8 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
                 </button>
                 <button
                   onClick={goToNext}
-                  className={`p-2 rounded-full transition-colors ${
+                  aria-label="Next testimonial"
+                  className={`p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full transition-colors ${
                     isDark ? 'bg-white/5 hover:bg-white/10' : 'bg-slate-100 hover:bg-slate-200'
                   }`}
                 >
@@ -233,7 +242,7 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
                 initial={{ opacity: 0, x: 20 }}
                 animate={isInView ? { opacity: 1, x: 0 } : {}}
                 transition={{ delay: index * 0.1 }}
-                className={`w-[300px] flex-shrink-0 rounded-xl border p-5 ${
+                className={`w-[260px] sm:w-[300px] flex-shrink-0 rounded-xl border p-5 ${
                   isDark ? 'bg-[#1e1040]/50 border-white/5' : 'bg-white/90 border-amber-200 shadow-lg'
                 }`}
               >

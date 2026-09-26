@@ -228,8 +228,8 @@ function ProfileContent() {
           </Link>
        </div>
 
-      <div className="flex items-center gap-4 mb-8">
-        <div className="relative group">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 mb-8">
+        <div className="relative group shrink-0">
           <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
             {photoURL ? (
               <AvatarImage src={photoURL} alt={`${user?.firstName}'s profile`} />
@@ -252,7 +252,8 @@ function ProfileContent() {
               type="button"
               size="icon"
               variant="ghost"
-              className="text-white hover:bg-white/20 h-10 w-10"
+              aria-label="Upload photo"
+              className="text-white hover:bg-white/20 h-10 w-10 min-h-[40px] min-w-[40px]"
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploadingPhoto}
             >
@@ -270,31 +271,32 @@ function ProfileContent() {
               type="button"
               size="icon"
               variant="destructive"
-              className="absolute -top-1 -right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+              aria-label="Remove photo"
+              className="absolute -top-1 -right-1 h-7 w-7 rounded-full sm:opacity-0 sm:group-hover:opacity-100 opacity-100 transition-opacity flex items-center justify-center"
               onClick={handleRemovePhoto}
               disabled={isUploadingPhoto}
             >
-              <X className="h-3 w-3" />
+              <X className="h-3.5 w-3.5" />
             </Button>
           )}
         </div>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{user?.firstName} {user?.lastName}</h1>
-          <p className="text-muted-foreground">{user?.email}</p>
-          <div className="flex items-center gap-2 mt-2">
-            <div className="flex items-center text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded w-fit">
-              <Calendar className="w-3 h-3 mr-1" />
+        <div className="flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{user?.firstName} {user?.lastName}</h1>
+          <p className="text-muted-foreground text-sm break-all">{user?.email}</p>
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-2">
+            <div className="flex items-center text-xs text-muted-foreground bg-muted/50 px-2.5 py-1.5 rounded w-fit">
+              <Calendar className="w-3.5 h-3.5 mr-1" />
               Joined {user?.createdAt?.toDate ? new Date(user.createdAt.toDate()).toLocaleDateString() : "Recently"}
             </div>
             <Button
               type="button"
               variant="outline"
               size="sm"
-              className="h-6 text-xs"
+              className="h-8 px-3 text-xs"
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploadingPhoto}
             >
-              <Upload className="h-3 w-3 mr-1" />
+              <Upload className="h-3.5 w-3.5 mr-1" />
               {photoURL ? "Change Photo" : "Add Photo"}
             </Button>
           </div>
@@ -302,11 +304,11 @@ function ProfileContent() {
       </div>
 
       <Tabs defaultValue="general" className="w-full">
-        <TabsList className="mb-8 grid w-full grid-cols-4 sm:w-auto sm:inline-flex">
-          <TabsTrigger value="general" className="gap-2 text-xs sm:text-sm"><User className="w-4 h-4" /> <span className="hidden sm:inline">General</span><span className="sm:hidden">Info</span></TabsTrigger>
-          <TabsTrigger value="security" className="gap-2 text-xs sm:text-sm"><Lock className="w-4 h-4" /> Security</TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-2 text-xs sm:text-sm"><Bell className="w-4 h-4" /> <span className="hidden sm:inline">Notifications</span><span className="sm:hidden">Alerts</span></TabsTrigger>
-          <TabsTrigger value="flier" className="gap-2 text-xs sm:text-sm"><Award className="w-4 h-4" /> <span className="hidden sm:inline">My Flier</span><span className="sm:hidden">Flier</span></TabsTrigger>
+        <TabsList className="mb-8 grid w-full grid-cols-4 sm:w-auto sm:inline-flex h-auto p-1">
+          <TabsTrigger value="general" className="gap-1.5 text-xs sm:text-sm py-2"><User className="w-4 h-4" /> <span className="hidden sm:inline">General</span><span className="sm:hidden">Info</span></TabsTrigger>
+          <TabsTrigger value="security" className="gap-1.5 text-xs sm:text-sm py-2"><Lock className="w-4 h-4" /> Security</TabsTrigger>
+          <TabsTrigger value="notifications" className="gap-1.5 text-xs sm:text-sm py-2"><Bell className="w-4 h-4" /> <span className="hidden sm:inline">Notifications</span><span className="sm:hidden">Alerts</span></TabsTrigger>
+          <TabsTrigger value="flier" className="gap-1.5 text-xs sm:text-sm py-2"><Award className="w-4 h-4" /> <span className="hidden sm:inline">My Flier</span><span className="sm:hidden">Flier</span></TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">

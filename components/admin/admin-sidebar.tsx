@@ -75,7 +75,7 @@ export function AdminSidebar() {
         </h2>
         <p className="text-xs text-muted-foreground">Partner Management</p>
       </div>
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-4 space-y-2 overflow-y-auto min-h-0">
         {sidebarItems.map((item) => {
           const isActive = pathname === item.href
           return (
@@ -84,22 +84,22 @@ export function AdminSidebar() {
               href={item.href}
               onClick={() => setOpen(false)}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200",
+                "flex items-center gap-3 px-4 py-3 min-h-[44px] text-sm font-medium rounded-lg transition-all duration-200",
                 isActive
                   ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
                   : "hover:bg-muted text-muted-foreground hover:text-foreground"
               )}
             >
-              <item.icon className="w-4 h-4" />
-              {item.title}
+              <item.icon className="w-4 h-4 shrink-0" />
+              <span>{item.title}</span>
             </Link>
           )
         })}
       </nav>
-      <div className="p-4 border-t">
+      <div className="p-4 border-t shrink-0">
         <Button
           variant="outline"
-          className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+          className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 min-h-[44px]"
           onClick={() => logout()}
         >
           <LogOut className="w-4 h-4 mr-2" />
@@ -119,11 +119,16 @@ export function AdminSidebar() {
       {/* Mobile Trigger */}
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden fixed top-4 left-4 z-50">
-                <Menu className="h-6 w-6" />
+            <Button 
+              variant="outline" 
+              size="icon" 
+              aria-label="Open Admin Menu"
+              className="md:hidden fixed top-4 left-4 z-50 h-10 w-10 min-h-[40px] min-w-[40px] bg-background/90 backdrop-blur-md shadow-sm border border-border"
+            >
+                <Menu className="h-5 w-5" />
             </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="p-0 w-64">
+        <SheetContent side="left" className="p-0 w-64 max-w-[80vw]">
             <SidebarContent />
         </SheetContent>
       </Sheet>

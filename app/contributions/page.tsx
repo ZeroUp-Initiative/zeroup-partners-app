@@ -317,7 +317,7 @@ function ContributionsContent() {
                                     {getStatusBadge(contribution.status)}
                                   </div>
                                   {contribution.proofURL &&
-                                    <Button variant="outline" size="sm" asChild className="hover:bg-primary hover:text-primary-foreground transition-colors flex-shrink-0">
+                                    <Button variant="outline" size="sm" asChild className="hover:bg-primary hover:text-primary-foreground transition-colors flex-shrink-0 min-h-[38px] px-3">
                                       <Link href={contribution.proofURL} target="_blank">
                                           <FileText className="w-4 h-4 sm:mr-2" />
                                           <span className="hidden sm:inline">View Proof</span>
@@ -349,13 +349,14 @@ function ContributionsContent() {
               <p className="text-sm text-muted-foreground order-2 sm:order-1">
                 Showing {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, contributions.length)} of {contributions.length} contributions
               </p>
-              <div className="flex items-center gap-1 order-1 sm:order-2">
+              <div className="flex items-center gap-1.5 order-1 sm:order-2 flex-wrap justify-center">
                 <Button
                   variant="outline"
                   size="sm"
+                  aria-label="Previous page"
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="h-8 w-8 p-0"
+                  className="h-9 w-9 sm:h-8 sm:w-8 min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-0"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
@@ -374,8 +375,9 @@ function ContributionsContent() {
                       key={page}
                       variant={currentPage === page ? "default" : "outline"}
                       size="sm"
+                      aria-label={`Page ${page}`}
                       onClick={() => setCurrentPage(page)}
-                      className={`h-8 w-8 p-0 ${currentPage === page ? 'bg-[#8d44d1] hover:bg-[#7030b0] border-[#8d44d1]' : ''}`}
+                      className={`h-9 w-9 sm:h-8 sm:w-8 min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-0 text-sm ${currentPage === page ? 'bg-[#8d44d1] hover:bg-[#7030b0] border-[#8d44d1]' : ''}`}
                     >
                       {page}
                     </Button>
@@ -385,9 +387,10 @@ function ContributionsContent() {
                 <Button
                   variant="outline"
                   size="sm"
+                  aria-label="Next page"
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  className="h-8 w-8 p-0"
+                  className="h-9 w-9 sm:h-8 sm:w-8 min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-0"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </Button>

@@ -786,8 +786,9 @@ function DashboardPage() {
                                             type="button"
                                             variant="outline"
                                             size="sm"
+                                            aria-label="Copy account number"
                                             onClick={copyAccountNumber}
-                                            className="h-8 px-2"
+                                            className="h-9 px-3 min-h-[36px]"
                                         >
                                             <Copy className="w-3.5 h-3.5 mr-1" />
                                             Copy
@@ -816,7 +817,7 @@ function DashboardPage() {
                     {/* Partner of the Month - Premium Flier Design */}
                     <div className="col-span-1">
                       <div ref={partnerFlierRef}>
-                        <Card className="relative overflow-hidden border-0 shadow-2xl aspect-[4/5]">
+                        <Card className="relative overflow-hidden border-0 shadow-2xl aspect-auto sm:aspect-[4/5] min-h-[500px] sm:min-h-0">
                             {/* Background gradient with premium look */}
                             <div className="absolute inset-0 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500" />
                             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-yellow-400/40 via-transparent to-transparent" />
@@ -1049,7 +1050,10 @@ function DashboardPage() {
                                                     </div>
                                                     <PartnerFlierModal
                                                         trigger={
-                                                            <button className="cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0">
+                                                            <button 
+                                                              aria-label={`View recognition card for ${contributor.name}`}
+                                                              className="cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center"
+                                                            >
                                                                 <Avatar className="h-8 w-8 sm:h-10 sm:w-10 ring-2 ring-background">
                                                                     <AvatarImage src={contributor.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${contributor.name}`} />
                                                                     <AvatarFallback className="bg-gradient-to-br from-purple-400 to-pink-400 text-white">{contributor.name[0]}</AvatarFallback>

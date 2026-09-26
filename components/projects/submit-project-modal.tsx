@@ -216,7 +216,7 @@ export function SubmitProjectModal({ open, onOpenChange }: SubmitProjectModalPro
             <p className="text-muted-foreground max-w-sm">
               Your project has been submitted and is pending review. We'll notify you once it's been approved and made live.
             </p>
-            <Button onClick={handleClose} className="mt-2 bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0">
+            <Button onClick={handleClose} className="mt-2 min-h-[44px] bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0">
               Close
             </Button>
           </div>
@@ -383,17 +383,17 @@ export function SubmitProjectModal({ open, onOpenChange }: SubmitProjectModalPro
             )}
 
             {/* Navigation */}
-            <div className="flex justify-between mt-6">
+            <div className="flex justify-between items-center gap-3 mt-6">
               {step > 0 ? (
-                <Button type="button" variant="outline" onClick={back}>
+                <Button type="button" variant="outline" onClick={back} className="min-h-[44px]">
                   <ArrowLeft className="w-4 h-4 mr-2" /> Back
                 </Button>
               ) : (
-                <Button type="button" variant="ghost" onClick={handleClose}>Cancel</Button>
+                <Button type="button" variant="ghost" onClick={handleClose} className="min-h-[44px]">Cancel</Button>
               )}
 
               {step < STEPS.length - 1 ? (
-                <Button type="button" onClick={next} className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0">
+                <Button type="button" onClick={next} className="min-h-[44px] bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0">
                   Next <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               ) : (
@@ -401,7 +401,7 @@ export function SubmitProjectModal({ open, onOpenChange }: SubmitProjectModalPro
                   type="button"
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
+                  className="min-h-[44px] bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
                 >
                   {isSubmitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Submitting…</> : 'Submit Project'}
                 </Button>

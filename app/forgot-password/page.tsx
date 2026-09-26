@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-2">
-          <Link href="/login" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
+          <Link href="/login" className="inline-flex items-center min-h-[44px] py-2 text-muted-foreground hover:text-foreground mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to login
           </Link>
@@ -77,7 +77,7 @@ export default function ForgotPasswordPage() {
         <Card className="border-0 shadow-xl">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Forgot Password</CardTitle>
-            <CardDescription>Enter your email and we\'ll send you a link to reset your password.</CardDescription>
+            <CardDescription>Enter your email and we'll send you a link to reset your password.</CardDescription>
           </CardHeader>
           <CardContent>
             {success ? (
@@ -107,7 +107,7 @@ export default function ForgotPasswordPage() {
                     disabled={isLoading}
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button type="submit" className="w-full min-h-[44px]" disabled={isLoading}>
                   {isLoading ? "Sending..." : "Send Reset Link"}
                 </Button>
               </form>

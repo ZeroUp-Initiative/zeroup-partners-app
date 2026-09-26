@@ -79,7 +79,7 @@ export default function Header({ title, subtitle }: HeaderProps) {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="md:hidden"
+              className="md:hidden h-10 w-10 min-h-[40px] min-w-[40px]"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               <Menu className="w-5 h-5" />
@@ -128,38 +128,38 @@ export default function Header({ title, subtitle }: HeaderProps) {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-lg border-b border-border/40 shadow-lg">
-          <nav className="container mx-auto px-4 py-4 space-y-3">
+          <nav className="container mx-auto px-4 py-4 space-y-2">
             <Link 
               href="/contributions" 
-              className="block text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2"
+              className="flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-3 min-h-[44px]"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Contributions
             </Link>
             <Link 
               href="/projects" 
-              className="block text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2"
+              className="flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-3 min-h-[44px]"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Projects
             </Link>
             <Link 
               href="/analytics" 
-              className="block text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2"
+              className="flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-3 min-h-[44px]"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Analytics
             </Link>
             <Link 
               href="/community" 
-              className="block text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2"
+              className="flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-3 min-h-[44px]"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Community
             </Link>
             
             {/* Theme Toggle in Mobile */}
-            <div className="flex items-center justify-between py-2">
+            <div className="flex items-center justify-between py-2 min-h-[44px]">
               <span className="text-sm text-muted-foreground">Theme</span>
               <ThemeToggle />
             </div>
@@ -168,8 +168,8 @@ export default function Header({ title, subtitle }: HeaderProps) {
             <div className="border-t border-border/40 pt-4 mt-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Link href="/dashboard/profile" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Avatar className="h-8 w-8 ring-2 ring-primary/20">
+                  <Link href="/dashboard/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3">
+                    <Avatar className="h-9 w-9 ring-2 ring-primary/20">
                       {user?.photoURL && (
                         <AvatarImage src={user.photoURL} alt={`${user.firstName}'s profile`} />
                       )}
@@ -177,23 +177,23 @@ export default function Header({ title, subtitle }: HeaderProps) {
                         {user?.firstName?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
+                    <div>
+                      <p className="text-sm font-medium">
+                        {user?.firstName && user?.lastName 
+                          ? `${user.firstName} ${user.lastName}` 
+                          : user?.displayName 
+                          ? user.displayName 
+                          : user?.email?.split('@')[0]}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Individual Partner</p>
+                    </div>
                   </Link>
-                  <div>
-                    <p className="text-sm font-medium">
-                      {user?.firstName && user?.lastName 
-                        ? `${user.firstName} ${user.lastName}` 
-                        : user?.displayName 
-                        ? user.displayName 
-                        : user?.email?.split('@')[0]}
-                    </p>
-                    <p className="text-xs text-muted-foreground">Individual Partner</p>
-                  </div>
                 </div>
                 <Button 
                   variant="ghost" 
                   size="icon" 
                   onClick={logout} 
-                  className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                  className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors h-10 w-10 min-h-[40px] min-w-[40px]"
                 >
                   <LogOut className="w-4 h-4" />
                   <span className="sr-only">Logout</span>

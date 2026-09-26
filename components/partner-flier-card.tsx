@@ -225,7 +225,7 @@ export function PartnerFlierCard({
           <Button
             onClick={handleDownload}
             disabled={isDownloading}
-            className={`${
+            className={`min-h-[44px] ${
               isTopPartner
                 ? "bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700"
                 : "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"

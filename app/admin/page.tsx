@@ -141,7 +141,7 @@ function AdminDashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent className="overflow-x-auto">
-          <Table>
+          <Table className="min-w-[550px]">
             <TableHeader>
               <TableRow>
                 <TableHead>User</TableHead>
@@ -154,16 +154,16 @@ function AdminDashboard() {
             <TableBody>
               {pendingPayments.map(payment => (
                 <TableRow key={payment.id}>
-                  <TableCell className="font-medium">{payment.userFullName || "N/A"}</TableCell>
-                  <TableCell>₦{payment.amount?.toLocaleString() || "0.00"}</TableCell>
-                  <TableCell>{payment.date?.toLocaleDateString() || "N/A"}</TableCell>
+                  <TableCell className="font-medium whitespace-nowrap">{payment.userFullName || "N/A"}</TableCell>
+                  <TableCell className="whitespace-nowrap font-semibold">₦{payment.amount?.toLocaleString() || "0.00"}</TableCell>
+                  <TableCell className="whitespace-nowrap">{payment.date?.toLocaleDateString() || "N/A"}</TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm" onClick={() => setViewingProof(payment.proofURL)}>
+                    <Button variant="outline" size="sm" aria-label="View proof" onClick={() => setViewingProof(payment.proofURL)} className="min-h-[32px] px-2.5">
                       View
                     </Button>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button size="sm" variant="outline" asChild>
+                    <Button size="sm" variant="outline" asChild className="min-h-[32px] px-2.5">
                       <Link href="/admin/transactions">
                         Review <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                       </Link>
@@ -197,7 +197,7 @@ function AdminDashboard() {
               )}
             </CardHeader>
             <CardContent className="overflow-x-auto">
-              <Table>
+              <Table className="min-w-[600px]">
                 <TableHeader>
                   <TableRow>
                     <TableHead>User</TableHead>
@@ -228,7 +228,7 @@ function AdminDashboard() {
                         </TableCell>
                         <TableCell className="text-xs max-w-[160px] truncate">{payment.rejectionReason || "-"}</TableCell>
                         <TableCell>
-                          <Button variant="outline" size="sm" onClick={() => setViewingProof(payment.proofURL)}>
+                          <Button variant="outline" size="sm" className="min-h-[32px] px-2.5" onClick={() => setViewingProof(payment.proofURL)}>
                             View
                           </Button>
                         </TableCell>
@@ -248,7 +248,8 @@ function AdminDashboard() {
                       variant="outline" size="sm"
                       onClick={() => setHistoryPage(p => Math.max(1, p - 1))}
                       disabled={historyPage === 1}
-                      className="h-8 w-8 p-0"
+                      className="h-9 w-9 sm:h-8 sm:w-8 min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-0"
+                      aria-label="Previous history page"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </Button>
@@ -265,7 +266,7 @@ function AdminDashboard() {
                           variant={historyPage === page ? "default" : "outline"}
                           size="sm"
                           onClick={() => setHistoryPage(page)}
-                          className={`h-8 w-8 p-0 ${historyPage === page ? 'bg-[#8d44d1] hover:bg-[#7030b0] border-[#8d44d1]' : ''}`}
+                          className={`h-9 w-9 sm:h-8 sm:w-8 min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-0 ${historyPage === page ? 'bg-[#8d44d1] hover:bg-[#7030b0] border-[#8d44d1]' : ''}`}
                         >
                           {page}
                         </Button>
@@ -275,7 +276,8 @@ function AdminDashboard() {
                       variant="outline" size="sm"
                       onClick={() => setHistoryPage(p => Math.min(historyTotalPages, p + 1))}
                       disabled={historyPage === historyTotalPages}
-                      className="h-8 w-8 p-0"
+                      className="h-9 w-9 sm:h-8 sm:w-8 min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-0"
+                      aria-label="Next history page"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </Button>
@@ -293,7 +295,8 @@ function AdminDashboard() {
              <div className="relative w-full h-full min-h-[50vh] flex items-center justify-center bg-black/80 rounded-lg backdrop-blur-sm p-4">
                 <button 
                   onClick={() => setViewingProof(null)}
-                  className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/50 text-white hover:bg-white/20 transition-colors"
+                  className="absolute top-4 right-4 z-50 p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full bg-black/50 text-white hover:bg-white/20 transition-colors"
+                  aria-label="Close proof preview"
                 >
                   <span className="sr-only">Close</span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>

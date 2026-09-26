@@ -140,7 +140,7 @@ function AnalyticsContent() {
 
       <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="mb-6">
-          <Link href="/dashboard" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+          <Link href="/dashboard" className="inline-flex items-center min-h-[44px] py-2 text-sm text-muted-foreground hover:text-primary transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Link>
@@ -192,20 +192,20 @@ function AnalyticsContent() {
           </div>
 
           <Tabs defaultValue="trends" className="space-y-6 animate-fade-in delay-400">
-            <TabsList className="glass-card grid w-full grid-cols-3">
+            <TabsList className="glass-card grid w-full grid-cols-3 h-auto p-1">
               <TabsTrigger
                 value="trends"
-                className="text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+                className="py-2.5 min-h-[40px] text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
               >
                 Contribution Trends
               </TabsTrigger>
               <TabsTrigger
                 value="impact"
-                className="text-xs sm:text-sm data-[state=active]:bg-secondary/20 data-[state=active]:text-secondary"
+                className="py-2.5 min-h-[40px] text-xs sm:text-sm data-[state=active]:bg-secondary/20 data-[state=active]:text-secondary"
               >
                 Impact Distribution
               </TabsTrigger>
-              <TabsTrigger value="goals" className="text-xs sm:text-sm data-[state=active]:bg-accent/20 data-[state=active]:text-accent">
+              <TabsTrigger value="goals" className="py-2.5 min-h-[40px] text-xs sm:text-sm data-[state=active]:bg-accent/20 data-[state=active]:text-accent">
                 Goal Progress
               </TabsTrigger>
             </TabsList>

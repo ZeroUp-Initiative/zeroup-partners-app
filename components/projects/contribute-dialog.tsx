@@ -181,7 +181,7 @@ export function ContributeDialog({ project, open, onOpenChange, onSuccess }: Con
             customMessage={project.id === 'general' ? "I just partnered with ZeroUp!" : `I just partnered with ${project.title}!`}
             showDownload={true}
           />
-          <Button variant="outline" className="w-full" onClick={() => onOpenChange(false)}>Close</Button>
+          <Button variant="outline" className="w-full min-h-[44px]" onClick={() => onOpenChange(false)}>Close</Button>
         </DialogContent>
       </Dialog>
     )
@@ -189,7 +189,7 @@ export function ContributeDialog({ project, open, onOpenChange, onSuccess }: Con
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-lg p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {project?.id === 'general' ? 'Make General Contribution' : `Contribute to ${project?.title}`}
@@ -217,10 +217,11 @@ export function ContributeDialog({ project, open, onOpenChange, onSuccess }: Con
                     type="button"
                     variant="ghost"
                     size="sm"
+                    aria-label="Copy account number"
                     onClick={copyAccountNumber}
-                    className="h-6 w-6 p-0 hover:bg-blue-100 dark:hover:bg-blue-900"
+                    className="h-8 w-8 min-h-[32px] min-w-[32px] p-0 flex items-center justify-center hover:bg-blue-100 dark:hover:bg-blue-900"
                   >
-                    <Copy className="w-3 h-3" />
+                    <Copy className="w-3.5 h-3.5" />
                   </Button>
                 </div>
               </div>
@@ -286,9 +287,9 @@ export function ContributeDialog({ project, open, onOpenChange, onSuccess }: Con
           </div>
           {error && <p className="text-sm text-red-500">{error}</p>}
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={handleConfirmContribution} disabled={isContributing}>
+        <DialogFooter className="flex-col-reverse sm:flex-row gap-2 sm:gap-0">
+          <Button variant="outline" className="w-full sm:w-auto min-h-[40px]" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button className="w-full sm:w-auto min-h-[40px]" onClick={handleConfirmContribution} disabled={isContributing}>
             {isContributing ? 'Processing...' : 'Confirm Contribution'}
           </Button>
         </DialogFooter>

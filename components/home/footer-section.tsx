@@ -40,20 +40,20 @@ export function FooterSection({ isDark }: FooterSectionProps) {
           {/* Quick Links */}
           <div>
             <h4 className={`font-semibold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>Quick Links</h4>
-            <nav className="flex flex-col gap-2">
-              <Link href="/projects" className={`text-sm transition-colors ${isDark ? 'text-white/40 hover:text-white/70' : 'text-slate-500 hover:text-slate-700'}`}>Projects</Link>
-              <Link href="/community" className={`text-sm transition-colors ${isDark ? 'text-white/40 hover:text-white/70' : 'text-slate-500 hover:text-slate-700'}`}>Community</Link>
-              <Link href="/resources" className={`text-sm transition-colors ${isDark ? 'text-white/40 hover:text-white/70' : 'text-slate-500 hover:text-slate-700'}`}>Resources</Link>
-              <Link href="/dashboard" className={`text-sm transition-colors ${isDark ? 'text-white/40 hover:text-white/70' : 'text-slate-500 hover:text-slate-700'}`}>Dashboard</Link>
+            <nav className="flex flex-col gap-1">
+              <Link href="/projects" className={`text-sm py-1.5 min-h-[36px] flex items-center transition-colors ${isDark ? 'text-white/40 hover:text-white/70' : 'text-slate-500 hover:text-slate-700'}`}>Projects</Link>
+              <Link href="/community" className={`text-sm py-1.5 min-h-[36px] flex items-center transition-colors ${isDark ? 'text-white/40 hover:text-white/70' : 'text-slate-500 hover:text-slate-700'}`}>Community</Link>
+              <Link href="/resources" className={`text-sm py-1.5 min-h-[36px] flex items-center transition-colors ${isDark ? 'text-white/40 hover:text-white/70' : 'text-slate-500 hover:text-slate-700'}`}>Resources</Link>
+              <Link href="/dashboard" className={`text-sm py-1.5 min-h-[36px] flex items-center transition-colors ${isDark ? 'text-white/40 hover:text-white/70' : 'text-slate-500 hover:text-slate-700'}`}>Dashboard</Link>
             </nav>
           </div>
 
           {/* Support */}
           <div>
             <h4 className={`font-semibold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>Support</h4>
-            <nav className="flex flex-col gap-2">
-              <a href="mailto:support@zeroup.org" className={`text-sm transition-colors ${isDark ? 'text-white/40 hover:text-white/70' : 'text-slate-500 hover:text-slate-700'}`}>Contact Us</a>
-              <a href="mailto:partners@zeroup.org" className={`text-sm transition-colors ${isDark ? 'text-white/40 hover:text-white/70' : 'text-slate-500 hover:text-slate-700'}`}>Partner Inquiries</a>
+            <nav className="flex flex-col gap-1">
+              <a href="mailto:support@zeroup.org" className={`text-sm py-1.5 min-h-[36px] flex items-center transition-colors ${isDark ? 'text-white/40 hover:text-white/70' : 'text-slate-500 hover:text-slate-700'}`}>Contact Us</a>
+              <a href="mailto:partners@zeroup.org" className={`text-sm py-1.5 min-h-[36px] flex items-center transition-colors ${isDark ? 'text-white/40 hover:text-white/70' : 'text-slate-500 hover:text-slate-700'}`}>Partner Inquiries</a>
             </nav>
           </div>
 

@@ -45,7 +45,7 @@ function ProjectsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
-        <Link href="/dashboard" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+        <Link href="/dashboard" className="inline-flex items-center min-h-[44px] py-2 text-sm text-muted-foreground hover:text-primary transition-colors">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Dashboard
         </Link>
@@ -68,7 +68,7 @@ function ProjectsPage() {
                 status: 'open'
               } as Project);
             }}
-            className="shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all"
+            className="w-full sm:w-auto min-h-[44px] shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all"
           >
             <Banknote className="w-5 h-5 mr-2" />
             Make General Contribution
@@ -122,6 +122,7 @@ function ProjectsPage() {
               <CardFooter className="flex justify-between items-center">
                  <Badge variant={project.status === 'fully-funded' ? 'secondary' : 'default'}>{project.status.toUpperCase()}</Badge>
                 <Button
+                  className="min-h-[40px] px-4"
                   onClick={(e) => { e.stopPropagation(); handleContributeClick(project) }}
                   disabled={project.status !== 'open'}
                 >
