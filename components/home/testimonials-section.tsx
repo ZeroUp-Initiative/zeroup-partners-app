@@ -3,8 +3,7 @@
 import { useRef, useState, useEffect } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { Quote, ChevronLeft, ChevronRight, Volume2 } from 'lucide-react'
-import { db } from '@/lib/firebase/client'
-import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore'
+import { subscribeCommunity } from '@/lib/community-data'
 
 interface Testimonial {
   quote: string
@@ -37,17 +36,13 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
   // logging a contribution. No placeholder/invented quotes — if nobody has
   // left one yet, the section says so instead of making one up.
   useEffect(() => {
-    const q = query(
-      collection(db, 'payments'),
-      where('status', '==', 'approved'),
-      orderBy('createdAt', 'desc'),
-      limit(50)
-    )
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    return subscribeCommunity(({ contributions }) => {
+      const newest = [...contributions]
+        .sort((x, y) => (y.createdAt?.getTime() ?? 0) - (x.createdAt?.getTime() ?? 0))
+        .slice(0, 50)
       const items: Testimonial[] = []
-      snapshot.forEach((doc) => {
-        const data = doc.data() as any
-        const quote = typeof data.message === 'string' ? data.message.trim() : ''
+      newest.forEach((data) => {
+        const quote = (data.message || '').trim()
         if (!quote) return
         items.push({
           quote,
@@ -60,9 +55,8 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
       })
       setTestimonials(items)
       setLoaded(true)
-      setCurrentIndex(0)
-    })
-    return () => unsubscribe()
+      setCurrentIndex((i) => (i < items.length ? i : 0))
+    }, () => setLoaded(true))
   }, [])
 
   useEffect(() => {

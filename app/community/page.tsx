@@ -3,6 +3,7 @@
 import ProtectedRoute from "@/components/auth/protected-route"
 import { useAuth } from "@/contexts/auth-context"
 import { auth, db } from "@/lib/firebase/client"
+import { subscribeCommunity } from '@/lib/community-data'
 import { collection, query, where, onSnapshot } from "firebase/firestore"
 import { useState, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/button"
@@ -42,32 +43,16 @@ function CommunityContent() {
   useEffect(() => {
     if (!user) return
 
-    // Real-time listener for users
-    const unsubUsers = onSnapshot(collection(db, "users"), (snapshot) => {
+    return subscribeCommunity(({ profiles, contributions }) => {
       const userMap = new Map<string, any>()
-      snapshot.forEach(doc => {
-        const userData = { id: doc.id, ...doc.data() }
-        userMap.set(doc.id, userData)
-      })
+      profiles.filter(p => p.kind !== 'organization').forEach(p => userMap.set(p.id, p))
+      const orgIds = new Set(profiles.filter(p => p.kind === 'organization').map(p => p.id))
       setUsersMap(userMap)
-      setStats(prev => ({ ...prev, totalPartners: snapshot.size }))
+      setStats(prev => ({ ...prev, totalPartners: userMap.size }))
+      // Organization accounts don't compete on partner rankings
+      setPaymentsData(contributions.filter(p => !p.userId || !orgIds.has(p.userId)))
       setLoading(false)
-    })
-
-    // Real-time listener for payments
-    const unsubPayments = onSnapshot(
-      query(collection(db, "payments"), where("status", "==", "approved")), 
-      (snapshot) => {
-        const payments: any[] = []
-        snapshot.forEach(doc => payments.push({ id: doc.id, ...doc.data() }))
-        setPaymentsData(payments)
-      }
-    )
-
-    return () => {
-      unsubUsers()
-      unsubPayments()
-    }
+    }, () => setLoading(false))
   }, [user])
 
   // Process data when payments or users change

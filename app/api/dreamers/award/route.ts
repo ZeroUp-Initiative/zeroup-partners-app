@@ -39,6 +39,10 @@ export async function POST(req: NextRequest) {
     if (!paymentId) return NextResponse.json({ error: 'Missing paymentId.' }, { status: 400 })
 
     const paymentRef = fdb.collection('payments').doc(String(paymentId))
+    const payer = (await paymentRef.get()).data() as Record<string, any> | undefined
+    if (payer?.userId === callerUid) {
+      return NextResponse.json({ error: 'Another admin must approve your own contribution.' }, { status: 403 })
+    }
 
     // --- Referral award (independent + idempotent): credit the referrer who brought this contribution ---
     // Referrer earns 50 DR per ₦1,000 referred (floor(amount / 20)).
@@ -112,7 +116,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ awarded: 0, reason: 'not_a_dreamer' })
     }
 
-    // Any approved contribution earns, whoever owns the project (ZeroUp or not).
+    // Any approved contribution earns, whoever owns the project (ZeroUp or not),
+    // except an organization funding itself: that would mint coins for moving its own money.
+    const contributor = contributorSnap.data() as Record<string, any> | undefined
+    if (contributor?.role === 'organization') {
+      await unclaim('organization_account')
+      return NextResponse.json({ awarded: 0, reason: 'organization_account' })
+    }
+    if (p.projectId && p.projectId !== 'general') {
+      const proj = (await fdb.collection('projects').doc(String(p.projectId)).get()).data() as Record<string, any> | undefined
+      if (proj?.ownerOrgId) {
+        const org = (await fdb.collection('organizations').doc(String(proj.ownerOrgId)).get()).data() as Record<string, any> | undefined
+        const sameEmail = !!org?.email && String(contributor?.email || '').toLowerCase() === org.email
+        if (proj.ownerOrgUid === p.userId || sameEmail) {
+          await unclaim('own_project')
+          return NextResponse.json({ awarded: 0, reason: 'own_project' })
+        }
+      }
+    }
     const dr = drForAmount(p.amount)
     if (dr <= 0) {
       await unclaim('amount_too_small')

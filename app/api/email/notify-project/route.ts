@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendMail } from '@/lib/mailer'
 import { getAdminDb } from '@/lib/firebase/admin'
+import { APP_URL } from '@/lib/app-url'
+import { verifyAdmin } from '@/lib/auth/verify-admin'
 
-const BASE_URL = 'https://zeroup-partners-app.vercel.app'
+const BASE_URL = APP_URL
 
 const sharedStyles = `
   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background: #f4f4f5; }
@@ -101,6 +103,7 @@ const templates: Record<string, (name: string, data: BroadcastData) => { subject
 }
 
 export async function POST(req: NextRequest) {
+  if (!(await verifyAdmin(req))) return NextResponse.json({ error: 'Admins only.' }, { status: 401 })
   try {
     const { type, data } = (await req.json()) as { type: string; data: BroadcastData }
 

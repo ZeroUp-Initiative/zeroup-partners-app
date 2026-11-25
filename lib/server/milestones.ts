@@ -1,4 +1,5 @@
 import 'server-only'
+import { sendTemplateEmail } from '@/lib/server/email-templates'
 import type { FirestoreRestDb } from '@/lib/firebase/firestore-admin-rest'
 import type { MilestoneType } from '@/lib/types'
 
@@ -67,21 +68,13 @@ export async function fireMilestone(params: {
 
       // Personalized email via the existing /api/email template.
       try {
-        await fetch(new URL('/api/email', requestOrigin).toString(), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: r.email,
-            type: 'milestone_reached',
-            data: {
-              name: r.name,
-              milestoneLabel: label,
-              contributorCount: String(recipients.length),
-              isDreamer: r.isDreamer ? 'true' : 'false',
-              drAmount: String(DR_AWARD),
-              claimUrl,
-            },
-          }),
+        await sendTemplateEmail(r.email, 'milestone_reached', {
+          name: r.name,
+          milestoneLabel: label,
+          contributorCount: String(recipients.length),
+          isDreamer: r.isDreamer ? 'true' : 'false',
+          drAmount: String(DR_AWARD),
+          claimUrl,
         })
       } catch (err) {
         console.error(`[milestones] Failed to email ${r.email}:`, err)

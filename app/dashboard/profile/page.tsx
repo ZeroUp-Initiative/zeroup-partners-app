@@ -58,7 +58,7 @@ function ProfileContent() {
         const paymentsQuery = query(
           collection(db, "payments"),
           where("userId", "==", user.uid),
-          where("status", "==", "verified")
+          where("status", "==", "approved")
         );
         const snapshot = await getDocs(paymentsQuery);
         const total = snapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);

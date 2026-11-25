@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useAuth } from "@/contexts/auth-context"
 import { db } from "@/lib/firebase/client"
+import { fetchCommunity, subscribeCommunity } from '@/lib/community-data'
 import { collection, query, where, onSnapshot, getDocs } from "firebase/firestore"
 import ProtectedRoute from "@/components/auth/protected-route"
 import Header from "@/components/layout/header"
@@ -111,15 +112,13 @@ function DashboardPage() {
   useEffect(() => {
     if (!isBrowser || !user || !db) return;
 
-    const unsubUsers = onSnapshot(collection(db, "users"), (snapshot) => {
+    return subscribeCommunity(({ profiles, contributions }) => {
       const userMap = new Map<string, any>();
-      snapshot.forEach(doc => {
-        userMap.set(doc.id, { id: doc.id, ...doc.data() });
-      });
+      profiles.filter((p) => p.kind !== 'organization').forEach((p) => userMap.set(p.id, p));
+      const orgIds = new Set(profiles.filter((p) => p.kind === 'organization').map((p) => p.id));
       setUsersMap(userMap);
+      setPaymentsData(contributions.filter((p) => !p.userId || !orgIds.has(p.userId)) as any[]);
     });
-
-    return () => unsubUsers();
   }, [user]);
 
   useEffect(() => {
@@ -189,10 +188,9 @@ function DashboardPage() {
 
     setIsRefreshing(true);
     try {
-      const paymentsQuery = query(collection(db, "payments"), where("status", "==", "approved"));
-      const snapshot = await getDocs(paymentsQuery);
-      const payments = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setPaymentsData(payments as any[]);
+      const { contributions, profiles } = await fetchCommunity(true);
+      const orgIds = new Set(profiles.filter((p) => p.kind === 'organization').map((p) => p.id));
+      setPaymentsData(contributions.filter((p) => !p.userId || !orgIds.has(p.userId)) as any[]);
     } catch (error) {
       console.error("Error refreshing trends:", error);
       toast.error("Unable to refresh contribution trends. Please try again.");
@@ -206,14 +204,6 @@ function DashboardPage() {
       setIsLoading(false);
       return;
     }
-
-    // Listener for all approved contributions
-    const paymentsQuery = query(collection(db, "payments"), where("status", "==", "approved"));
-    const unsubscribeTotal = onSnapshot(paymentsQuery, (snapshot) => {
-      const payments: any[] = [];
-      snapshot.forEach((doc) => payments.push({ id: doc.id, ...doc.data() }));
-      setPaymentsData(payments);
-    });
 
     // Listener for the current user's contributions
     const myPaymentsQuery = query(
@@ -259,7 +249,6 @@ function DashboardPage() {
     });
 
     return () => {
-      unsubscribeTotal();
       unsubscribeMine();
     };
   }, [user]);
@@ -514,6 +503,17 @@ function DashboardPage() {
   // Cases, so they get an entirely separate, lean dashboard instead of the
   // funder one (contribution stats, leaderboards, dream coins etc. don't
   // apply to them).
+  if (user && user.role === 'organization') {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header title="Partners Hub" subtitle="Organization" />
+        <main className="container mx-auto px-4 py-8">
+          <Link href="/dashboard/organization" className="inline-flex min-h-[44px] items-center font-medium underline">Open your organization dashboard</Link>
+        </main>
+      </div>
+    )
+  }
+
   if (user && user.role === 'school') {
     return <SchoolDashboardOverview user={user} />
   }

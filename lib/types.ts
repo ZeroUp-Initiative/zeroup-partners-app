@@ -144,6 +144,10 @@ export interface Project {
   submittedByEmail?: string
   adminNotes?: string
   ownedByZeroUp?: boolean
+  /** Set when an organization account proposed this project and ZeroUp approved it. */
+  ownerOrgId?: string
+  ownerOrgName?: string
+  ownerOrgUid?: string
   /** Set when this project originated from a verified Education Case — see EducationCase. */
   caseId?: string
   /** Denormalized from the source case's verificationNotes at conversion time, for the public "Verified by ZeroUp" stamp — avoids needing public read access to the (private) cases collection. */

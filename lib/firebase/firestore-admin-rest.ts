@@ -69,6 +69,9 @@ function docIdFromName(name: string): string {
   return name.split('/').pop()!
 }
 
+// Next caches fetch() by default, even POSTs, which served stale database reads.
+const freshFetch = (url: string, init: RequestInit = {}) => fetch(url, { ...init, cache: 'no-store' })
+
 async function authHeaders(): Promise<Record<string, string>> {
   const token = await getServiceAccountAccessToken()
   if (!token) throw new Error('Firebase service account not configured or token mint failed.')
@@ -158,7 +161,7 @@ class AggregateQuery {
   async get(): Promise<{ data: () => { count: number } }> {
     const headers = await authHeaders()
     const structuredQuery = buildStructuredQuery(this.q.collectionPath, this.q.filters, this.q.orderings, this.q.limitN)
-    const res = await fetch(`${base()}:runAggregationQuery`, {
+    const res = await freshFetch(`${base()}:runAggregationQuery`, {
       method: 'POST',
       headers,
       body: JSON.stringify({
@@ -200,7 +203,7 @@ export class Query {
   async get(): Promise<QuerySnapshot> {
     const headers = await authHeaders()
     const structuredQuery = buildStructuredQuery(this.collectionPath, this.filters, this.orderings, this.limitN)
-    const res = await fetch(`${base()}:runQuery`, {
+    const res = await freshFetch(`${base()}:runQuery`, {
       method: 'POST',
       headers,
       body: JSON.stringify({ structuredQuery }),
@@ -229,7 +232,7 @@ export class DocRef {
 
   async get(): Promise<DocSnapshot> {
     const headers = await authHeaders()
-    const res = await fetch(`${base()}/${this.path}`, { headers })
+    const res = await freshFetch(`${base()}/${this.path}`, { headers })
     if (res.status === 404) return new DocSnapshot(this.id, undefined, false)
     if (!res.ok) {
       const body = await res.text()
@@ -244,7 +247,7 @@ export class DocRef {
     const query = opts?.merge
       ? '?' + Object.keys(data).map((k) => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&')
       : ''
-    const res = await fetch(`${base()}/${this.path}${query}`, {
+    const res = await freshFetch(`${base()}/${this.path}${query}`, {
       method: 'PATCH',
       headers,
       body: JSON.stringify({ fields: encodeFields(data) }),
@@ -258,7 +261,7 @@ export class DocRef {
   async update(data: Record<string, unknown>): Promise<void> {
     const headers = await authHeaders()
     const mask = Object.keys(data).map((k) => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&')
-    const res = await fetch(`${base()}/${this.path}?${mask}&currentDocument.exists=true`, {
+    const res = await freshFetch(`${base()}/${this.path}?${mask}&currentDocument.exists=true`, {
       method: 'PATCH',
       headers,
       body: JSON.stringify({ fields: encodeFields(data) }),
@@ -271,7 +274,7 @@ export class DocRef {
 
   async create(data: Record<string, unknown>): Promise<void> {
     const headers = await authHeaders()
-    const res = await fetch(`${base()}:commit`, {
+    const res = await freshFetch(`${base()}:commit`, {
       method: 'POST',
       headers,
       body: JSON.stringify({
@@ -291,7 +294,7 @@ export class DocRef {
 
   async delete(): Promise<void> {
     const headers = await authHeaders()
-    const res = await fetch(`${base()}/${this.path}`, { method: 'DELETE', headers })
+    const res = await freshFetch(`${base()}/${this.path}`, { method: 'DELETE', headers })
     if (!res.ok && res.status !== 404) {
       const body = await res.text()
       throw new Error(`Firestore delete failed (${res.status}): ${body}`)
@@ -319,7 +322,7 @@ export class CollectionRef extends Query {
 
   async add(data: Record<string, unknown>): Promise<DocRef> {
     const headers = await authHeaders()
-    const res = await fetch(`${base()}/${this.collectionPath}`, {
+    const res = await freshFetch(`${base()}/${this.collectionPath}`, {
       method: 'POST',
       headers,
       body: JSON.stringify({ fields: encodeFields(data) }),
@@ -342,7 +345,7 @@ interface Transaction {
 
 export async function runTransaction<T>(fn: (tx: Transaction) => Promise<T>): Promise<T> {
   const headers = await authHeaders()
-  const beginRes = await fetch(`${base()}:beginTransaction`, { method: 'POST', headers, body: JSON.stringify({}) })
+  const beginRes = await freshFetch(`${base()}:beginTransaction`, { method: 'POST', headers, body: JSON.stringify({}) })
   if (!beginRes.ok) {
     throw new Error(`Firestore beginTransaction failed (${beginRes.status}): ${await beginRes.text()}`)
   }
@@ -351,7 +354,7 @@ export async function runTransaction<T>(fn: (tx: Transaction) => Promise<T>): Pr
   const writes: unknown[] = []
   const tx: Transaction = {
     get: async (ref) => {
-      const res = await fetch(`${base()}/${ref.path}?transaction=${encodeURIComponent(transaction)}`, { headers })
+      const res = await freshFetch(`${base()}/${ref.path}?transaction=${encodeURIComponent(transaction)}`, { headers })
       if (res.status === 404) return new DocSnapshot(ref.id, undefined, false)
       if (!res.ok) throw new Error(`Firestore transaction get failed (${res.status}): ${await res.text()}`)
       const json = await res.json()
@@ -376,12 +379,12 @@ export async function runTransaction<T>(fn: (tx: Transaction) => Promise<T>): Pr
   try {
     result = await fn(tx)
   } catch (err) {
-    await fetch(`${base()}:rollback`, { method: 'POST', headers, body: JSON.stringify({ transaction }) }).catch(() => {})
+    await freshFetch(`${base()}:rollback`, { method: 'POST', headers, body: JSON.stringify({ transaction }) }).catch(() => {})
     throw err
   }
 
   if (writes.length > 0) {
-    const commitRes = await fetch(`${base()}:commit`, {
+    const commitRes = await freshFetch(`${base()}:commit`, {
       method: 'POST',
       headers,
       body: JSON.stringify({ writes, transaction }),
@@ -390,7 +393,7 @@ export async function runTransaction<T>(fn: (tx: Transaction) => Promise<T>): Pr
       throw new Error(`Firestore transaction commit failed (${commitRes.status}): ${await commitRes.text()}`)
     }
   } else {
-    await fetch(`${base()}:rollback`, { method: 'POST', headers, body: JSON.stringify({ transaction }) }).catch(() => {})
+    await freshFetch(`${base()}:rollback`, { method: 'POST', headers, body: JSON.stringify({ transaction }) }).catch(() => {})
   }
 
   return result

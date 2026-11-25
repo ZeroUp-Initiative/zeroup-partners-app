@@ -334,7 +334,7 @@ function DreamersCoinContent() {
                   const tierForCard = explicitActiveTier || status.current || tiers[0]
                   const locked = !status.current
                   const viewingOther = !!explicitActiveTier && explicitActiveTier.id !== status.current?.id
-                  const origin = typeof window !== "undefined" ? window.location.origin : "https://zeroup-partners-app.vercel.app"
+                  const origin = typeof window !== "undefined" ? window.location.origin : "https://zeroup-partners-app.bridegai.workers.dev"
                   const qrValue = `${origin}/dreamer/${me?.dreamerId || ""}`
                   return (
                     <div className="space-y-6">
@@ -678,7 +678,7 @@ function DreamersCoinContent() {
             {previewTierId && (() => {
               const t = tiers.find((x) => x.id === previewTierId)
               if (!t) return null
-              const origin = typeof window !== "undefined" ? window.location.origin : "https://zeroup-partners-app.vercel.app"
+              const origin = typeof window !== "undefined" ? window.location.origin : "https://zeroup-partners-app.bridegai.workers.dev"
               return (
                 <Dialog open={!!previewTierId} onOpenChange={(o) => { if (!o) setPreviewTierId(null) }}>
                   <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { db } from "@/lib/firebase/client"
+import { authedFetch } from '@/lib/authed-fetch'
 import { addDoc, collection, serverTimestamp, Timestamp, query, where, getDocs, orderBy } from "firebase/firestore"
 import { uploadImage, validateImageFile } from "@/lib/image-upload"
 import { useAuth } from "@/contexts/auth-context"
@@ -171,7 +172,7 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
 
       // Send confirmation email to contributor (fire-and-forget)
       if (user.email) {
-        fetch('/api/email', {
+        authedFetch('/api/email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -188,15 +189,10 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
       }
 
       // Notify admin (fire-and-forget)
-      fetch('/api/settings/payment')
-        .then(r => r.json())
-        .then(settings => {
-          if (settings.adminNotificationEmail) {
-            return fetch('/api/email', {
+      authedFetch('/api/email', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                to: settings.adminNotificationEmail,
                 type: 'admin_contribution_submitted',
                 data: {
                   partnerName,
@@ -206,10 +202,7 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
                   date: dateFormatted,
                 },
               }),
-            })
-          }
-        })
-        .catch(() => {})
+            }).catch(() => {})
 
       setSuccess("Contribution logged successfully!")
       setTimeout(() => {

@@ -32,6 +32,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Your session expired. Please sign in again.' }, { status: 401 })
     }
 
+    const profile = (await fdb.collection('users').doc(uid).get()).data() as Record<string, any> | undefined
+    if (profile?.role === 'organization') {
+      return NextResponse.json({ error: "Organization accounts can't be linked to a Dreamer." }, { status: 403 })
+    }
+
     const body = await req.json().catch(() => ({}))
     // Normalize: drop spaces/dashes/punctuation so formatting (e.g. "D7K-9QP") doesn't matter
     const code = String(body?.code || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase()

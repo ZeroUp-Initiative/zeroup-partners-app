@@ -14,7 +14,6 @@ export async function GET() {
     }
 
     const data = snap.data() as {
-      adminNotificationEmail?: string
       bankName?: string
       accountNumber?: string
       accountName?: string
@@ -23,7 +22,6 @@ export async function GET() {
 
     return NextResponse.json({
       configured: true,
-      adminNotificationEmail: data.adminNotificationEmail ?? '',
       bankName: data.bankName ?? '',
       accountNumber: data.accountNumber ?? '',
       accountName: data.accountName ?? '',

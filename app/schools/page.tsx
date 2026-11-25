@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { collection, onSnapshot, query, where } from 'firebase/firestore'
 import { db } from '@/lib/firebase/client'
+import { subscribeCommunity } from '@/lib/community-data'
 import ProtectedRoute from '@/components/auth/protected-route'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { ArrowLeft, School, MapPin } from 'lucide-react'
@@ -22,12 +23,14 @@ function SchoolsPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const unsubUsers = onSnapshot(query(collection(db, 'users'), where('role', '==', 'school')), (userSnap) => {
-      const approvedSchools = userSnap.docs
-        .map(d => ({ id: d.id, ...(d.data() as any) }))
-        .filter(u => u.schoolStatus === 'approved')
+    let unsubProjects = () => {}
+    let started = false
+    const unsubCommunity = subscribeCommunity(({ profiles }) => {
+      const approvedSchools = profiles.filter(p => p.kind === 'school' && p.schoolName)
+      if (started) unsubProjects()
+      started = true
 
-      const unsubProjects = onSnapshot(collection(db, 'projects'), (projectSnap) => {
+      unsubProjects = onSnapshot(collection(db, 'projects'), (projectSnap) => {
         const projects: Project[] = []
         projectSnap.forEach(d => {
           const data = d.data()
@@ -50,9 +53,8 @@ function SchoolsPage() {
         setSchools(listings)
         setIsLoading(false)
       })
-      return unsubProjects
-    })
-    return () => unsubUsers()
+    }, () => setIsLoading(false))
+    return () => { unsubCommunity(); unsubProjects() }
   }, [])
 
   return (

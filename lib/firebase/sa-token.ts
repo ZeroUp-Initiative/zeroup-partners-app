@@ -16,7 +16,7 @@ interface ServiceAccount {
 const SCOPE = 'https://www.googleapis.com/auth/datastore'
 
 let cachedServiceAccount: ServiceAccount | null | undefined
-let cachedToken: { token: string; expiresAt: number } | null = null
+const cachedTokens = new Map<string, { token: string; expiresAt: number }>()
 
 function loadServiceAccount(): ServiceAccount | null {
   if (cachedServiceAccount !== undefined) return cachedServiceAccount
@@ -42,8 +42,9 @@ export function hasServiceAccount(): boolean {
   return loadServiceAccount() !== null
 }
 
-export async function getServiceAccountAccessToken(): Promise<string | null> {
+export async function getServiceAccountAccessToken(scope: string = SCOPE): Promise<string | null> {
   const now = Math.floor(Date.now() / 1000)
+  const cachedToken = cachedTokens.get(scope)
   if (cachedToken && cachedToken.expiresAt - 60 > now) return cachedToken.token
 
   const sa = loadServiceAccount()
@@ -51,7 +52,7 @@ export async function getServiceAccountAccessToken(): Promise<string | null> {
 
   try {
     const privateKey = await importPKCS8(sa.private_key, 'RS256')
-    const jwt = await new SignJWT({ scope: SCOPE })
+    const jwt = await new SignJWT({ scope })
       .setProtectedHeader({ alg: 'RS256' })
       .setIssuedAt(now)
       .setIssuer(sa.client_email)
@@ -62,6 +63,7 @@ export async function getServiceAccountAccessToken(): Promise<string | null> {
 
     const res = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
+      cache: 'no-store',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
@@ -73,8 +75,8 @@ export async function getServiceAccountAccessToken(): Promise<string | null> {
       return null
     }
     const json = (await res.json()) as { access_token: string; expires_in: number }
-    cachedToken = { token: json.access_token, expiresAt: now + json.expires_in }
-    return cachedToken.token
+    cachedTokens.set(scope, { token: json.access_token, expiresAt: now + json.expires_in })
+    return json.access_token
   } catch (err) {
     console.error('[sa-token] Failed to mint access token:', err)
     return null

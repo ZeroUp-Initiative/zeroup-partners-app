@@ -27,82 +27,80 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.schoolStatus == 'approved';
     }
 
-    // Users collection
-    match /users/{userId} {
-      // Allow public read of basic profile info for constellation display
-      // This exposes: firstName, lastName, photoURL, createdAt
-      allow read: if true;
+    // Fields only the server or an admin may set on a user document. A user who
+    // could edit dreamerDashUserId could spend another Dreamer's coins.
+    function protectedUserFields() {
+      return ['role', 'schoolStatus', 'isDreamer', 'dreamerDashUserId', 'dreamerTelegramId',
+              'dreamerUsername', 'dreamerLinkedAt', 'orgId', 'orgStatus'];
+    }
 
-      // Users can create their own profile during signup. A self-created doc
-      // may only ever self-declare as a plain user or an UNAPPROVED school
-      // application — never admin, and never a pre-approved school — closing
-      // a privilege-escalation hole where a raw client write could otherwise
-      // set role:'admin' (or schoolStatus:'approved') on signup.
+    // Users collection. Private: names and photos for public pages are served
+    // by /api/community, which never includes emails, Telegram ids or push tokens.
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+
+      // Sign-up: a plain user, or an unapproved school application.
       allow create: if isOwner(userId) &&
         (!('role' in request.resource.data) || request.resource.data.role in ['user', 'school']) &&
-        (!('schoolStatus' in request.resource.data) || request.resource.data.schoolStatus == 'pending');
+        (!('schoolStatus' in request.resource.data) || request.resource.data.schoolStatus == 'pending') &&
+        !request.resource.data.keys().hasAny(['isDreamer', 'dreamerDashUserId', 'dreamerTelegramId',
+          'dreamerUsername', 'dreamerLinkedAt', 'orgId', 'orgStatus']);
 
-      // Users can update their own profile, but not change role or school
-      // approval status themselves.
       allow update: if isOwner(userId) &&
-        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'schoolStatus']));
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(protectedUserFields());
 
-      // Admins can update any field including role/schoolStatus changes
       allow update: if isAdmin();
-
-      // Only admins can delete users
       allow delete: if isAdmin();
     }
-    
-    // Payments/Contributions collection
+
+    // Payments/Contributions collection. Private: public totals come from /api/community.
     match /payments/{paymentId} {
-      // Allow public read of approved payments (for constellation connections)
-      // Only exposes: userId, projectId, status for approved payments
-      allow read: if resource.data.status == 'approved';
-      
-      // Users can read their own payments (any status)
       allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
-      
-      // Admins can read all payments
       allow read: if isAdmin();
-      
-      // Authenticated users can create payments (with their own userId)
-      allow create: if isAuthenticated() && 
+
+      // Partners log their own pending contribution, with display fields only
+      // (never award flags or review fields) and a positive amount.
+      allow create: if isAuthenticated() &&
         request.resource.data.userId == request.auth.uid &&
-        request.resource.data.status == 'pending';
-      
-      // Only admins can update payments (approve/reject)
-      allow update: if isAdmin();
-      
-      // Only admins can delete payments
-      allow delete: if isAdmin();
+        request.resource.data.status == 'pending' &&
+        request.resource.data.amount is number && request.resource.data.amount > 0 &&
+        request.resource.data.keys().hasOnly(['userId', 'userFirstName', 'userLastName', 'userFullName', 'userEmail',
+          'amount', 'date', 'description', 'projectId', 'projectTitle', 'proofURL', 'status',
+          'referrerDreamerId', 'createdAt', 'message', 'isSoloSponsor']);
+
+      // Admins review contributions, but never their own.
+      allow update: if isAdmin() && resource.data.userId != request.auth.uid;
+      allow delete: if isAdmin() && resource.data.userId != request.auth.uid;
     }
-    
+
     // Projects collection
     match /projects/{projectId} {
-      // Anyone can read projects (public)
       allow read: if true;
 
-      // Authenticated users can submit a project for review
-      // Must be pending status and must tag themselves as submitter
-      // Admins are allowed to create projects directly (they should set submittedBy to their uid)
-      allow create: if isAuthenticated() && (
-        (request.resource.data.status == 'pending' && request.resource.data.submittedBy == request.auth.uid)
-        || isAdmin()
-      );
+      // Created by admins, or by the server from an approved case or organization proposal.
+      allow create: if isAdmin();
 
-      // Updates: owners can update their own projects fully.
-      // Admins may only modify review-related fields (status, adminNotes, reviewedAt, reviewedBy)
-      // plus the public rich-content fields (story, videoUrl, gallery, timeline, budgetPhases),
-      // so they can add cinematic content to a project without being its original submitter.
-      allow update: if (
-        isAuthenticated() && resource.data.submittedBy == request.auth.uid
-      ) || (
-        isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','adminNotes','reviewedAt','reviewedBy','story','videoUrl','gallery','timeline','budgetPhases'])
-      );
+      // Any admin can manage any project (including funding totals on approval).
+      allow update: if isAdmin();
 
-      // Deletes: the original submitter (owner) or any admin may delete a project.
-      allow delete: if isAuthenticated() && (resource.data.submittedBy == request.auth.uid || isAdmin());
+      // A non-admin owner may edit the narrative only: never the goal, amount
+      // raised, status, ownership or review fields. Organizations go through
+      // the server instead, so suspending one takes effect immediately.
+      allow update: if isAuthenticated() && resource.data.submittedBy == request.auth.uid &&
+        !('ownerOrgId' in resource.data) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['description', 'story', 'videoUrl', 'gallery',
+          'timeline', 'imageUrl', 'category', 'location', 'phase', 'background', 'expectedBeneficiaries',
+          'expectedOutcomes', 'contactName', 'contactEmail', 'contactPhone', 'updatedAt']);
+
+      allow delete: if isAdmin();
+    }
+
+    // Organization accounts and their project proposals: server-only.
+    match /organizations/{orgId} {
+      allow read, write: if false;
+    }
+    match /orgProposals/{proposalId} {
+      allow read, write: if false;
     }
 
     // Education Cases collection — a real, specific need submitted by an

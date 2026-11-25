@@ -87,7 +87,7 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
   const isFullyFunded = project.status === 'fully-funded'
   const isClosed = project.status === 'closed'
   const canContribute = project.status === 'open'
-  const canDelete = !!user?.uid && (project.submittedBy === user.uid || (user as any)?.role === 'admin')
+  const canDelete = !!user?.uid && (user as any)?.role === 'admin'
 
   const handleConfirmDelete = async () => {
     setIsDeleting(true)
@@ -176,6 +176,9 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
                 )}
               </div>
               <h1 className="text-2xl sm:text-4xl font-bold text-white drop-shadow-sm">{project.title}</h1>
+              {project.ownerOrgName && (
+                <p className="mt-2 text-sm text-white/90">By {project.ownerOrgName}, verified by ZeroUp</p>
+              )}
             </div>
           </div>
         )}
@@ -195,6 +198,9 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
             )}
           </div>
           <h1 className="text-2xl sm:text-4xl font-bold">{project.title}</h1>
+          {project.ownerOrgName && (
+                <p className="mt-2 text-sm text-muted-foreground">By {project.ownerOrgName}, verified by ZeroUp</p>
+              )}
         </div>
       )}
 

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendMail } from '@/lib/mailer'
+import { APP_URL } from '@/lib/app-url'
+import { verifyAdmin } from '@/lib/auth/verify-admin'
 
-const BASE_URL = 'https://zeroup-partners-app.vercel.app'
+const BASE_URL = APP_URL
 
 const styles = `
   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background: #f4f4f5; }
@@ -35,6 +37,7 @@ function htmlToText(html: string) {
 }
 
 export async function POST(req: NextRequest) {
+  if (!(await verifyAdmin(req))) return NextResponse.json({ error: 'Admins only.' }, { status: 401 })
   try {
     const { recipients, subject, body } = await req.json() as {
       recipients: { email: string; name: string }[]

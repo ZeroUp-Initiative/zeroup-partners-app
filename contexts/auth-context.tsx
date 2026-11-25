@@ -20,6 +20,8 @@ interface UserProfile {
   flagged?: boolean;
   suspended?: boolean;
   declinedContributionsCount?: number;
+  orgId?: string;
+  orgStatus?: 'active' | 'suspended';
   schoolName?: string;
   schoolStatus?: 'pending' | 'approved' | 'rejected';
   schoolAddress?: string;

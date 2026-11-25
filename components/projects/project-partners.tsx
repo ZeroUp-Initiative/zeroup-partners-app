@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { collection, query, where, onSnapshot } from 'firebase/firestore'
-import { db } from '@/lib/firebase/client'
+import { subscribeCommunity } from '@/lib/community-data'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Sparkles, Users } from 'lucide-react'
 
@@ -32,20 +31,10 @@ export function ProjectPartners({ projectId }: { projectId: string }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubUsers = onSnapshot(collection(db, 'users'), (snap) => {
-      const map = new Map<string, any>()
-      snap.forEach((d) => map.set(d.id, d.data()))
-      setUsersMap(map)
-    })
-    return () => unsubUsers()
-  }, [])
-
-  useEffect(() => {
-    const q = query(collection(db, 'payments'), where('projectId', '==', projectId), where('status', '==', 'approved'))
-    const unsubscribe = onSnapshot(q, (snap) => {
+    return subscribeCommunity(({ profiles, contributions }) => {
+      setUsersMap(new Map(profiles.map((p) => [p.id, p])))
       const byUser = new Map<string, PartnerEntry>()
-      snap.forEach((d) => {
-        const data = d.data()
+      contributions.filter((c) => c.projectId === projectId).forEach((data) => {
         const uid = data.userId
         if (!uid) return
         const existing = byUser.get(uid)
@@ -66,8 +55,7 @@ export function ProjectPartners({ projectId }: { projectId: string }) {
       })
       setPartners(Array.from(byUser.values()))
       setLoading(false)
-    })
-    return () => unsubscribe()
+    }, () => setLoading(false))
   }, [projectId])
 
   if (loading || partners.length === 0) return null

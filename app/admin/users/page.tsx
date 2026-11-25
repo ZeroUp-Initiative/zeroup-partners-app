@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { collection, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy, QuerySnapshot, DocumentData, QueryDocumentSnapshot } from "firebase/firestore"
 import { db } from "@/lib/firebase/client"
+import { authedFetch } from '@/lib/authed-fetch'
 import ProtectedRoute from "@/components/auth/protected-route"
 import { useAuth } from "@/contexts/auth-context"
 import { Button } from "@/components/ui/button"
@@ -225,7 +226,7 @@ function AdminUsersPage() {
               data: { name: emailTarget.firstName || "Partner" },
             }
 
-      const res = await fetch("/api/email", {
+      const res = await authedFetch("/api/email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -263,7 +264,7 @@ function AdminUsersPage() {
     setIsBroadcasting(true)
     setBroadcastResult(null)
     try {
-      const res = await fetch("/api/email/broadcast", {
+      const res = await authedFetch("/api/email/broadcast", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ recipients, subject: broadcastSubject, body: broadcastBody }),

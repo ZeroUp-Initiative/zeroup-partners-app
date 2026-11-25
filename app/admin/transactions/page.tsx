@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect } from "react"
 import { collection, onSnapshot, query, orderBy, doc, updateDoc, writeBatch, getDoc } from "firebase/firestore"
 import { db, auth } from "@/lib/firebase/client"
+import { authedFetch } from '@/lib/authed-fetch'
 import toast from "react-hot-toast"
 import ProtectedRoute from "@/components/auth/protected-route"
 import { useAuth } from "@/contexts/auth-context"
@@ -134,7 +135,7 @@ function AdminTransactionsPage() {
       return;
     }
     try {
-      const res = await fetch("/api/email", {
+      const res = await authedFetch("/api/email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ to, type, data }),
@@ -148,8 +149,11 @@ function AdminTransactionsPage() {
     }
   }
 
+  const isOwnContribution = !!selectedTransaction && selectedTransaction.userId === user?.uid;
+
   const handleApprove = async () => {
     if (!selectedTransaction) return;
+    if (isOwnContribution) { setError("Another admin must approve your own contribution."); return; }
 
     setIsProcessing(true);
     setError("");
@@ -229,7 +233,7 @@ function AdminTransactionsPage() {
       await batch.commit();
 
       if (crossedPhaseName) {
-        fetch('/api/email/notify-project', {
+        authedFetch('/api/email/notify-project', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -240,7 +244,7 @@ function AdminTransactionsPage() {
       }
 
       if (crossedAlmostFunded) {
-        fetch('/api/email/notify-project', {
+        authedFetch('/api/email/notify-project', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -286,8 +290,8 @@ function AdminTransactionsPage() {
             toast.success(`Awarded ${Number(data.awarded).toLocaleString()} dream coins to this Dreamer`)
           } else if (data.already) {
             // Already awarded (re-approval edge case) — not an error, no toast needed.
-          } else if (data.reason && data.reason !== 'not_a_dreamer' && data.reason !== 'amount_too_small') {
-            // Only surface unexpected skip reasons — the two above are normal, expected outcomes.
+          } else if (data.reason && data.reason !== 'not_a_dreamer' && data.reason !== 'amount_too_small' && data.reason !== 'organization_account') {
+            // Only surface unexpected skip reasons — the ones above are normal, expected outcomes.
             toast.error(`Dream coin award skipped: ${data.reason}`)
           }
         }
@@ -680,6 +684,9 @@ function AdminTransactionsPage() {
             </div>
           )}
 
+          {isOwnContribution && (
+            <p className="text-sm text-amber-700 dark:text-amber-400">This is your own contribution. Another admin must review it.</p>
+          )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setSelectedTransaction(null)}>
               Cancel
@@ -688,7 +695,7 @@ function AdminTransactionsPage() {
               <Button
                 variant="destructive"
                 onClick={handleDecline}
-                disabled={isProcessing}
+                disabled={isProcessing || isOwnContribution}
               >
                 {isProcessing ? (
                   <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Declining...</>
@@ -698,7 +705,7 @@ function AdminTransactionsPage() {
               </Button>
               <Button
                 onClick={handleApprove}
-                disabled={isProcessing}
+                disabled={isProcessing || isOwnContribution}
               >
                 {isProcessing ? (
                   <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Approving...</>

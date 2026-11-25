@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from "firebase/auth"
 import { auth, db } from "@/lib/firebase/client"
+import { authedFetch } from '@/lib/authed-fetch'
 import { verifyEmailActionCodeSettings } from "@/lib/firebase/action-code-settings"
 import { doc, setDoc, serverTimestamp } from "firebase/firestore"
 import { uploadImage, validateImageFile } from "@/lib/image-upload"
@@ -122,7 +123,7 @@ export default function SignupPage() {
       await sendEmailVerification(firebaseUser, verifyEmailActionCodeSettings)
 
       // Send welcome / application-received email (fire-and-forget, don't block signup flow)
-      fetch('/api/email', {
+      authedFetch('/api/email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -134,21 +135,14 @@ export default function SignupPage() {
 
       if (isSchool) {
         // Notify admin of the new school application
-        fetch('/api/settings/payment')
-          .then(r => r.json())
-          .then(settings => {
-            if (settings.adminNotificationEmail) {
-              return fetch('/api/email', {
+        authedFetch('/api/email', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  to: settings.adminNotificationEmail,
-                  type: 'admin_school_application_submitted',
+                type: 'admin_school_application_submitted',
                   data: { schoolName, contactName: `${firstName} ${lastName}`.trim(), contactEmail: email },
                 }),
-              })
-            }
-          }).catch(() => {})
+              }).catch(() => {})
       } else {
         // Check whether this signup just crossed a new 100-partner milestone
         // (fire-and-forget — worst case it's caught on the next signup instead).

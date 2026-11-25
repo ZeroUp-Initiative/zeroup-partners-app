@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect } from "react"
 import { collection, onSnapshot, query, where, doc, updateDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase/client"
+import { authedFetch } from '@/lib/authed-fetch'
 import toast from "react-hot-toast"
 import ProtectedRoute from "@/components/auth/protected-route"
 import { useAuth } from "@/contexts/auth-context"
@@ -96,7 +97,7 @@ function AdminSchoolsPage() {
 
   async function sendSchoolEmail(type: 'school_approved' | 'school_rejected', school: SchoolApplication, notes: string) {
     try {
-      await fetch('/api/email', {
+      await authedFetch('/api/email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

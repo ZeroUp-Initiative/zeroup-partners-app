@@ -55,7 +55,7 @@ const DEFAULT_HTML = `<!DOCTYPE html>
       Highlighted detail goes here.
     </div>
     <p>Continue your message here...</p>
-    <a href="https://zeroup-partners-app.vercel.app/dashboard" class="btn">Button text goes here</a>
+    <a href="https://zeroup-partners-app.bridegai.workers.dev/dashboard" class="btn">Button text goes here</a>
   </div>
   <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
 </div></div>

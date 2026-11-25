@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { collection, addDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase/client'
+import { authedFetch } from '@/lib/authed-fetch'
 import { useAuth } from '@/contexts/auth-context'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -135,7 +136,7 @@ export function ContributeDialog({ project, open, onOpenChange, onSuccess, prese
       })
 
       try {
-        await fetch('/api/email', {
+        await authedFetch('/api/email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

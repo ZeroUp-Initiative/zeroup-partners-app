@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect } from "react"
 import { collection, addDoc, onSnapshot, query, orderBy, updateDoc, deleteDoc, doc, serverTimestamp } from "firebase/firestore"
 import { db } from "@/lib/firebase/client"
+import { authedFetch } from '@/lib/authed-fetch'
 import { uploadImage, validateImageFile } from "@/lib/image-upload"
 import ProtectedRoute from "@/components/auth/protected-route"
 import { useAuth } from "@/contexts/auth-context"
@@ -26,7 +27,7 @@ import type { Project } from "@/lib/types"
 const EMPTY_RICH_CONTENT: RichContentValue = { story: '', videoUrl: '', gallery: [], timeline: [], budgetPhases: [] }
 
 function notifyNewProject(projectId: string, title: string) {
-  fetch('/api/email/notify-project', {
+  authedFetch('/api/email/notify-project', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type: 'new_project_announcement', data: { title, projectId } }),
@@ -227,7 +228,7 @@ function AdminProjectsPage() {
     const to = project.contactEmail || project.submittedByEmail
     if (!to) return
     const name = project.contactName || project.submittedByName || 'Partner'
-    fetch('/api/email', {
+    authedFetch('/api/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ to, type, data: { name, title: project.title, notes } }),

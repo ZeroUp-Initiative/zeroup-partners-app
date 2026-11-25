@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect } from "react"
 import { collection, onSnapshot, query, orderBy, doc, updateDoc, getDoc } from "firebase/firestore"
 import { db, auth } from "@/lib/firebase/client"
+import { authedFetch } from '@/lib/authed-fetch'
 import toast from "react-hot-toast"
 import ProtectedRoute from "@/components/auth/protected-route"
 import { useAuth } from "@/contexts/auth-context"
@@ -61,7 +62,7 @@ function AdminCasesPage() {
       const school = schoolSnap.exists() ? schoolSnap.data() : null
       const to = school?.email
       if (to) {
-        await fetch('/api/email', {
+        await authedFetch('/api/email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -122,7 +123,7 @@ function AdminCasesPage() {
         const schoolSnap = await getDoc(doc(db, 'users', convertCase.schoolId))
         const school = schoolSnap.exists() ? schoolSnap.data() : null
         if (school?.email) {
-          fetch('/api/email', {
+          authedFetch('/api/email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -159,7 +160,7 @@ function AdminCasesPage() {
       const schoolSnap = await getDoc(doc(db, 'users', outcomeCase.schoolId))
       const school = schoolSnap.exists() ? schoolSnap.data() : null
       if (school?.email) {
-        fetch('/api/email', {
+        authedFetch('/api/email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

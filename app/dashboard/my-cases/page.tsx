@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { collection, query, where, onSnapshot, doc, updateDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/lib/firebase/client'
+import { authedFetch } from '@/lib/authed-fetch'
 import { useAuth } from '@/contexts/auth-context'
 import ProtectedRoute from '@/components/auth/protected-route'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -116,21 +117,14 @@ function MyCasesPage() {
         outcomePhotos,
         outcomeSubmittedAt: serverTimestamp(),
       })
-      fetch('/api/settings/payment')
-        .then(r => r.json())
-        .then(settings => {
-          if (settings.adminNotificationEmail) {
-            return fetch('/api/email', {
+      authedFetch('/api/email', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                to: settings.adminNotificationEmail,
                 type: 'admin_case_outcome_submitted',
                 data: { schoolName: outcomeCase.schoolName, caseTitle: outcomeCase.title },
               }),
-            })
-          }
-        }).catch(() => {})
+            }).catch(() => {})
       toast.success('Outcome update submitted — our team will review it before it goes live.')
       setOutcomeCase(null); setOutcomeNote(''); setOutcomePhotos([])
     } catch (err) {
