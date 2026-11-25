@@ -13,29 +13,14 @@ export async function loadTiers(fdb: any): Promise<DreamTierConfig[]> {
   return DEFAULT_DREAM_TIERS
 }
 
-// Total Naira a web user (Firebase uid) has partnered with ZeroUp (general/direct + ZeroUp-owned projects, approved).
+// Total Naira a web user (Firebase uid) has partnered, across every approved contribution (any project, or direct).
 export async function computePartneredTotal(fdb: any, uid: string): Promise<number> {
   let total = 0
   try {
     const paySnap = await fdb.collection('payments').where('userId', '==', uid).where('status', '==', 'approved').get()
-    const rows: { amount: number; projectId?: string }[] = []
-    const projectIds = new Set<string>()
     paySnap.forEach((d: any) => {
-      const p = d.data()
-      rows.push({ amount: Number(p.amount) || 0, projectId: p.projectId })
-      if (p.projectId && p.projectId !== 'general') projectIds.add(String(p.projectId))
+      total += Number(d.data().amount) || 0
     })
-    const ownedMap = new Map<string, boolean>()
-    await Promise.all(
-      [...projectIds].map(async (pid) => {
-        const ps = await fdb.collection('projects').doc(pid).get()
-        ownedMap.set(pid, ps.data()?.ownedByZeroUp === true)
-      }),
-    )
-    for (const r of rows) {
-      const isZeroUp = !r.projectId || r.projectId === 'general' || ownedMap.get(r.projectId) === true
-      if (isZeroUp) total += r.amount
-    }
   } catch (e) {
     console.error('[impact] computePartneredTotal failed:', e)
   }

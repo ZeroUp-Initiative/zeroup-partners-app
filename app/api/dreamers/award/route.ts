@@ -112,18 +112,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ awarded: 0, reason: 'not_a_dreamer' })
     }
 
-    // Target must be ZeroUp's: a general (direct) contribution, or a project explicitly flagged ownedByZeroUp
-    let isZeroUpOwned = !p.projectId || p.projectId === 'general'
-    if (!isZeroUpOwned) {
-      const projSnap = await fdb.collection('projects').doc(String(p.projectId)).get()
-      const proj = projSnap.data() as Record<string, any> | undefined
-      if (proj?.ownedByZeroUp === true) isZeroUpOwned = true
-    }
-    if (!isZeroUpOwned) {
-      await unclaim('not_zeroup_owned')
-      return NextResponse.json({ awarded: 0, reason: 'not_zeroup_owned' })
-    }
-
+    // Any approved contribution earns, whoever owns the project (ZeroUp or not).
     const dr = drForAmount(p.amount)
     if (dr <= 0) {
       await unclaim('amount_too_small')
@@ -131,7 +120,7 @@ export async function POST(req: NextRequest) {
     }
 
     const targetName =
-      p.projectId && p.projectId !== 'general' ? (p.projectTitle || 'a ZeroUp project') : 'ZeroUp (direct)'
+      p.projectId && p.projectId !== 'general' ? (p.projectTitle || 'a project') : 'ZeroUp (direct)'
     const description = `Partnership: ${targetName} (₦${(Number(p.amount) || 0).toLocaleString()})`
 
     const { error: rpcErr } = await sb.rpc('award_dream_coins', {

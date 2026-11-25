@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin'
 import { getDreamerDashDb } from '@/lib/supabase/admin'
+import { computePartneredTotal } from '@/lib/dreamers/impact'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,7 +39,7 @@ export async function GET(req: NextRequest) {
 
     const { data: me, error: meErr } = await sb
       .from('users')
-      .select('id, first_name, username, photo_url, balance, total_earned, streak, created_at')
+      .select('id, first_name, username, photo_url, balance, total_earned, streak, created_at, member_id')
       .eq('id', dreamerId)
       .maybeSingle()
 
@@ -53,31 +54,8 @@ export async function GET(req: NextRequest) {
 
     const balance = me.balance ?? 0
 
-    // Total Naira this Dreamer has partnered with ZeroUp (general/direct + ZeroUp-owned projects, approved) — drives the Dream Card tier
-    let partneredTotal = 0
-    try {
-      const paySnap = await fdb.collection('payments').where('userId', '==', uid).where('status', '==', 'approved').get()
-      const rows: { amount: number; projectId?: string }[] = []
-      const projectIds = new Set<string>()
-      paySnap.forEach((d) => {
-        const p = d.data() as Record<string, any>
-        rows.push({ amount: Number(p.amount) || 0, projectId: p.projectId })
-        if (p.projectId && p.projectId !== 'general') projectIds.add(String(p.projectId))
-      })
-      const ownedMap = new Map<string, boolean>()
-      await Promise.all(
-        [...projectIds].map(async (pid) => {
-          const ps = await fdb.collection('projects').doc(pid).get()
-          ownedMap.set(pid, ps.data()?.ownedByZeroUp === true)
-        }),
-      )
-      for (const r of rows) {
-        const isZeroUp = !r.projectId || r.projectId === 'general' || ownedMap.get(r.projectId) === true
-        if (isZeroUp) partneredTotal += r.amount
-      }
-    } catch (e) {
-      console.error('[dreamers/me] partneredTotal calc failed:', e)
-    }
+    // Total Naira this Dreamer has partnered (any approved contribution); drives the Dream Card tier
+    const partneredTotal = await computePartneredTotal(fdb, uid)
 
     const grantSnap = await fdb.collection('dreamerGrants').doc(dreamerId).get()
     const grantedTierId = (grantSnap.data()?.grantedTierId as string | undefined) || null
@@ -88,9 +66,9 @@ export async function GET(req: NextRequest) {
       sb.from('transactions').select('type, amount, description, created_at').eq('user_id', dreamerId).order('created_at', { ascending: false }).limit(12),
     ])
 
-    // Non-sensitive display card number derived from the (stable) Dreamer id
-    const digits = (String(dreamerId).replace(/\D/g, '') + '0000000000000000').slice(0, 16)
-    const memberNumber = digits.replace(/(.{4})(?=.)/g, '$1 ')
+    // Stable, sequential Member ID assigned by join order (Supabase users.member_id)
+    const memberId = (me as Record<string, any>).member_id as number | null
+    const memberNumber = memberId ? `DREAMER #${String(memberId).padStart(4, '0')}` : ''
     const memberSince = me.created_at
       ? new Date(me.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase()
       : ''

@@ -92,7 +92,7 @@ export function ProjectPartners({ projectId }: { projectId: string }) {
   return (
     <section>
       <div className="flex items-center gap-2 mb-4">
-        <Users className="w-5 h-5 text-[#8d44d1]" />
+        <Users className="w-5 h-5 text-editorial-navy" />
         <h2 className="text-xl font-bold">Partners on This Project</h2>
         <span className="text-sm text-muted-foreground">({withDisplay.length})</span>
       </div>
@@ -103,7 +103,7 @@ export function ProjectPartners({ projectId }: { projectId: string }) {
           {avatarStack.map((p) => (
             <Avatar key={p.userId} className="h-10 w-10 border-2 border-background ring-1 ring-border" title={p.name}>
               <AvatarImage src={p.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${p.name}`} />
-              <AvatarFallback className="bg-gradient-to-br from-[#8d44d1] to-[#7030b0] text-white text-xs">
+              <AvatarFallback className="bg-gradient-to-br from-editorial-navy to-editorial-navy-deep text-white text-xs">
                 {p.name.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
@@ -123,7 +123,7 @@ export function ProjectPartners({ projectId }: { projectId: string }) {
             </div>
             <Avatar className="h-9 w-9 flex-shrink-0">
               <AvatarImage src={p.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${p.name}`} />
-              <AvatarFallback className="bg-gradient-to-br from-[#8d44d1] to-[#7030b0] text-white text-xs">
+              <AvatarFallback className="bg-gradient-to-br from-editorial-navy to-editorial-navy-deep text-white text-xs">
                 {p.name.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>

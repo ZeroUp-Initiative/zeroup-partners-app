@@ -270,7 +270,7 @@ function AdminSettingsPage() {
                 <Button
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
+                  className="bg-editorial-navy hover:bg-editorial-navy-deep text-editorial-cream border-0"
                 >
                   {isSaving
                     ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving…</>
@@ -402,7 +402,7 @@ function AdminSettingsPage() {
                 <Button
                   onClick={handleSaveSmtp}
                   disabled={isSavingSmtp}
-                  className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
+                  className="bg-editorial-navy hover:bg-editorial-navy-deep text-editorial-cream border-0"
                 >
                   {isSavingSmtp
                     ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving…</>

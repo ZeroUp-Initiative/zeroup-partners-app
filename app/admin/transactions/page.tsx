@@ -36,6 +36,7 @@ interface Transaction {
   createdAt: any;
   description?: string;
   adminDescription?: string;
+  isSoloSponsor?: boolean;
 }
 
 function AdminTransactionsPage() {
@@ -71,7 +72,8 @@ function AdminTransactionsPage() {
           receiptUrl: data.proofURL,
           createdAt: data.createdAt,
           description: data.description,
-          adminDescription: data.adminDescription
+          adminDescription: data.adminDescription,
+          isSoloSponsor: data.isSoloSponsor || false,
         });
       });
       setTransactions(transactionsData);
@@ -170,11 +172,14 @@ function AdminTransactionsPage() {
       // Get current project data to update funding
       const projectSnapshot = await getDoc(projectRef);
       let crossedPhaseName: string | null = null
+      let crossedAlmostFunded = false
       let newFunding = 0
+      let newFundingGoal = 0
       if (projectSnapshot.exists()) {
         const projectData = projectSnapshot.data();
         const oldFunding = projectData.currentFunding || 0
         newFunding = oldFunding + selectedTransaction.amount;
+        newFundingGoal = projectData.fundingGoal || 0
         const newStatus = newFunding >= projectData.fundingGoal ? 'fully-funded' : 'open';
 
         const projectUpdate: Record<string, unknown> = {
@@ -191,6 +196,21 @@ function AdminTransactionsPage() {
               ? { ...p, currentAmount: (p.currentAmount || 0) + selectedTransaction.amount }
               : p
           )
+        }
+
+        // Recognize a solo sponsor — a contribution explicitly flagged as
+        // covering the full remaining balance that actually closed it out.
+        if (selectedTransaction.isSoloSponsor && newStatus === 'fully-funded') {
+          projectUpdate.soloSponsoredBy = selectedTransaction.userId
+          projectUpdate.soloSponsoredByName = selectedTransaction.userFullName
+        }
+
+        // Nudge past contributors once, the first time this project crosses
+        // 80% funded without yet being fully funded.
+        const goal = projectData.fundingGoal || 0
+        if (goal > 0 && newStatus !== 'fully-funded' && !projectData.almostFundedNotified && oldFunding < goal * 0.8 && newFunding >= goal * 0.8) {
+          crossedAlmostFunded = true
+          projectUpdate.almostFundedNotified = true
         }
 
         batch.update(projectRef, projectUpdate);
@@ -219,6 +239,17 @@ function AdminTransactionsPage() {
         }).catch(() => {})
       }
 
+      if (crossedAlmostFunded) {
+        fetch('/api/email/notify-project', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'almost_funded',
+            data: { title: selectedTransaction.projectTitle, projectId: selectedTransaction.projectId, remaining: Math.max(0, newFundingGoal - newFunding) },
+          }),
+        }).catch(() => {})
+      }
+
       // Send in-app notification
       await NotificationHelpers.contributionApproved(
         selectedTransaction.userId,
@@ -235,7 +266,7 @@ function AdminTransactionsPage() {
         receiptNo: receiptNumber(selectedTransaction),
       })
 
-      // Award dream coins (only credits linked Dreamers contributing to ZeroUp-owned targets).
+      // Award dream coins (credits any linked Dreamer, whichever project they backed).
       // Failures here must be visible to the admin — this silently failed for months in the
       // past because errors only went to console.error, which nobody was watching.
       try {
@@ -255,8 +286,8 @@ function AdminTransactionsPage() {
             toast.success(`Awarded ${Number(data.awarded).toLocaleString()} dream coins to this Dreamer`)
           } else if (data.already) {
             // Already awarded (re-approval edge case) — not an error, no toast needed.
-          } else if (data.reason && data.reason !== 'not_a_dreamer' && data.reason !== 'not_zeroup_owned' && data.reason !== 'amount_too_small') {
-            // Only surface unexpected skip reasons — the three above are normal, expected outcomes.
+          } else if (data.reason && data.reason !== 'not_a_dreamer' && data.reason !== 'amount_too_small') {
+            // Only surface unexpected skip reasons — the two above are normal, expected outcomes.
             toast.error(`Dream coin award skipped: ${data.reason}`)
           }
         }

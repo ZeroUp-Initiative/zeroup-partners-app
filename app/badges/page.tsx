@@ -135,7 +135,7 @@ function BadgesContent() {
                       <div className="flex-1">
                         <p className="font-medium text-sm">{badge.label}</p>
                       </div>
-                      <CheckCircle2 className="w-4 h-4 text-[#8d44d1]" />
+                      <CheckCircle2 className="w-4 h-4 text-editorial-navy" />
                     </CardContent>
                   </Card>
                 ))}

@@ -265,7 +265,7 @@ function AdminDashboard() {
                           variant={historyPage === page ? "default" : "outline"}
                           size="sm"
                           onClick={() => setHistoryPage(page)}
-                          className={`h-8 w-8 p-0 ${historyPage === page ? 'bg-[#8d44d1] hover:bg-[#7030b0] border-[#8d44d1]' : ''}`}
+                          className={`h-8 w-8 p-0 ${historyPage === page ? 'bg-editorial-navy hover:bg-editorial-navy-deep border-editorial-navy' : ''}`}
                         >
                           {page}
                         </Button>

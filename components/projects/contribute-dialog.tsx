@@ -18,6 +18,7 @@ import toast from 'react-hot-toast'
 interface ContributeProject {
   id: string
   title: string
+  imageUrl?: string
 }
 
 interface ContributeDialogProps {
@@ -25,9 +26,13 @@ interface ContributeDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSuccess?: () => void
+  /** Pre-fills (and locks) the amount — used by the "sponsor this case fully" flow. */
+  presetAmount?: number
+  /** Tags the resulting payment as a solo-sponsor pledge, recognized on the project page once approved. */
+  soloSponsor?: boolean
 }
 
-export function ContributeDialog({ project, open, onOpenChange, onSuccess }: ContributeDialogProps) {
+export function ContributeDialog({ project, open, onOpenChange, onSuccess, presetAmount, soloSponsor }: ContributeDialogProps) {
   const { user } = useAuth()
   const [contributionAmount, setContributionAmount] = useState('')
   const [message, setMessage] = useState('')
@@ -62,12 +67,12 @@ export function ContributeDialog({ project, open, onOpenChange, onSuccess }: Con
   useEffect(() => {
     if (open) {
       setError('')
-      setContributionAmount('')
+      setContributionAmount(presetAmount ? String(presetAmount) : '')
       setMessage('')
       setReceiptFile(null)
       setJustContributed(null)
     }
-  }, [open])
+  }, [open, presetAmount])
 
   const copyAccountNumber = () => {
     const accountNumber = paymentSettings?.accountNumber
@@ -126,6 +131,7 @@ export function ContributeDialog({ project, open, onOpenChange, onSuccess }: Con
         date: new Date(),
         description: project.id === 'general' ? 'General contribution' : `Contribution to project: ${project.title}`,
         message: message.trim() || null,
+        isSoloSponsor: !!soloSponsor,
       })
 
       try {
@@ -162,10 +168,10 @@ export function ContributeDialog({ project, open, onOpenChange, onSuccess }: Con
   if (justContributed && project) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-md p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-md p-4 sm:p-6 max-h-[92dvh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <PartyPopper className="w-5 h-5 text-[#8d44d1]" /> Thank you for partnering!
+              <PartyPopper className="w-5 h-5 text-editorial-navy" /> Thank you for partnering!
             </DialogTitle>
             <DialogDescription>
               Your contribution is submitted and pending review. Here's a card to share the moment.
@@ -178,7 +184,8 @@ export function ContributeDialog({ project, open, onOpenChange, onSuccess }: Con
             photoURL={user?.photoURL || undefined}
             month={new Date().toLocaleString('default', { month: 'long' })}
             year={new Date().getFullYear()}
-            customMessage={project.id === 'general' ? "I just partnered with ZeroUp!" : `I just partnered with ${project.title}!`}
+            projectTitle={project.id === 'general' ? undefined : project.title}
+            projectImageURL={project.id === 'general' ? undefined : project.imageUrl || undefined}
             showDownload={true}
           />
           <Button variant="outline" className="w-full" onClick={() => onOpenChange(false)}>Close</Button>
@@ -192,10 +199,12 @@ export function ContributeDialog({ project, open, onOpenChange, onSuccess }: Con
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {project?.id === 'general' ? 'Make General Contribution' : `Contribute to ${project?.title}`}
+            {soloSponsor ? `Fully Sponsor ${project?.title}` : project?.id === 'general' ? 'Make General Contribution' : `Contribute to ${project?.title}`}
           </DialogTitle>
           <DialogDescription>
-            {project?.id === 'general'
+            {soloSponsor
+              ? "You're covering the entire remaining balance in one go — you'll be recognized as this case's sole sponsor once approved."
+              : project?.id === 'general'
               ? 'Your contribution will support our overall mission.'
               : 'Your contribution will directly fund this project.'}
           </DialogDescription>
@@ -246,6 +255,8 @@ export function ContributeDialog({ project, open, onOpenChange, onSuccess }: Con
               placeholder="e.g., 5000"
               value={contributionAmount}
               onChange={(e) => setContributionAmount(e.target.value)}
+              readOnly={!!presetAmount}
+              className={presetAmount ? 'bg-muted' : undefined}
             />
           </div>
           <div className="space-y-2">

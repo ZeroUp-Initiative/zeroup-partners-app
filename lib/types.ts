@@ -15,6 +15,24 @@ export interface UserProfile {
   isAdmin?: boolean
   createdAt: Timestamp | Date
   emailVerified?: boolean
+  role?: "user" | "admin" | "school"
+  // Partner-school fields (present when role === "school")
+  schoolName?: string
+  schoolRegistrationNumber?: string
+  schoolAddress?: string
+  schoolContactName?: string
+  schoolContactPhone?: string
+  /** The rep's role/title at the school (Principal, Admin, Program Coordinator...) — helps admin judge legitimacy. */
+  schoolRepTitle?: string
+  /** Approximate student population — gives case scale context. */
+  schoolStudentPopulation?: string
+  /** Freeform: what prompted this application, in the school's own words. */
+  schoolApplicationNote?: string
+  schoolDocuments?: string[]
+  schoolStatus?: "pending" | "approved" | "rejected"
+  schoolAppliedAt?: Timestamp | Date
+  /** Admin-only notes left when approving/rejecting a school application. */
+  schoolReviewNotes?: string
 }
 
 export interface AuthUser {
@@ -59,6 +77,8 @@ export interface Payment {
   rejectionReason?: string
   userDeleted?: boolean
   deletedAt?: Timestamp | Date
+  /** Set when this payment was logged via the "sponsor this case fully" flow — see soloSponsoredBy on Project. */
+  isSoloSponsor?: boolean
 }
 
 export interface PaymentFormData {
@@ -124,6 +144,23 @@ export interface Project {
   submittedByEmail?: string
   adminNotes?: string
   ownedByZeroUp?: boolean
+  /** Set when this project originated from a verified Education Case — see EducationCase. */
+  caseId?: string
+  /** Denormalized from the source case's verificationNotes at conversion time, for the public "Verified by ZeroUp" stamp — avoids needing public read access to the (private) cases collection. */
+  verificationNote?: string
+  /** Denormalized from the source case at conversion time, for public browse filtering. */
+  caseType?: CaseType
+  /** Denormalized from the source case's school at conversion time, for the public school directory. */
+  schoolName?: string
+  /** Set once the school's post-funding outcome update has been admin-published — the "what happened" evidence. */
+  outcomeNote?: string
+  outcomePhotos?: string[]
+  outcomeConfirmedAt?: any
+  /** Guards the "almost funded" nudge (see NotificationHelpers) from firing more than once per project. */
+  almostFundedNotified?: boolean
+  /** Set when one partner's contribution fully closed this project in a single go — see the "sponsor this case" flow. */
+  soloSponsoredBy?: string
+  soloSponsoredByName?: string
   // Rich content (public, added post-approval)
   story?: string
   videoUrl?: string
@@ -133,6 +170,88 @@ export interface Project {
   budgetPhases?: ProjectBudgetPhase[]
   createdAt?: any
   updatedAt?: any
+}
+
+// ==========================================
+// Education Case Types (school-submitted, admin-verified)
+// ==========================================
+
+export type CaseStatus = "submitted" | "needs_info" | "verified" | "published" | "outcome_submitted" | "closed" | "rejected"
+
+export type CaseType =
+  | "fees"
+  | "feeding"
+  | "materials"
+  | "infrastructure"
+  | "special_needs"
+  | "teacher_support"
+  | "other"
+
+/** A single itemized cost line on a case — maps 1:1 to a ProjectBudgetPhase on conversion. */
+export interface CaseBudgetItem {
+  id: string
+  name: string
+  amount: number
+  description?: string
+}
+
+/**
+ * A real, specific education need submitted by a partner school (e.g. one
+ * student's fees, a classroom's supplies). Reviewed and verified by admin,
+ * then converted into a public Project — see Project.caseId.
+ */
+export interface EducationCase {
+  id: string
+  schoolId: string
+  schoolName: string
+  title: string
+  caseType: CaseType
+  narrative: string
+  /** First name / initials only — never a full identity. See `anonymize` below. */
+  beneficiaryDisplayName: string
+  /** A band ("Grade 6", "14-16"), not an exact date of birth. */
+  beneficiaryAgeGrade?: string
+  /** When true, nothing beneficiary-identifying (name or photo) may be shown publicly. */
+  anonymize: boolean
+  estimatedCost: number
+  budgetItems?: CaseBudgetItem[]
+  photos?: string[]
+  documents?: string[]
+  /** The school attests it has guardian consent to share this story publicly. */
+  consentConfirmed: boolean
+  urgency?: "low" | "medium" | "high"
+  status: CaseStatus
+  /** Admin-only working notes. */
+  adminNotes?: string
+  /** What was checked to verify this case — becomes the public "Verified by ZeroUp" note. */
+  verificationNotes?: string
+  projectId?: string
+  /** The school's own account of what happened after funding — awaiting admin publish. */
+  outcomeNote?: string
+  outcomePhotos?: string[]
+  outcomeSubmittedAt?: any
+  createdAt: any
+  updatedAt?: any
+  reviewedAt?: any
+  reviewedBy?: string
+}
+
+// ==========================================
+// Referral Types (lightweight "flag a need" lead for non-school partners)
+// ==========================================
+
+export type ReferralStatus = "new" | "contacted" | "converted" | "closed"
+
+export interface Referral {
+  id: string
+  submittedBy: string
+  submittedByName?: string
+  /** Who/what is being referred — freeform, e.g. a student's name or a school. */
+  subjectName?: string
+  contactInfo?: string
+  description: string
+  status: ReferralStatus
+  createdAt: any
 }
 
 export interface ProjectFormData {
@@ -147,13 +266,23 @@ export interface ProjectFormData {
 // Notification Types
 // ==========================================
 
-export type NotificationType = 
+export type NotificationType =
   | "contribution_approved"
   | "contribution_rejected"
   | "achievement_unlocked"
   | "level_up"
   | "new_project"
   | "general"
+  | "badge_earned"
+  | "system"
+  | "school_approved"
+  | "school_rejected"
+  | "case_needs_info"
+  | "case_verified"
+  | "case_rejected"
+  | "case_published"
+  | "case_outcome_published"
+  | "almost_funded"
 
 export interface Notification {
   id: string

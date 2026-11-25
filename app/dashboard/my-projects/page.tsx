@@ -19,7 +19,6 @@ import { Upload, Loader2, Plus, Edit, Trash2, Eye, ArrowLeft, Calendar, Banknote
 import { uploadImage, validateImageFile } from '@/lib/image-upload'
 import toast from 'react-hot-toast'
 import Header from '@/components/layout/header'
-import { SubmitProjectModal } from '@/components/projects/submit-project-modal'
 import { RichContentFields } from '@/components/projects/rich-content-fields'
 import type { Project } from '@/lib/types'
 
@@ -49,7 +48,6 @@ function MyProjectsPage() {
   const [deleteError, setDeleteError] = useState('')
   const [editError, setEditError] = useState('')
   const [isUploading, setIsUploading] = useState(false)
-  const [isSubmitProjectOpen, setIsSubmitProjectOpen] = useState(false)
 
   useEffect(() => {
     if (!user?.uid) return
@@ -210,7 +208,7 @@ function MyProjectsPage() {
     const map: Record<string, { label: string; icon: any; className: string }> = {
       pending: { label: 'Pending Review', icon: Clock, className: 'bg-amber-500/10 text-amber-600 dark:text-amber-400' },
       open: { label: 'Open', icon: CheckCircle, className: 'bg-green-500/10 text-green-600 dark:text-green-400' },
-      'fully-funded': { label: 'Funded', icon: CheckCircle, className: 'bg-[#8d44d1]/10 text-[#7030b0]' },
+      'fully-funded': { label: 'Funded', icon: CheckCircle, className: 'bg-editorial-navy/10 text-editorial-navy' },
       closed: { label: 'Closed', icon: XCircle, className: 'bg-gray-500/10 text-gray-600' },
       rejected: { label: 'Rejected', icon: XCircle, className: 'bg-red-500/10 text-red-600 dark:text-red-400' },
     }
@@ -240,14 +238,10 @@ function MyProjectsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">My Projects</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">Manage and track your submitted projects.</p>
+          <p className="text-sm sm:text-base text-muted-foreground">
+            A history of projects you've submitted. Individual project submission has moved to our partner-school Education Cases program.
+          </p>
         </div>
-        <Button
-          className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
-          onClick={() => setIsSubmitProjectOpen(true)}
-        >
-          <Plus className="w-4 h-4 mr-2" /> New Project
-        </Button>
       </div>
 
       {isLoading ? (
@@ -272,13 +266,9 @@ function MyProjectsPage() {
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Plus className="h-12 w-12 text-muted-foreground mb-4 opacity-50" />
             <p className="text-lg font-medium mb-2">No projects yet</p>
-            <p className="text-muted-foreground mb-4">Create your first project to start receiving funding.</p>
-            <Button
-              className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
-              onClick={() => setIsSubmitProjectOpen(true)}
-            >
-              Submit a Project
-            </Button>
+            <p className="text-muted-foreground">
+              You haven't submitted any projects. Know a school or student in need? Use "Refer a Need" from your dashboard.
+            </p>
           </CardContent>
         </Card>
       ) : (
@@ -565,7 +555,7 @@ function MyProjectsPage() {
             <Button
               onClick={handleUpdateProject}
               disabled={isUpdating || isUploading}
-              className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
+              className="bg-editorial-navy hover:bg-editorial-navy-deep text-editorial-cream border-0"
             >
               {isUpdating ? (
                 <>
@@ -618,7 +608,6 @@ function MyProjectsPage() {
       </Dialog>
     </div>
       </main>
-      <SubmitProjectModal open={isSubmitProjectOpen} onOpenChange={setIsSubmitProjectOpen} />
     </div>
   )
 }

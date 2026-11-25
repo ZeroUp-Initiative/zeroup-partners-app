@@ -282,7 +282,7 @@ function AdminProjectsPage() {
   const statusBadge = (status: string) => {
     const map: Record<string, { label: string; className: string }> = {
       open: { label: 'Open', className: 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20' },
-      'fully-funded': { label: 'Funded', className: 'bg-[#8d44d1]/10 text-[#7030b0] dark:text-[#a05cd4] border-[#8d44d1]/20' },
+      'fully-funded': { label: 'Funded', className: 'bg-editorial-navy/10 text-editorial-navy dark:text-editorial-cream border-editorial-navy/20' },
       closed: { label: 'Closed', className: 'bg-muted text-muted-foreground border-border' },
       pending: { label: 'Pending', className: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' },
       rejected: { label: 'Rejected', className: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20' },
@@ -335,7 +335,7 @@ function AdminProjectsPage() {
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Search projects…" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
             </div>
-            <Button onClick={() => setIsCreateModalOpen(true)} className="whitespace-nowrap bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0">
+            <Button onClick={() => setIsCreateModalOpen(true)} className="whitespace-nowrap bg-editorial-navy hover:bg-editorial-navy-deep text-editorial-cream border-0">
               <Plus className="w-4 h-4 mr-2" /> Create Project
             </Button>
           </div>
@@ -559,7 +559,7 @@ function AdminProjectsPage() {
               <Checkbox id="ownedByZeroUp" checked={newProject.ownedByZeroUp} onCheckedChange={(c) => setNewProject(p => ({ ...p, ownedByZeroUp: c === true }))} className="mt-0.5" />
               <Label htmlFor="ownedByZeroUp" className="text-sm font-normal leading-snug cursor-pointer">
                 ZeroUp-owned project
-                <span className="block text-xs text-muted-foreground">Dreamers earn dream coins (100 DR per ₦1,000) for supporting this project.</span>
+                <span className="block text-xs text-muted-foreground">Marks this as ZeroUp's own project. Dreamers earn coins and tier credit on every project either way.</span>
               </Label>
             </div>
 
@@ -578,7 +578,7 @@ function AdminProjectsPage() {
             {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={isLoading || isUploading} className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0">
+              <Button type="submit" disabled={isLoading || isUploading} className="bg-editorial-navy hover:bg-editorial-navy-deep text-editorial-cream border-0">
                 {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{isUploading ? 'Uploading…' : 'Creating…'}</> : 'Create Project'}
               </Button>
             </div>
@@ -610,7 +610,7 @@ function AdminProjectsPage() {
               <Checkbox id="edit-ownedByZeroUp" checked={editFormData.ownedByZeroUp} onCheckedChange={(c) => setEditFormData(p => ({ ...p, ownedByZeroUp: c === true }))} className="mt-0.5" />
               <Label htmlFor="edit-ownedByZeroUp" className="text-sm font-normal leading-snug cursor-pointer">
                 ZeroUp-owned project
-                <span className="block text-xs text-muted-foreground">Dreamers earn dream coins (100 DR per ₦1,000) for supporting this project.</span>
+                <span className="block text-xs text-muted-foreground">Marks this as ZeroUp's own project. Dreamers earn coins and tier credit on every project either way.</span>
               </Label>
             </div>
 

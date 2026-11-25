@@ -20,6 +20,17 @@ interface UserProfile {
   flagged?: boolean;
   suspended?: boolean;
   declinedContributionsCount?: number;
+  schoolName?: string;
+  schoolStatus?: 'pending' | 'approved' | 'rejected';
+  schoolAddress?: string;
+  schoolRegistrationNumber?: string;
+  schoolContactName?: string;
+  schoolContactPhone?: string;
+  schoolRepTitle?: string;
+  schoolStudentPopulation?: string;
+  schoolApplicationNote?: string;
+  schoolReviewNotes?: string;
+  schoolAppliedAt?: any;
 }
 
 interface AuthState {

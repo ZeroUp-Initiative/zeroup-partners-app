@@ -12,12 +12,23 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { ArrowLeft, Banknote } from "lucide-react"
 import { ContributeDialog } from "@/components/projects/contribute-dialog"
-import type { Project } from "@/lib/types"
+import type { Project, CaseType } from "@/lib/types"
+
+const CASE_TYPE_LABEL: Record<CaseType, string> = {
+  fees: 'School Fees',
+  feeding: 'Feeding',
+  materials: 'Learning Materials',
+  infrastructure: 'Infrastructure',
+  special_needs: 'Special Needs',
+  teacher_support: 'Teacher Support',
+  other: 'Other',
+}
 
 function ProjectsPage() {
   const router = useRouter()
   const [projects, setProjects] = useState<Project[]>([])
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+  const [caseTypeFilter, setCaseTypeFilter] = useState<CaseType | 'all'>('all')
 
   useEffect(() => {
     const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
@@ -41,6 +52,9 @@ function ProjectsPage() {
     if (project.status !== 'open') return;
     setSelectedProject(project);
   }
+
+  const presentCaseTypes = Array.from(new Set(projects.map(p => p.caseType).filter(Boolean))) as CaseType[]
+  const visibleProjects = caseTypeFilter === 'all' ? projects : projects.filter(p => p.caseType === caseTypeFilter)
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -76,8 +90,30 @@ function ProjectsPage() {
         </div>
       </div>
 
+      {presentCaseTypes.length > 0 && (
+        <div className="flex flex-wrap justify-center gap-2 mb-8">
+          <Button
+            size="sm"
+            variant={caseTypeFilter === 'all' ? 'default' : 'outline'}
+            onClick={() => setCaseTypeFilter('all')}
+          >
+            All Causes
+          </Button>
+          {presentCaseTypes.map((type) => (
+            <Button
+              key={type}
+              size="sm"
+              variant={caseTypeFilter === type ? 'default' : 'outline'}
+              onClick={() => setCaseTypeFilter(type)}
+            >
+              {CASE_TYPE_LABEL[type]}
+            </Button>
+          ))}
+        </div>
+      )}
+
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {projects.map((project) => {
+        {visibleProjects.map((project) => {
           const progress = (project.currentFunding / project.fundingGoal) * 100;
           return (
             <Card
@@ -108,6 +144,9 @@ function ProjectsPage() {
                     project.description
                   }
                 </CardDescription>
+                {project.caseType && (
+                  <Badge variant="outline" className="w-fit mt-1">{CASE_TYPE_LABEL[project.caseType]}</Badge>
+                )}
               </CardHeader>
               <CardContent className="flex-grow space-y-4">
                 <div>

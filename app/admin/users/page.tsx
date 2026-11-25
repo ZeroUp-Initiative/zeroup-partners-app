@@ -398,7 +398,7 @@ function AdminUsersPage() {
 
         <Button
           onClick={() => { setBroadcastOpen(true); setBroadcastResult(null) }}
-          className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0 gap-2 sm:ml-auto"
+          className="bg-editorial-navy hover:bg-editorial-navy-deep text-editorial-cream border-0 gap-2 sm:ml-auto"
         >
           <Megaphone className="h-4 w-4" />
           Broadcast Email
@@ -654,7 +654,7 @@ function AdminUsersPage() {
             <Button
               onClick={handleSendEmail}
               disabled={isSendingEmail || (emailType === "custom" && (!customEmailSubject.trim() || !customEmailBody.trim()))}
-              className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
+              className="bg-editorial-navy hover:bg-editorial-navy-deep text-editorial-cream border-0"
             >
               {isSendingEmail ? "Sending…" : <><Send className="w-4 h-4 mr-2" />Send Email</>}
             </Button>
@@ -733,7 +733,7 @@ function AdminUsersPage() {
             <Button
               onClick={handleBroadcast}
               disabled={isBroadcasting || !broadcastSubject.trim() || !broadcastBody.trim()}
-              className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
+              className="bg-editorial-navy hover:bg-editorial-navy-deep text-editorial-cream border-0"
             >
               {isBroadcasting
                 ? "Sending…"

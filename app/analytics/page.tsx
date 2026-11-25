@@ -212,8 +212,8 @@ function AnalyticsContent() {
 
             <TabsContent value="trends" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-[#8d44d1]/25 hover:-translate-y-1">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8d44d1] to-[#8d44d1]" />
+                <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-editorial-navy/25 hover:-translate-y-1">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-editorial-navy to-editorial-navy" />
                   <CardHeader>
                     <CardTitle>Monthly Contributions</CardTitle>
                     <CardDescription>Your contribution history over the past 6 months</CardDescription>
@@ -244,8 +244,8 @@ function AnalyticsContent() {
                   </CardContent>
                 </Card>
 
-                <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/25 hover:-translate-y-1">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-400" />
+                <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-editorial-navy/25 hover:-translate-y-1">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-editorial-navy to-editorial-navy-deep" />
                   <CardHeader>
                     <CardTitle>Impact Score Trend</CardTitle>
                     <CardDescription>How your impact score has evolved</CardDescription>
@@ -392,8 +392,8 @@ function AnalyticsContent() {
             </TabsContent>
           </Tabs>
 
-          <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-[#8d44d1]/25 hover:-translate-y-1 animate-fade-in delay-500">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8d44d1] to-[#8d44d1]" />
+          <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-editorial-navy/25 hover:-translate-y-1 animate-fade-in delay-500">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-editorial-navy to-editorial-navy" />
             <CardHeader>
               <CardTitle>Your Impact Stories</CardTitle>
               <CardDescription>See how your contributions are making a real difference</CardDescription>

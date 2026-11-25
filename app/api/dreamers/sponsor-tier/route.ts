@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin'
 import { getDreamerDashDb } from '@/lib/supabase/admin'
+import { computePartneredTotal } from '@/lib/dreamers/impact'
 import { DEFAULT_DREAM_TIERS, normalizeTiers, getEffectiveTierStatus, sortTiers } from '@/lib/dreamers/tiers'
 
 export const dynamic = 'force-dynamic'
@@ -65,26 +66,7 @@ export async function POST(req: NextRequest) {
     let recipientPartnered = 0
     try {
       const linkSnap = await fdb.collection('users').where('dreamerDashUserId', '==', recipient.id).limit(1).get()
-      if (!linkSnap.empty) {
-        const rUid = linkSnap.docs[0].id
-        const paySnap = await fdb.collection('payments').where('userId', '==', rUid).where('status', '==', 'approved').get()
-        const rows: { amount: number; projectId?: string }[] = []
-        const projectIds = new Set<string>()
-        paySnap.forEach((d) => {
-          const p = d.data() as Record<string, any>
-          rows.push({ amount: Number(p.amount) || 0, projectId: p.projectId })
-          if (p.projectId && p.projectId !== 'general') projectIds.add(String(p.projectId))
-        })
-        const ownedMap = new Map<string, boolean>()
-        await Promise.all([...projectIds].map(async (pid) => {
-          const ps = await fdb.collection('projects').doc(pid).get()
-          ownedMap.set(pid, ps.data()?.ownedByZeroUp === true)
-        }))
-        for (const r of rows) {
-          const isZeroUp = !r.projectId || r.projectId === 'general' || ownedMap.get(r.projectId) === true
-          if (isZeroUp) recipientPartnered += r.amount
-        }
-      }
+      if (!linkSnap.empty) recipientPartnered = await computePartneredTotal(fdb, linkSnap.docs[0].id)
     } catch (e) {
       console.error('[sponsor-tier] recipient partnered calc failed:', e)
     }

@@ -1,11 +1,11 @@
 "use client"
 
-import { useRef, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useEffect, useMemo, useState } from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Crown, Medal, Star, Trophy, Sparkles, Download, Loader2 } from "lucide-react"
-import html2canvas from "html2canvas"
+import { Download, Loader2, RefreshCw, Share2 } from "lucide-react"
+import { CARD_SIZE, renderPartnerCard, type PartnerCardFormat } from "@/lib/partner-card"
+import toast from "react-hot-toast"
 
 export interface PartnerFlierCardProps {
   variant?: "top-partner" | "regular"
@@ -14,9 +14,29 @@ export interface PartnerFlierCardProps {
   photoURL?: string
   month: string
   year: number
+  /** Project being celebrated. Omit for an overall "ZeroUp partner" card. */
+  projectTitle?: string
+  projectImageURL?: string
   customMessage?: string
   showDownload?: boolean
   className?: string
+}
+
+const FORMATS: { id: PartnerCardFormat; label: string }[] = [
+  { id: "post", label: "Post" },
+  { id: "story", label: "Story / Status" },
+]
+
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+}
+
+function supportsFileShare() {
+  try {
+    return !!navigator.canShare?.({ files: [new File([""], "card.png", { type: "image/png" })] })
+  } catch {
+    return false
+  }
 }
 
 export function PartnerFlierCard({
@@ -26,218 +46,150 @@ export function PartnerFlierCard({
   photoURL,
   month,
   year,
+  projectTitle,
+  projectImageURL,
   customMessage,
   showDownload = true,
   className = "",
 }: PartnerFlierCardProps) {
-  const cardRef = useRef<HTMLDivElement>(null)
-  const [isDownloading, setIsDownloading] = useState(false)
+  const [format, setFormat] = useState<PartnerCardFormat>("post")
+  const [file, setFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [failed, setFailed] = useState(false)
+  const [attempt, setAttempt] = useState(0)
+  const [isTouch, setIsTouch] = useState(false)
+  const [canShare, setCanShare] = useState(false)
 
-  const isTopPartner = variant === "top-partner"
-  
-  const defaultMessage = isTopPartner 
-    ? "Thank you for your incredible generosity and commitment to transforming lives!"
-    : "Thank you for being a valued partner in our mission to transform lives!"
+  useEffect(() => {
+    setIsTouch(window.matchMedia("(pointer: coarse)").matches)
+    setCanShare(supportsFileShare())
+  }, [])
 
-  const handleDownload = async () => {
-    if (!cardRef.current) return
-    
-    setIsDownloading(true)
+  const fileName = useMemo(() => {
+    const slug = (name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "partner"
+    return `zeroup-partner-${slug}-${month.toLowerCase()}-${year}-${format}.png`
+  }, [name, month, year, format])
+
+  // The image is made ahead of the tap: iOS only opens the share sheet directly
+  // from a tap, with no waiting in between.
+  useEffect(() => {
+    let cancelled = false
+    let url: string | null = null
+    setFile(null)
+    setFailed(false)
+    const timer = setTimeout(async () => {
+      try {
+        const blob = await renderPartnerCard(
+          { variant, name, amount, month, year, photoURL, projectTitle, projectImageURL, message: customMessage },
+          format,
+        )
+        if (cancelled) return
+        url = URL.createObjectURL(blob)
+        setFile(new File([blob], fileName, { type: "image/png" }))
+        setPreviewUrl(url)
+      } catch (err) {
+        console.error("Partner card could not be created:", err)
+        if (!cancelled) setFailed(true)
+      }
+    }, 250)
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+      // The old preview stays on screen until the next one is ready.
+      const old = url
+      if (old) setTimeout(() => URL.revokeObjectURL(old), 30000)
+    }
+  }, [variant, name, amount, month, year, photoURL, projectTitle, projectImageURL, customMessage, format, fileName, attempt])
+
+  const share = async () => {
+    if (!file) return
     try {
-      const canvas = await html2canvas(cardRef.current, {
-        scale: 3, // Higher quality for social media
-        backgroundColor: null,
-        useCORS: true,
-        allowTaint: true,
-        logging: false,
-      })
-      
-      const link = document.createElement("a")
-      link.download = `zeroup-partner-${name.toLowerCase().replace(/\s+/g, '-')}-${month}-${year}.png`
-      link.href = canvas.toDataURL("image/png")
-      link.click()
-    } catch (error) {
-      console.error("Error downloading image:", error)
-    } finally {
-      setIsDownloading(false)
+      await navigator.share({ files: [file] })
+    } catch (err: any) {
+      if (err?.name !== "AbortError") toast.error("Sharing didn't open. Press and hold the card to save it.")
     }
   }
 
+  const download = () => {
+    if (!file) return
+    // iPhones save photos through the share sheet ("Save Image").
+    if (isIOS() && canShare) return void share()
+    const url = URL.createObjectURL(file)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = fileName
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    setTimeout(() => URL.revokeObjectURL(url), 60000)
+    toast.success(isTouch ? "Saving your card. If it doesn't appear, press and hold the card." : "Card downloaded.")
+  }
+
+  const { w, h } = CARD_SIZE[format]
+
   return (
-    <div className={`relative ${className}`}>
-      <Card 
-        ref={cardRef}
-        className="relative overflow-hidden border-0 shadow-2xl aspect-[4/5]"
-      >
-        {/* Background gradient with premium look */}
-        <div className={`absolute inset-0 ${
-          isTopPartner 
-            ? "bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500"
-            : "bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600"
-        }`} />
-        <div className={`absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] ${
-          isTopPartner
-            ? "from-yellow-400/40 via-transparent to-transparent"
-            : "from-cyan-400/40 via-transparent to-transparent"
-        }`} />
-        <div className={`absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] ${
-          isTopPartner 
-            ? "from-red-600/30 via-transparent to-transparent"
-            : "from-violet-600/30 via-transparent to-transparent"
-        }`} />
-        
-        {/* Decorative sparkles/patterns */}
-        <div className="absolute top-4 right-4 text-white/20">
-          <Sparkles className="w-10 h-10 sm:w-14 sm:h-14" />
+    <div className={`mx-auto w-full max-w-[420px] ${className}`}>
+      {showDownload && (
+        <div role="group" aria-label="Card size" className="mb-3 grid grid-cols-2 gap-1 rounded-lg border bg-muted p-1">
+          {FORMATS.map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              aria-pressed={format === f.id}
+              onClick={() => setFormat(f.id)}
+              className={`min-h-10 rounded-md px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                format === f.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
         </div>
-        <div className="absolute top-1/4 left-6 text-white/15">
-          <Sparkles className="w-8 h-8 sm:w-10 sm:h-10" />
-        </div>
-        <div className="absolute top-1/4 left-8 w-2 h-2 bg-white/30 rounded-full" />
-        <div className="absolute top-1/3 right-12 w-3 h-3 bg-white/20 rounded-full" />
-        
-        <CardHeader className="relative pb-1 pt-3 sm:pt-5">
-          <div className="flex items-center gap-2 sm:gap-3 justify-center">
-            <div className={`p-1.5 sm:p-2.5 rounded-xl backdrop-blur-sm shadow-lg bg-white/20`}>
-              {isTopPartner ? (
-                <Crown className="h-4 w-4 sm:h-6 sm:w-6 text-white drop-shadow-lg" />
-              ) : (
-                <Star className="h-4 w-4 sm:h-6 sm:w-6 text-white drop-shadow-lg" />
-              )}
-            </div>
-            <div className="text-center">
-              <CardTitle className="text-base sm:text-xl md:text-2xl font-bold text-white drop-shadow-lg">
-                {isTopPartner ? "Partner of the Month" : "Partner for"}
-              </CardTitle>
-              {!isTopPartner && (
-                <p className="text-white/90 text-sm sm:text-base font-semibold mt-0.5">
-                  {month} {year}
-                </p>
-              )}
-            </div>
-          </div>
-        </CardHeader>
-        
-        <CardContent className="flex flex-col items-center justify-between h-[calc(100%-60px)] sm:h-[calc(100%-80px)] py-2 sm:py-4 relative">
-          {/* Month/Year Banner - only for top partner */}
-          {isTopPartner && (
-            <div className="px-3 sm:px-5 py-0.5 sm:py-1 bg-white/90 dark:bg-gray-900/90 rounded-full shadow-xl backdrop-blur-sm">
-              <span className="text-[10px] sm:text-xs font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-                {month} {year}
-              </span>
+      )}
+
+      <div className="mx-auto" style={{ maxWidth: format === "story" ? 300 : undefined }}>
+        <div className="relative w-full overflow-hidden rounded-xl bg-editorial-navy shadow-lg" style={{ aspectRatio: `${w} / ${h}` }}>
+          {previewUrl && !failed && (
+            // eslint-disable-next-line @next/next/no-img-element -- local blob; a plain <img> is what press-and-hold can save
+            <img
+              src={previewUrl}
+              alt={`Partner card for ${name}`}
+              className={`block h-full w-full object-contain transition-opacity ${file ? "opacity-100" : "opacity-40"}`}
+            />
+          )}
+          {!file && !failed && (
+            <div className="absolute inset-0 grid place-items-center text-editorial-cream" role="status">
+              <span className="flex items-center gap-2 text-sm"><Loader2 className="h-4 w-4 animate-spin" /> Making your card</span>
             </div>
           )}
-          
-          {/* For regular variant, just add a spacer */}
-          {!isTopPartner && <div className="h-2" />}
-          
-          <div className="relative my-2 sm:my-3">
-            {/* Premium glow effect */}
-            <div className="absolute inset-0 bg-white rounded-full blur-2xl opacity-40 scale-125" />
-            <div className={`absolute inset-0 rounded-full blur-xl opacity-50 scale-110 ${
-              isTopPartner 
-                ? "bg-gradient-to-br from-yellow-300 to-orange-400"
-                : "bg-gradient-to-br from-cyan-300 to-blue-400"
-            }`} />
-            <Avatar className="h-20 w-20 sm:h-28 sm:w-28 md:h-32 md:w-32 border-4 sm:border-[5px] border-white shadow-2xl relative">
-              <AvatarImage src={photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${name}&backgroundColor=${isTopPartner ? 'f59e0b' : '3b82f6'}`} />
-              <AvatarFallback className={`text-2xl sm:text-3xl font-bold text-white ${
-                isTopPartner 
-                  ? "bg-gradient-to-br from-amber-400 to-orange-500"
-                  : "bg-gradient-to-br from-blue-400 to-indigo-500"
-              }`}>
-                {name?.charAt(0)?.toUpperCase() || '?'}
-              </AvatarFallback>
-            </Avatar>
-            
-            {/* Crown/Star badge */}
-            {isTopPartner && (
-              <div className="absolute -top-2 sm:-top-3 left-1/2 -translate-x-1/2">
-                <div className="bg-gradient-to-br from-yellow-400 to-amber-500 text-white p-1 sm:p-1.5 rounded-full shadow-xl animate-bounce">
-                  <Crown className="h-3 w-3 sm:h-5 sm:w-5" />
-                </div>
+          {failed && (
+            <div className="absolute inset-0 grid place-items-center p-6 text-center text-editorial-cream" role="alert">
+              <div className="space-y-3">
+                <p className="text-sm">Your card couldn&apos;t be made. Check your connection and try again.</p>
+                <Button type="button" variant="secondary" onClick={() => setAttempt((a) => a + 1)}>
+                  <RefreshCw className="mr-2 h-4 w-4" /> Try again
+                </Button>
               </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {showDownload && !failed && (
+        <div className="mt-4 space-y-2" data-download-btn>
+          <div className={`grid gap-2 ${canShare ? "grid-cols-2" : "grid-cols-1"}`}>
+            <Button type="button" onClick={download} disabled={!file} className="h-12 w-full">
+              <Download className="mr-2 h-4 w-4" /> Download
+            </Button>
+            {canShare && (
+              <Button type="button" variant="outline" onClick={share} disabled={!file} className="h-12 w-full">
+                <Share2 className="mr-2 h-4 w-4" /> Share
+              </Button>
             )}
-            
-            {/* Medal badge */}
-            <div className={`absolute -bottom-1 -right-1 text-white p-1.5 sm:p-2 rounded-full shadow-xl ${
-              isTopPartner 
-                ? "bg-white text-amber-500 ring-2 sm:ring-4 ring-amber-400"
-                : "bg-white text-blue-500 ring-2 sm:ring-4 ring-blue-400"
-            }`}>
-              <Medal className="h-3 w-3 sm:h-5 sm:w-5" />
-            </div>
           </div>
-          
-          <div className="text-center space-y-1 sm:space-y-2">
-            <h3 className="text-lg sm:text-xl md:text-3xl font-extrabold text-white drop-shadow-lg tracking-tight px-2">
-              {name || 'Anonymous Partner'}
-            </h3>
-            <div className="inline-flex items-center gap-1 px-2 sm:px-4 py-1 sm:py-2 rounded-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-xl">
-              <span className="text-gray-500 text-[10px] sm:text-xs font-medium">Contributed</span>
-              <span className={`text-base sm:text-xl md:text-2xl font-black bg-clip-text text-transparent ${
-                isTopPartner 
-                  ? "bg-gradient-to-r from-amber-500 to-orange-600"
-                  : "bg-gradient-to-r from-blue-500 to-indigo-600"
-              }`}>
-                ₦{amount.toLocaleString()}
-              </span>
-            </div>
-          </div>
-          
-          {/* Star rating */}
-          <div className="flex gap-0.5 sm:gap-1">
-            {[1,2,3,4,5].map(i => (
-              <Star 
-                key={i} 
-                className={`h-4 w-4 sm:h-5 sm:w-5 drop-shadow-lg ${
-                  isTopPartner 
-                    ? "fill-yellow-300 text-yellow-300"
-                    : "fill-cyan-300 text-cyan-300"
-                }`}
-              />
-            ))}
-          </div>
-          
-          <p className="text-[10px] sm:text-xs text-center text-white/90 max-w-[200px] sm:max-w-[280px] font-medium italic drop-shadow px-2 leading-tight">
-            "{customMessage || defaultMessage}"
-          </p>
-          
-          {/* Bottom badge and branding */}
-          <div className="flex flex-col items-center gap-1 sm:gap-2">
-            <div className={`flex items-center gap-1.5 sm:gap-2 ${isTopPartner ? "text-white/90" : "text-white/90"}`}>
-              <Trophy className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="text-[10px] sm:text-xs font-semibold tracking-wide">
-                {isTopPartner ? "TOP CONTRIBUTOR" : "VALUED PARTNER"}
-              </span>
-              <Trophy className="h-3 w-3 sm:h-4 sm:w-4" />
-            </div>
-            <span className="text-white/40 text-[8px] sm:text-[10px] font-semibold tracking-widest">
-              ZEROUP PARTNERS
-            </span>
-          </div>
-        </CardContent>
-      </Card>
-      
-      {/* Download button - positioned outside the card for cleaner export */}
-      {showDownload && (
-        <div className="mt-4 flex justify-center" data-download-btn>
-          <Button
-            onClick={handleDownload}
-            disabled={isDownloading}
-            className={`${
-              isTopPartner
-                ? "bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700"
-                : "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
-            } text-white shadow-lg`}
-          >
-            {isDownloading ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Download className="w-4 h-4 mr-2" />
-            )}
-            Download Image
-          </Button>
+          {isTouch && (
+            <p className="text-center text-xs text-muted-foreground">You can also press and hold the card to save it.</p>
+          )}
         </div>
       )}
     </div>
@@ -245,8 +197,6 @@ export function PartnerFlierCard({
 }
 
 // Modal version for showing partner flier in a dialog
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-
 interface PartnerFlierModalProps {
   trigger: React.ReactNode
   partner: {
@@ -267,15 +217,13 @@ export function PartnerFlierModal({
   customMessage,
 }: PartnerFlierModalProps) {
   const now = new Date()
-  const month = partner.month || now.toLocaleString('default', { month: 'long' })
+  const month = partner.month || now.toLocaleString("default", { month: "long" })
   const year = partner.year || now.getFullYear()
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        {trigger}
-      </DialogTrigger>
-      <DialogContent className="max-w-md p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent className="max-h-[92dvh] max-w-md overflow-y-auto p-4 sm:p-6">
         <DialogHeader className="sr-only">
           <DialogTitle>Partner Recognition Card</DialogTitle>
         </DialogHeader>

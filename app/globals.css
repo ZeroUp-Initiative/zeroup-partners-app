@@ -2,41 +2,51 @@
 @import "tw-animate-css";
 
 :root {
-  --background: oklch(0.985 0.005 240);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.45 0.2 270);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.45 0.2 270);
-  --muted: oklch(0.94 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --accent: oklch(0.94 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  /* Editorial redesign palette — now the app-wide system (see below). */
+  --editorial-cream: #f4f0e5;
+  --editorial-cream-soft: #faf8f2;
+  --editorial-navy: #1b2540;
+  --editorial-navy-deep: #131b33;
+  --editorial-ink: #3d3b34;
+  --editorial-muted: #7a776c;
+  --editorial-border: #e4ddcb;
+
+  --background: var(--editorial-cream);
+  --foreground: var(--editorial-ink);
+  --card: #ffffff;
+  --card-foreground: var(--editorial-ink);
+  --popover: #ffffff;
+  --popover-foreground: var(--editorial-ink);
+  --primary: var(--editorial-navy);
+  --primary-foreground: var(--editorial-cream);
+  --secondary: var(--editorial-cream-soft);
+  --secondary-foreground: var(--editorial-navy);
+  --muted: var(--editorial-cream-soft);
+  --muted-foreground: var(--editorial-muted);
+  --accent: var(--editorial-cream-soft);
+  --accent-foreground: var(--editorial-navy);
   --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.9 0.02 240);
-  --input: oklch(0.9 0.02 240);
-  --ring: oklch(0.45 0.2 270);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: var(--editorial-border);
+  --input: var(--editorial-border);
+  --ring: var(--editorial-navy);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0.005 240);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.45 0.2 270);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.94 0 0);
-  --sidebar-accent-foreground: oklch(0.45 0.2 270);
-  --sidebar-border: oklch(0.9 0.02 240);
-  --sidebar-ring: oklch(0.45 0.2 270);
+  --sidebar: var(--editorial-navy-deep);
+  --sidebar-foreground: var(--editorial-cream);
+  --sidebar-primary: var(--editorial-cream);
+  --sidebar-primary-foreground: var(--editorial-navy-deep);
+  --sidebar-accent: rgba(255, 255, 255, 0.08);
+  --sidebar-accent-foreground: var(--editorial-cream);
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: var(--editorial-cream);
 
-  /* Adding neon and gradient color variables */
+  /* Legacy neon/gradient variables — kept only for components not yet
+     migrated off them; new work should use the editorial-* tokens above. */
   --neon-blue: #00d4ff;
   --neon-purple: #8b5cf6;
   --neon-teal: #7030b0;
@@ -47,38 +57,38 @@
 }
 
 .dark {
-  --background: #130927;
-  --foreground: oklch(0.985 0 0);
-  --card: #1e1040;
-  --card-foreground: oklch(0.985 0 0);
-  --popover: #1e1040;
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.65 0.22 305);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: #251450;
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: #251450;
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: #251450;
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: rgba(255,255,255,0.08);
-  --input: rgba(255,255,255,0.08);
-  --ring: oklch(0.65 0.22 305);
-  --chart-1: oklch(0.65 0.22 305);
-  --chart-2: oklch(0.58 0.22 310);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: #1e1040;
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.65 0.22 305);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: #251450;
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: rgba(255,255,255,0.08);
-  --sidebar-ring: oklch(0.65 0.22 305);
+  --background: var(--editorial-navy-deep);
+  --foreground: var(--editorial-cream);
+  --card: var(--editorial-navy);
+  --card-foreground: var(--editorial-cream);
+  --popover: var(--editorial-navy);
+  --popover-foreground: var(--editorial-cream);
+  --primary: var(--editorial-cream);
+  --primary-foreground: var(--editorial-navy-deep);
+  --secondary: rgba(255, 255, 255, 0.08);
+  --secondary-foreground: var(--editorial-cream);
+  --muted: rgba(255, 255, 255, 0.06);
+  --muted-foreground: rgba(244, 240, 229, 0.65);
+  --accent: rgba(255, 255, 255, 0.08);
+  --accent-foreground: var(--editorial-cream);
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: var(--editorial-cream);
+  --chart-1: oklch(0.75 0.18 70);
+  --chart-2: oklch(0.7 0.14 195);
+  --chart-3: oklch(0.75 0.15 300);
+  --chart-4: oklch(0.83 0.19 84);
+  --chart-5: oklch(0.77 0.19 25);
+  --sidebar: var(--editorial-navy-deep);
+  --sidebar-foreground: var(--editorial-cream);
+  --sidebar-primary: var(--editorial-cream);
+  --sidebar-primary-foreground: var(--editorial-navy-deep);
+  --sidebar-accent: rgba(255, 255, 255, 0.08);
+  --sidebar-accent-foreground: var(--editorial-cream);
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: var(--editorial-cream);
 }
 
 @theme inline {
@@ -123,6 +133,17 @@
   --font-sans: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui,
     sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
     "Noto Color Emoji";
+  --font-script: var(--font-caveat), cursive;
+  --font-display: var(--font-playfair), Georgia, serif;
+
+  /* Editorial redesign palette utilities (bg-editorial-navy, text-editorial-ink, etc.) */
+  --color-editorial-cream: var(--editorial-cream);
+  --color-editorial-cream-soft: var(--editorial-cream-soft);
+  --color-editorial-navy: var(--editorial-navy);
+  --color-editorial-navy-deep: var(--editorial-navy-deep);
+  --color-editorial-ink: var(--editorial-ink);
+  --color-editorial-muted: var(--editorial-muted);
+  --color-editorial-border: var(--editorial-border);
 }
 
 @layer base {

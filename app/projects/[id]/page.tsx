@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
-import { ArrowLeft, Loader2, Sparkles, MapPin, Tag, Trash2 } from 'lucide-react'
+import { ArrowLeft, Loader2, Sparkles, MapPin, Tag, Trash2, ShieldCheck, Crown } from 'lucide-react'
 import type { Project } from '@/lib/types'
 import { VideoEmbed, parseVideoUrl } from '@/components/projects/video-embed'
 import { ProjectTimeline } from '@/components/projects/project-timeline'
@@ -29,6 +29,7 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [contributeOpen, setContributeOpen] = useState(false)
+  const [sponsorMode, setSponsorMode] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -113,12 +114,21 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
         {project.status.toUpperCase()}
       </Badge>
       <Button
-        className="w-full bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
+        className="w-full bg-editorial-navy hover:bg-editorial-navy-deep text-editorial-cream border-0"
         disabled={!canContribute}
-        onClick={() => setContributeOpen(true)}
+        onClick={() => { setSponsorMode(false); setContributeOpen(true) }}
       >
         {isFullyFunded ? 'Goal Reached' : isClosed ? 'Closed' : 'Contribute to This Project'}
       </Button>
+      {project.caseId && canContribute && (
+        <Button
+          variant="outline"
+          className="w-full border-amber-500/40 text-amber-700 dark:text-amber-400 hover:bg-amber-500/10"
+          onClick={() => { setSponsorMode(true); setContributeOpen(true) }}
+        >
+          <Crown className="w-4 h-4 mr-2" /> Sponsor This Case Fully
+        </Button>
+      )}
       {canDelete && (
         <Button
           variant="outline"
@@ -140,7 +150,7 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
         ) : project.imageUrl ? (
           <img src={project.imageUrl} alt={project.title} className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[#8d44d1] to-[#7030b0]" />
+          <div className="w-full h-full bg-gradient-to-br from-editorial-navy to-editorial-navy-deep" />
         )}
         {!hasVideo && (
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -195,6 +205,30 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
 
           {/* Main content */}
           <div className="lg:col-span-2 space-y-10 lg:order-1">
+            {project.caseId && (
+              <div className="flex items-start gap-3 rounded-xl border border-green-500/20 bg-green-500/5 p-4">
+                <ShieldCheck className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-green-700 dark:text-green-400">Verified Education Case</p>
+                  <p className="text-sm text-muted-foreground">
+                    {project.verificationNote || 'This case was reviewed and verified by the ZeroUp team before publication.'}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {project.soloSponsoredBy && (
+              <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+                <Crown className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">Fully Sponsored</p>
+                  <p className="text-sm text-muted-foreground">
+                    This case was closed out entirely by {project.soloSponsoredByName || 'one partner'} in a single contribution.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Story */}
             <section>
               <h2 className="text-xl font-bold mb-3">About This Project</h2>
@@ -214,6 +248,22 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
               <section>
                 <h2 className="text-xl font-bold mb-4">Budget by Phase</h2>
                 <ProjectBudgetBreakdown phases={project.budgetPhases!} fundingGoal={project.fundingGoal} />
+              </section>
+            )}
+
+            {project.outcomeNote && (
+              <section>
+                <h2 className="text-xl font-bold mb-3">What Happened</h2>
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 space-y-3">
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{project.outcomeNote}</p>
+                  {project.outcomePhotos && project.outcomePhotos.length > 0 && (
+                    <div className="flex gap-2 flex-wrap">
+                      {project.outcomePhotos.map((p, i) => (
+                        <img key={i} src={p} alt="" className="h-24 w-24 object-cover rounded-lg border" />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </section>
             )}
 
@@ -244,14 +294,14 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
             )}
 
             {/* CTA footer */}
-            <section className="rounded-2xl border bg-gradient-to-br from-[#8d44d1]/10 to-[#7030b0]/10 p-6 sm:p-8 text-center space-y-3">
+            <section className="rounded-2xl border bg-gradient-to-br from-editorial-navy/10 to-editorial-navy-deep/10 p-6 sm:p-8 text-center space-y-3">
               <h3 className="text-lg font-bold">Ready to partner on this project?</h3>
               <p className="text-sm text-muted-foreground max-w-md mx-auto">
                 Every contribution is custodially managed and routed directly toward this project's goals.
               </p>
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
+                className="bg-editorial-navy hover:bg-editorial-navy-deep text-editorial-cream border-0"
                 disabled={!canContribute}
                 onClick={() => setContributeOpen(true)}
               >
@@ -267,7 +317,13 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
         </div>
       </div>
 
-      <ContributeDialog project={project} open={contributeOpen} onOpenChange={setContributeOpen} />
+      <ContributeDialog
+        project={project}
+        open={contributeOpen}
+        onOpenChange={(o) => { setContributeOpen(o); if (!o) setSponsorMode(false) }}
+        presetAmount={sponsorMode ? Math.max(0, project.fundingGoal - project.currentFunding) : undefined}
+        soloSponsor={sponsorMode}
+      />
 
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>

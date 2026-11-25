@@ -21,7 +21,20 @@ import {
 export interface Notification {
   id: string;
   userId: string;
-  type: 'contribution_approved' | 'contribution_rejected' | 'new_project' | 'badge_earned' | 'system';
+  type:
+    | 'contribution_approved'
+    | 'contribution_rejected'
+    | 'new_project'
+    | 'badge_earned'
+    | 'system'
+    | 'school_approved'
+    | 'school_rejected'
+    | 'case_needs_info'
+    | 'case_verified'
+    | 'case_rejected'
+    | 'case_published'
+    | 'case_outcome_published'
+    | 'almost_funded';
   title: string;
   message: string;
   read: boolean;
@@ -190,5 +203,56 @@ export const NotificationHelpers = {
 
   systemMessage: (userId: string, title: string, message: string) => {
     return createNotification(userId, 'system', title, message);
+  },
+
+  schoolApplicationApproved: (userId: string, schoolName: string) => {
+    const title = 'School Application Approved! 🎉';
+    const message = `${schoolName} is now a ZeroUp partner school. You can submit Education Cases from your dashboard.`;
+    return createNotification(userId, 'school_approved', title, message, '/dashboard/my-cases');
+  },
+
+  schoolApplicationRejected: (userId: string, schoolName: string, reason?: string) => {
+    const title = 'School Application Not Approved';
+    const message = reason
+      ? `${schoolName}'s application was not approved. Reason: ${reason}`
+      : `${schoolName}'s application was not approved this time.`;
+    return createNotification(userId, 'school_rejected', title, message, '/dashboard');
+  },
+
+  caseNeedsInfo: (userId: string, caseTitle: string, notes?: string) => {
+    const title = 'More Info Needed on Your Case';
+    const message = notes
+      ? `We need more info on "${caseTitle}": ${notes}`
+      : `We need more info on "${caseTitle}" before we can verify it.`;
+    return createNotification(userId, 'case_needs_info', title, message, '/dashboard/my-cases');
+  },
+
+  caseVerified: (userId: string, caseTitle: string) => {
+    const title = 'Case Verified ✅';
+    const message = `"${caseTitle}" has been verified and is being prepared for partnership.`;
+    return createNotification(userId, 'case_verified', title, message, '/dashboard/my-cases');
+  },
+
+  caseRejected: (userId: string, caseTitle: string, reason?: string) => {
+    const title = 'Case Not Approved';
+    const message = reason
+      ? `"${caseTitle}" was not approved. Reason: ${reason}`
+      : `"${caseTitle}" was not approved this time.`;
+    return createNotification(userId, 'case_rejected', title, message, '/dashboard/my-cases');
+  },
+
+  caseConvertedToProject: (userId: string, caseTitle: string) => {
+    const title = 'Your Case is Live! 🎉';
+    const message = `"${caseTitle}" has been published as a project and is now open for partner funding.`;
+    return createNotification(userId, 'case_published', title, message, '/dashboard/my-cases');
+  },
+
+  caseOutcomePublished: (userId: string, caseTitle: string) => {
+    const title = 'Your Outcome Update is Live ✅';
+    const message = `Partners can now see what happened with "${caseTitle}".`;
+    return createNotification(userId, 'case_outcome_published', title, message, '/dashboard/my-cases');
   }
+  // Note: the "almost funded" nudge is targeted (past contributors to one
+  // project only), not a per-user helper call — it's generated server-side
+  // in /api/email/notify-project, which already resolves that recipient list.
 };

@@ -23,24 +23,61 @@ service cloud.firestore {
       return data.keys().hasAll(['firstName', 'lastName', 'email']) &&
              data.firstName is string && data.lastName is string && data.email is string;
     }
-    
+
+    function isApprovedSchool() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'school' &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.schoolStatus == 'approved';
+    }
+
     // Users collection
     match /users/{userId} {
       // Public read of basic profile info
       allow read: if true;
-      
-      // Users create own profile during signup
-      allow create: if isOwner(userId) && isValidUserData();
-      
+
+      // Users create own profile during signup. May only self-declare as a
+      // plain user or an UNAPPROVED school application — never admin, never
+      // a pre-approved school.
+      allow create: if isOwner(userId) && isValidUserData() &&
+        (!('role' in request.resource.data) || request.resource.data.role in ['user', 'school']) &&
+        (!('schoolStatus' in request.resource.data) || request.resource.data.schoolStatus == 'pending');
+
       // Users update own profile (excluding role/sensitive fields)
-      allow update: if isOwner(userId) && 
-        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'email']));
-      
+      allow update: if isOwner(userId) &&
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'email', 'schoolStatus']));
+
       // Admins can update any field including role changes
       allow update: if isAdmin();
-      
+
       // Only admins can delete users
       allow delete: if isAdmin();
+    }
+
+    // Education Cases collection — see firestore.rules for the full comment.
+    match /cases/{caseId} {
+      allow read: if isAuthenticated() && resource.data.schoolId == request.auth.uid;
+      allow read: if isAdmin();
+      allow create: if isApprovedSchool() &&
+        request.resource.data.schoolId == request.auth.uid &&
+        request.resource.data.status == 'submitted';
+      allow update: if (
+        isAuthenticated() && resource.data.schoolId == request.auth.uid &&
+        (
+          (resource.data.status in ['submitted', 'needs_info'] && request.resource.data.status == 'submitted') ||
+          (resource.data.status == 'published' && request.resource.data.status == 'outcome_submitted')
+        )
+      ) || isAdmin();
+      allow delete: if (
+        isAuthenticated() && resource.data.schoolId == request.auth.uid && resource.data.status == 'submitted'
+      ) || isAdmin();
+    }
+
+    // Referral leads from partners flagging a need they know about.
+    match /referrals/{referralId} {
+      allow create: if isAuthenticated() && request.resource.data.submittedBy == request.auth.uid;
+      allow read: if isAdmin();
+      allow update, delete: if isAdmin();
     }
     
     // Payments/Contributions collection

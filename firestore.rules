@@ -14,27 +14,42 @@ service cloud.firestore {
     
     // Helper function to check if user is admin
     function isAdmin() {
-      return isAuthenticated() && 
+      return isAuthenticated() &&
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
-    
+
+    // Helper function to check if user is an admin-approved partner school
+    function isApprovedSchool() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'school' &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.schoolStatus == 'approved';
+    }
+
     // Users collection
     match /users/{userId} {
       // Allow public read of basic profile info for constellation display
       // This exposes: firstName, lastName, photoURL, createdAt
       allow read: if true;
-      
-      // Users can create their own profile during signup
-      allow create: if isOwner(userId);
-      
-      // Users can update their own profile (but not change role)
-      allow update: if isOwner(userId) && 
-        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']));
-      
-      // Admins can update any field including role changes
+
+      // Users can create their own profile during signup. A self-created doc
+      // may only ever self-declare as a plain user or an UNAPPROVED school
+      // application — never admin, and never a pre-approved school — closing
+      // a privilege-escalation hole where a raw client write could otherwise
+      // set role:'admin' (or schoolStatus:'approved') on signup.
+      allow create: if isOwner(userId) &&
+        (!('role' in request.resource.data) || request.resource.data.role in ['user', 'school']) &&
+        (!('schoolStatus' in request.resource.data) || request.resource.data.schoolStatus == 'pending');
+
+      // Users can update their own profile, but not change role or school
+      // approval status themselves.
+      allow update: if isOwner(userId) &&
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'schoolStatus']));
+
+      // Admins can update any field including role/schoolStatus changes
       allow update: if isAdmin();
-      
+
       // Only admins can delete users
       allow delete: if isAdmin();
     }
@@ -89,7 +104,53 @@ service cloud.firestore {
       // Deletes: the original submitter (owner) or any admin may delete a project.
       allow delete: if isAuthenticated() && (resource.data.submittedBy == request.auth.uid || isAdmin());
     }
-    
+
+    // Education Cases collection — a real, specific need submitted by an
+    // admin-approved partner school. Not publicly readable: the resulting
+    // Project (once admin converts a verified case) is the public artifact,
+    // not the case itself.
+    match /cases/{caseId} {
+      // The submitting school can read its own cases.
+      allow read: if isAuthenticated() && resource.data.schoolId == request.auth.uid;
+
+      // Admins can read all cases.
+      allow read: if isAdmin();
+
+      // Only an approved school can submit a case, tagged as itself, starting
+      // in the "submitted" state.
+      allow create: if isApprovedSchool() &&
+        request.resource.data.schoolId == request.auth.uid &&
+        request.resource.data.status == 'submitted';
+
+      // The owning school may edit and resubmit while it's still under
+      // review (submitted / needs_info) — but may only set status back to
+      // "submitted", never verify/publish/reject itself. Once published, the
+      // school may submit a post-funding outcome update, but only admin can
+      // publish it (flip to "closed") onto the public project. Admins may
+      // update any field (status transitions, notes, projectId linkage).
+      allow update: if (
+        isAuthenticated() && resource.data.schoolId == request.auth.uid &&
+        (
+          (resource.data.status in ['submitted', 'needs_info'] && request.resource.data.status == 'submitted') ||
+          (resource.data.status == 'published' && request.resource.data.status == 'outcome_submitted')
+        )
+      ) || isAdmin();
+
+      // The owning school may withdraw a case only before review has begun;
+      // admins may delete any case.
+      allow delete: if (
+        isAuthenticated() && resource.data.schoolId == request.auth.uid && resource.data.status == 'submitted'
+      ) || isAdmin();
+    }
+
+    // Lightweight leads from any partner flagging a need they know about —
+    // not a public submission, just a pointer for admin to follow up on.
+    match /referrals/{referralId} {
+      allow create: if isAuthenticated() && request.resource.data.submittedBy == request.auth.uid;
+      allow read: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
     // Notifications collection
     match /notifications/{notificationId} {
       // Users can read their own notifications

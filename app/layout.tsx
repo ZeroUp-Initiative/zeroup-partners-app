@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Plus_Jakarta_Sans } from "next/font/google"
+import { Plus_Jakarta_Sans, Caveat, Playfair_Display } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import dynamic from "next/dynamic"
@@ -18,6 +18,20 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
   display: "swap",
   preload: true,
+})
+
+const caveat = Caveat({
+  subsets: ["latin"],
+  variable: "--font-caveat",
+  display: "swap",
+  preload: false,
+})
+
+const playfairDisplay = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
+  preload: false,
 })
 
 // Separate viewport export for themeColor (Next.js 14+)
@@ -78,7 +92,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${plusJakartaSans.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${plusJakartaSans.variable} ${caveat.variable} ${playfairDisplay.variable} antialiased`}>
       <head>
         <link rel="apple-touch-icon" sizes="180x180" href="/images/icon-192x192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -88,8 +102,8 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#6366f1" />
         <meta name="msapplication-tap-highlight" content="no" />
       </head>
-      <body className={`font-sans ${plusJakartaSans.variable} antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange={false}>
+      <body className={`font-sans ${plusJakartaSans.variable} ${caveat.variable} ${playfairDisplay.variable} antialiased`}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange={false}>
           <AppProviders>
             <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
           </AppProviders>

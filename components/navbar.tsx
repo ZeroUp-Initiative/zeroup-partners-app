@@ -75,6 +75,10 @@ export function Navbar({ isDark, isLoggedIn, user }: NavbarProps) {
               Projects
             </Link>
 
+            <Link href="/schools" className={navLinkClass}>
+              Schools
+            </Link>
+
             <Link href="/community" className={navLinkClass}>
               Community
             </Link>

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, FolderKanban, LogOut, Menu, X, Receipt, Users, Settings, CreditCard, CalendarCheck, Vote, Store, Mail } from "lucide-react"
+import { LayoutDashboard, FolderKanban, LogOut, Menu, X, Receipt, Users, Settings, CreditCard, CalendarCheck, Vote, Store, Mail, School, FileHeart } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/auth-context"
@@ -24,6 +24,16 @@ const sidebarItems = [
     title: "Transactions",
     href: "/admin/transactions",
     icon: Receipt,
+  },
+  {
+    title: "Schools",
+    href: "/admin/schools",
+    icon: School,
+  },
+  {
+    title: "Cases",
+    href: "/admin/cases",
+    icon: FileHeart,
   },
   {
     title: "Users",
@@ -70,7 +80,7 @@ export function AdminSidebar() {
   const SidebarContent = () => (
     <div className="flex bg-card h-full flex-col border-r">
       <div className="p-6 border-b">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+        <h2 className="font-display text-2xl font-bold text-editorial-navy">
           Admin
         </h2>
         <p className="text-xs text-muted-foreground">Partner Management</p>

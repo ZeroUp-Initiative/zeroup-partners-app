@@ -42,28 +42,12 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
         if (!linkSnap.empty) {
           const uid = linkSnap.docs[0].id
           const paySnap = await fdb.collection('payments').where('userId', '==', uid).where('status', '==', 'approved').get()
-          const rows: { amount: number; projectId?: string }[] = []
-          const projectIds = new Set<string>()
+          const backed = new Set<string>()
           paySnap.forEach((d) => {
             const p = d.data() as Record<string, any>
-            rows.push({ amount: Number(p.amount) || 0, projectId: p.projectId })
-            if (p.projectId && p.projectId !== 'general') projectIds.add(String(p.projectId))
+            partneredTotal += Number(p.amount) || 0
+            if (p.projectId && p.projectId !== 'general') backed.add(String(p.projectId))
           })
-          const ownedMap = new Map<string, boolean>()
-          await Promise.all(
-            [...projectIds].map(async (pid) => {
-              const ps = await fdb.collection('projects').doc(pid).get()
-              ownedMap.set(pid, ps.data()?.ownedByZeroUp === true)
-            }),
-          )
-          const backed = new Set<string>()
-          for (const r of rows) {
-            const isZeroUp = !r.projectId || r.projectId === 'general' || ownedMap.get(r.projectId) === true
-            if (isZeroUp) {
-              partneredTotal += r.amount
-              if (r.projectId && r.projectId !== 'general') backed.add(r.projectId)
-            }
-          }
           projectsBacked = backed.size
         }
       } catch (e) {

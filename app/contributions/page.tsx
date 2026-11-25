@@ -287,7 +287,7 @@ function ContributionsContent() {
                       >
                       {/* Status indicator bar */}
                       <div className={`h-1 ${
-                        contribution.status === 'approved' ? 'bg-gradient-to-r from-[#8d44d1] to-[#8d44d1]' :
+                        contribution.status === 'approved' ? 'bg-gradient-to-r from-editorial-navy to-editorial-navy' :
                         contribution.status === 'pending' ? 'bg-gradient-to-r from-amber-500 to-yellow-400' :
                         'bg-gradient-to-r from-red-500 to-rose-400'
                       }`} />
@@ -295,7 +295,7 @@ function ContributionsContent() {
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                               <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                                   <div className={`p-2 sm:p-3 rounded-xl transition-transform duration-300 group-hover:scale-110 flex-shrink-0 ${
-                                    contribution.status === 'approved' ? 'bg-gradient-to-br from-[#8d44d1]/20 to-[#8d44d1]/20' :
+                                    contribution.status === 'approved' ? 'bg-gradient-to-br from-editorial-navy/20 to-editorial-navy/20' :
                                     contribution.status === 'pending' ? 'bg-gradient-to-br from-amber-500/20 to-yellow-400/20' :
                                     'bg-gradient-to-br from-red-500/20 to-rose-400/20'
                                   }`}>
@@ -375,7 +375,7 @@ function ContributionsContent() {
                       variant={currentPage === page ? "default" : "outline"}
                       size="sm"
                       onClick={() => setCurrentPage(page)}
-                      className={`h-8 w-8 p-0 ${currentPage === page ? 'bg-[#8d44d1] hover:bg-[#7030b0] border-[#8d44d1]' : ''}`}
+                      className={`h-8 w-8 p-0 ${currentPage === page ? 'bg-editorial-navy hover:bg-editorial-navy-deep border-editorial-navy' : ''}`}
                     >
                       {page}
                     </Button>

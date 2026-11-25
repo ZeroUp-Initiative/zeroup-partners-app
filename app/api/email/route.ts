@@ -8,23 +8,23 @@ const sharedStyles = `
   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background: #f4f4f5; }
   .wrapper { padding: 32px 16px; }
   .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-  .header { background: linear-gradient(135deg, #8d44d1, #7030b0); color: white; padding: 36px 32px; text-align: center; }
+  .header { background: #1b2540; color: #f4f0e5; padding: 36px 32px; text-align: center; }
   .header h1 { margin: 0; font-size: 24px; font-weight: 700; }
   .header p { margin: 8px 0 0; opacity: 0.85; font-size: 15px; }
   .body { padding: 32px; }
   .body p { margin: 0 0 16px; color: #444; }
-  .highlight { background: #f5ecff; border-left: 4px solid #8d44d1; border-radius: 4px; padding: 16px; margin: 20px 0; }
-  .highlight strong { color: #7030b0; display: block; margin-bottom: 4px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .btn { display: inline-block; background: linear-gradient(135deg, #8d44d1, #7030b0); color: #ffffff !important; text-decoration: none; padding: 13px 28px; border-radius: 8px; font-weight: 600; font-size: 15px; margin-top: 8px; }
+  .highlight { background: #faf8f2; border-left: 4px solid #1b2540; border-radius: 4px; padding: 16px; margin: 20px 0; }
+  .highlight strong { color: #1b2540; display: block; margin-bottom: 4px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .btn { display: inline-block; background: #1b2540; color: #f4f0e5 !important; text-decoration: none; padding: 13px 28px; border-radius: 8px; font-weight: 600; font-size: 15px; margin-top: 8px; }
   .footer { text-align: center; padding: 24px 32px; color: #888; font-size: 13px; border-top: 1px solid #f0f0f0; }
   .receipt { border: 1px solid #e5d6f5; border-radius: 10px; padding: 18px 22px; margin: 24px 0; background: #faf7ff; }
-  .receipt-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: #8d44d1; font-weight: 700; margin-bottom: 12px; text-align: center; }
+  .receipt-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: #1b2540; font-weight: 700; margin-bottom: 12px; text-align: center; }
   .receipt table { width: 100%; border-collapse: collapse; }
   .receipt td { padding: 7px 0; font-size: 14px; color: #444; vertical-align: middle; border-bottom: 1px solid #efe6fb; }
   .receipt tr:last-child td { border-bottom: none; }
   .receipt td.label { color: #999; }
   .receipt td.value { text-align: right; font-weight: 600; color: #333; }
-  .receipt .amount-row td { font-size: 19px; color: #7030b0; font-weight: 700; }
+  .receipt .amount-row td { font-size: 19px; color: #1b2540; font-weight: 700; }
   .receipt .status { color: #16a34a; font-weight: 700; }
   .signoff { margin-top: 24px; color: #444; }
 `
@@ -315,6 +315,237 @@ const templates: Record<string, (data: EmailData) => { subject: string; html: st
           </div>
           <p>Head over and claim it — it only takes a second.</p>
           <a href="${claimUrl ?? `${BASE_URL}/badges`}" class="btn">Claim Your Badge</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  school_application_submitted: ({ schoolName, contactName }) => ({
+    subject: `📋 Application Received — ${schoolName}`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header">
+          <h1>📋 Application Received!</h1>
+          <p>Thank you for applying to partner with ZeroUp.</p>
+        </div>
+        <div class="body">
+          <p>Hi ${contactName ?? 'there'},</p>
+          <p>We've received your school's application to become a ZeroUp partner school.</p>
+          <div class="highlight">
+            <strong>School</strong>
+            ${schoolName}
+          </div>
+          <p>Our team will review your application and get back to you shortly. Once approved, you'll be able to submit Education Cases — real, specific needs we can help find partners for.</p>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  admin_school_application_submitted: ({ schoolName, contactName, contactEmail }) => ({
+    subject: `📋 New School Application: "${schoolName}"`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header">
+          <h1>📋 New School Application</h1>
+          <p>A school has applied to partner with ZeroUp.</p>
+        </div>
+        <div class="body">
+          <p>A new school application is awaiting your review.</p>
+          <div class="highlight">
+            <strong>School</strong>
+            ${schoolName}
+          </div>
+          <div class="highlight">
+            <strong>Contact</strong>
+            ${contactName || 'Unknown'} ${contactEmail ? `(${contactEmail})` : ''}
+          </div>
+          <a href="${BASE_URL}/admin/schools" class="btn">Review in Admin Panel</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Admin Notification</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  school_approved: ({ contactName, schoolName }) => ({
+    subject: `🎉 ${schoolName} is Now a ZeroUp Partner School`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header">
+          <h1>🎉 Application Approved!</h1>
+          <p>Welcome to the ZeroUp partner network.</p>
+        </div>
+        <div class="body">
+          <p>Hi ${contactName ?? 'there'},</p>
+          <p>Great news — <strong>${schoolName}</strong> has been approved as a ZeroUp partner school. You can now submit Education Cases for students and needs at your school, and our team will work to find partners to support them.</p>
+          <a href="${BASE_URL}/dashboard/my-cases" class="btn">Submit Your First Case</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  school_rejected: ({ contactName, schoolName, notes }) => ({
+    subject: `Update on Your ZeroUp Partner Application — ${schoolName}`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header" style="background: linear-gradient(135deg, #64748b, #475569);">
+          <h1>Application Update</h1>
+          <p>We've reviewed your school's application.</p>
+        </div>
+        <div class="body">
+          <p>Hi ${contactName ?? 'there'},</p>
+          <p>Thank you for applying to partner with ZeroUp on behalf of <strong>${schoolName}</strong>. After review, we're unable to approve the application at this time.</p>
+          ${notes ? `<div class="highlight"><strong>Feedback from our team</strong>${notes}</div>` : ''}
+          <p>Please reach out if you'd like more information, or feel free to reapply once any concerns are addressed.</p>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  case_needs_info: ({ contactName, schoolName, caseTitle, notes }) => ({
+    subject: `More Info Needed — "${caseTitle}"`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header">
+          <h1>A Little More Info Needed</h1>
+          <p>We're reviewing your submitted case.</p>
+        </div>
+        <div class="body">
+          <p>Hi ${contactName ?? schoolName ?? 'there'},</p>
+          <p>We're working on verifying your case and need a bit more information before we can proceed.</p>
+          <div class="highlight">
+            <strong>Case</strong>
+            ${caseTitle}
+          </div>
+          ${notes ? `<div class="highlight"><strong>What we need</strong>${notes}</div>` : ''}
+          <a href="${BASE_URL}/dashboard/my-cases" class="btn">Update Your Case</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  case_verified: ({ contactName, schoolName, caseTitle }) => ({
+    subject: `✅ Case Verified — "${caseTitle}"`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header">
+          <h1>✅ Case Verified!</h1>
+          <p>We're preparing this case for partnership.</p>
+        </div>
+        <div class="body">
+          <p>Hi ${contactName ?? schoolName ?? 'there'},</p>
+          <p>Good news — we've verified your case and are preparing it to go live for partner funding.</p>
+          <div class="highlight">
+            <strong>Case</strong>
+            ${caseTitle}
+          </div>
+          <p>We'll let you know as soon as it's published and open for partnership.</p>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  case_published: ({ contactName, schoolName, caseTitle, projectUrl }) => ({
+    subject: `🎉 Your Case is Live — "${caseTitle}"`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header">
+          <h1>🎉 Your Case is Now Live!</h1>
+          <p>Partners can now support this case directly.</p>
+        </div>
+        <div class="body">
+          <p>Hi ${contactName ?? schoolName ?? 'there'},</p>
+          <p>Your case has been published as a project on ZeroUp Partners and is now open for partner funding.</p>
+          <div class="highlight">
+            <strong>Case</strong>
+            ${caseTitle}
+          </div>
+          <a href="${projectUrl ?? `${BASE_URL}/projects`}" class="btn">View the Live Project</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  admin_case_outcome_submitted: ({ schoolName, caseTitle }) => ({
+    subject: `📸 Outcome Update Submitted — "${caseTitle}"`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header">
+          <h1>📸 Outcome Update Submitted</h1>
+          <p>A school has reported back on a funded case.</p>
+        </div>
+        <div class="body">
+          <p>A school has submitted an outcome update, awaiting your review before it goes public.</p>
+          <div class="highlight">
+            <strong>Case</strong>
+            ${caseTitle}
+          </div>
+          <div class="highlight">
+            <strong>School</strong>
+            ${schoolName}
+          </div>
+          <a href="${BASE_URL}/admin/cases" class="btn">Review in Admin Panel</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Admin Notification</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  case_outcome_published: ({ contactName, schoolName, caseTitle, projectUrl }) => ({
+    subject: `✅ Your Outcome Update is Live — "${caseTitle}"`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header">
+          <h1>✅ Outcome Published!</h1>
+          <p>Partners can now see the impact of their support.</p>
+        </div>
+        <div class="body">
+          <p>Hi ${contactName ?? schoolName ?? 'there'},</p>
+          <p>Thank you for closing the loop — your outcome update is now visible to every partner who supported this case.</p>
+          <div class="highlight">
+            <strong>Case</strong>
+            ${caseTitle}
+          </div>
+          <a href="${projectUrl ?? `${BASE_URL}/projects`}" class="btn">View the Live Project</a>
+        </div>
+        <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
+      </div></div></body></html>
+    `,
+  }),
+
+  case_rejected: ({ contactName, schoolName, caseTitle, notes }) => ({
+    subject: `Update on Your Submitted Case — "${caseTitle}"`,
+    html: `
+      <!DOCTYPE html><html><head><style>${sharedStyles}</style></head>
+      <body><div class="wrapper"><div class="container">
+        <div class="header" style="background: linear-gradient(135deg, #64748b, #475569);">
+          <h1>Case Review Update</h1>
+          <p>We've reviewed your submitted case.</p>
+        </div>
+        <div class="body">
+          <p>Hi ${contactName ?? schoolName ?? 'there'},</p>
+          <p>Thank you for submitting this case. After careful review, we're unable to verify and publish it at this time.</p>
+          <div class="highlight">
+            <strong>Case</strong>
+            ${caseTitle}
+          </div>
+          ${notes ? `<div class="highlight"><strong>Reason</strong>${notes}</div>` : ''}
+          <a href="${BASE_URL}/dashboard/my-cases" class="btn">Go to My Cases</a>
         </div>
         <div class="footer"><p>ZeroUp Partners · Building Dreams Together</p></div>
       </div></div></body></html>

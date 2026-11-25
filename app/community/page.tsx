@@ -424,8 +424,8 @@ function CommunityContent() {
                     </CardContent>
                   </Card>
 
-                  <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-[#8d44d1]/25 hover:-translate-y-1">
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8d44d1] to-[#8d44d1]" />
+                  <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-editorial-navy/25 hover:-translate-y-1">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-editorial-navy to-editorial-navy" />
                     <CardHeader>
                       <CardTitle>Your Progress</CardTitle>
                       <CardDescription>How you're doing this month</CardDescription>
@@ -452,8 +452,8 @@ function CommunityContent() {
             </TabsContent>
 
             <TabsContent value="activity" className="space-y-6">
-              <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/25 hover:-translate-y-1">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-400" />
+              <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-editorial-navy/25 hover:-translate-y-1">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-editorial-navy to-editorial-navy-deep" />
                 <CardHeader>
                   <CardTitle>Community Activity</CardTitle>
                   <CardDescription>Recent achievements and contributions from the community</CardDescription>

@@ -15,7 +15,7 @@ const isBrowser = typeof window !== 'undefined';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { DollarSign, Target, TrendingUp, Award, Plus, BarChart, Users, Heart, Trophy, Medal, Star, Receipt, Banknote, Copy, Crown, Sparkles, CalendarDays, ChevronDown, Download, RefreshCw, Loader2, Clock, AlertTriangle } from "lucide-react"
+import { DollarSign, Target, TrendingUp, Award, Plus, BarChart, Users, Heart, Trophy, Medal, Star, Receipt, Banknote, Copy, Crown, Sparkles, CalendarDays, ChevronDown, Download, RefreshCw, Loader2, Clock, AlertTriangle, School, HeartHandshake } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -25,8 +25,9 @@ import { CurrencyCounter, AnimatedCounter } from "@/components/ui/animated-count
 import { ProgressRing } from "@/components/ui/progress-ring"
 import { MiniBarChart } from "@/components/ui/mini-chart"
 import { PartnerFlierModal } from "@/components/partner-flier-card"
-import { SubmitProjectModal } from "@/components/projects/submit-project-modal"
+import { ReferNeedModal } from "@/components/referrals/refer-need-modal"
 import { DreamerDashboardCard } from "@/components/dreamers/dreamer-dashboard-card"
+import { SchoolDashboardOverview } from "@/components/dashboard/school-dashboard-overview"
 import toast from "react-hot-toast"
 
 interface MonthlyData {
@@ -57,7 +58,7 @@ function DashboardPage() {
     return `${now.getFullYear()}-${now.getMonth()}`;
   });
   const [isDownloadingFlier, setIsDownloadingFlier] = useState(false);
-  const [isSubmitProjectOpen, setIsSubmitProjectOpen] = useState(false);
+  const [isReferNeedOpen, setIsReferNeedOpen] = useState(false);
   const [paymentSettings, setPaymentSettings] = useState<{ accountNumber: string; bankName: string; accountName: string; bankDetails: string } | null>(null);
   const [approachingProjects, setApproachingProjects] = useState<{ id: string; title: string; dueDate: Date; daysLeft: number; currentFunding: number; fundingGoal: number }[]>([]);
   const partnerFlierRef = useRef<HTMLDivElement>(null);
@@ -509,6 +510,14 @@ function DashboardPage() {
   const selectedMonthLeaderboard = monthlyLeaderboards.get(selectedMonth) || [];
   const selectedMonthOtherContributors = selectedMonthLeaderboard.slice(1, 6);
 
+  // Schools don't partner with funds — they sign up to submit Education
+  // Cases, so they get an entirely separate, lean dashboard instead of the
+  // funder one (contribution stats, leaderboards, dream coins etc. don't
+  // apply to them).
+  if (user && user.role === 'school') {
+    return <SchoolDashboardOverview user={user} />
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header title="Partners Hub" subtitle="Partner Dashboard" />
@@ -600,12 +609,12 @@ function DashboardPage() {
 
                   {/* Contribution Trend Chart */}
                   <Card className="relative overflow-hidden">
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8d44d1] to-[#7030b0]" />
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-editorial-navy to-editorial-navy-deep" />
                     <CardHeader>
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="p-2.5 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/20">
-                            <BarChart className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+                          <div className="p-2.5 rounded-xl bg-editorial-navy/10">
+                            <BarChart className="h-5 w-5 text-editorial-navy dark:text-editorial-cream" />
                           </div>
                           <div>
                             <CardTitle>Contribution Trends</CardTitle>
@@ -700,11 +709,11 @@ function DashboardPage() {
                     <LogContributionModal>
                         <Card className="group hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
                             <CardHeader className="flex flex-row items-center gap-4">
-                                <div className="bg-gradient-to-br from-[#8d44d1]/20 to-[#8d44d1]/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                                    <Plus className="h-6 w-6 text-[#7030b0] dark:text-[#a05cd4]" />
+                                <div className="bg-gradient-to-br from-editorial-navy/20 to-editorial-navy/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                                    <Plus className="h-6 w-6 text-editorial-navy dark:text-editorial-cream" />
                                 </div>
                                 <div>
-                                    <CardTitle className="group-hover:text-[#7030b0] dark:group-hover:text-[#a05cd4] transition-colors">Log a New Contribution</CardTitle>
+                                    <CardTitle className="group-hover:text-editorial-navy dark:group-hover:text-editorial-cream transition-colors">Log a New Contribution</CardTitle>
                                     <CardDescription>Submit your monthly support.</CardDescription>
                                 </div>
                             </CardHeader>
@@ -713,11 +722,11 @@ function DashboardPage() {
                     <Link href="/projects">
                         <Card className="group hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
                             <CardHeader className="flex flex-row items-center gap-4">
-                                <div className="bg-gradient-to-br from-purple-500/20 to-pink-400/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                                    <BarChart className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                                <div className="bg-gradient-to-br from-orange-500/20 to-amber-400/20 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                                    <BarChart className="h-6 w-6 text-orange-600 dark:text-orange-400" />
                                 </div>
                                 <div>
-                                    <CardTitle className="group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Fund a Project</CardTitle>
+                                    <CardTitle className="group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">Fund a Project</CardTitle>
                                     <CardDescription>Direct your funds to a specific cause.</CardDescription>
                                 </div>
                             </CardHeader>
@@ -736,14 +745,42 @@ function DashboardPage() {
                             </CardHeader>
                         </Card>
                     </Link>
-                    <Card className="group hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer" onClick={() => setIsSubmitProjectOpen(true)}>
+                    {user?.role === 'school' && user?.schoolStatus === 'approved' && (
+                        <Link href="/dashboard/my-cases">
+                            <Card className="group hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
+                                <CardHeader className="flex flex-row items-center gap-4">
+                                    <div className="bg-gradient-to-br from-editorial-navy/15 to-editorial-navy-deep/15 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                                        <School className="h-6 w-6 text-editorial-navy dark:text-editorial-cream" />
+                                    </div>
+                                    <div>
+                                        <CardTitle className="group-hover:text-editorial-navy dark:group-hover:text-editorial-cream transition-colors">My Cases</CardTitle>
+                                        <CardDescription>Submit and track Education Cases for your school.</CardDescription>
+                                    </div>
+                                </CardHeader>
+                            </Card>
+                        </Link>
+                    )}
+                    {user?.role === 'school' && user?.schoolStatus === 'pending' && (
+                        <Card className="opacity-70">
+                            <CardHeader className="flex flex-row items-center gap-4">
+                                <div className="bg-gradient-to-br from-amber-500/15 to-amber-600/15 p-3 rounded-xl">
+                                    <School className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                                </div>
+                                <div>
+                                    <CardTitle>Application Under Review</CardTitle>
+                                    <CardDescription>We'll email you once your school is approved.</CardDescription>
+                                </div>
+                            </CardHeader>
+                        </Card>
+                    )}
+                    <Card className="group hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer" onClick={() => setIsReferNeedOpen(true)}>
                         <CardHeader className="flex flex-row items-center gap-4">
-                            <div className="bg-gradient-to-br from-[#8d44d1]/15 to-[#7030b0]/15 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                                <Target className="h-6 w-6 text-[#7030b0] dark:text-[#a05cd4]" />
+                            <div className="bg-gradient-to-br from-editorial-navy/15 to-editorial-navy-deep/15 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                                <HeartHandshake className="h-6 w-6 text-editorial-navy dark:text-editorial-cream" />
                             </div>
                             <div>
-                                <CardTitle className="group-hover:text-[#7030b0] dark:group-hover:text-[#a05cd4] transition-colors">Submit a Project</CardTitle>
-                                <CardDescription>Propose a project for community funding.</CardDescription>
+                                <CardTitle className="group-hover:text-editorial-navy dark:group-hover:text-editorial-cream transition-colors">Refer a Need</CardTitle>
+                                <CardDescription>Know a student or school in need? Let us know.</CardDescription>
                             </div>
                         </CardHeader>
                     </Card>
@@ -764,10 +801,10 @@ function DashboardPage() {
 
                     {/* Bank Account Details Card */}
                     <Card className="lg:col-span-2 relative overflow-hidden">
-                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8d44d1] to-[#7030b0]" />
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-editorial-navy to-editorial-navy-deep" />
                         <CardHeader className="flex flex-row items-center gap-4">
-                            <div className="bg-gradient-to-br from-[#8d44d1]/15 to-[#7030b0]/15 p-3 rounded-xl">
-                                <Banknote className="h-6 w-6 text-[#7030b0] dark:text-[#a05cd4]" />
+                            <div className="bg-gradient-to-br from-editorial-navy/15 to-editorial-navy-deep/15 p-3 rounded-xl">
+                                <Banknote className="h-6 w-6 text-editorial-navy dark:text-editorial-cream" />
                             </div>
                             <div>
                                 <CardTitle>Bank Transfer Details</CardTitle>
@@ -983,12 +1020,12 @@ function DashboardPage() {
                     
                     {/* Leaderboard - Modern Design */}
                     <Card className="relative overflow-hidden">
-                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8d44d1] to-[#7030b0]" />
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-editorial-navy to-editorial-navy-deep" />
                         <CardHeader>
                             <div className="flex items-center justify-between gap-3 flex-wrap">
                               <div className="flex items-center gap-3">
-                                <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20">
-                                    <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                                <div className="p-2.5 rounded-xl bg-editorial-navy/10">
+                                    <Users className="h-5 w-5 text-editorial-navy dark:text-editorial-cream" />
                                 </div>
                                 <div>
                                     <CardTitle>Top Contributors</CardTitle>
@@ -1036,7 +1073,7 @@ function DashboardPage() {
                                             "from-amber-600 to-amber-700", // 3rd
                                             "from-purple-500 to-purple-600", // 4th
                                             "from-blue-500 to-blue-600", // 5th
-                                            "from-[#7030b0] to-[#5e269a]", // 6th
+                                            "from-editorial-navy to-editorial-navy-deep", // 6th
                                         ];
                                         return (
                                             <div 
@@ -1052,7 +1089,7 @@ function DashboardPage() {
                                                             <button className="cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0">
                                                                 <Avatar className="h-8 w-8 sm:h-10 sm:w-10 ring-2 ring-background">
                                                                     <AvatarImage src={contributor.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${contributor.name}`} />
-                                                                    <AvatarFallback className="bg-gradient-to-br from-purple-400 to-pink-400 text-white">{contributor.name[0]}</AvatarFallback>
+                                                                    <AvatarFallback className="bg-gradient-to-br from-editorial-navy to-editorial-navy-deep text-white">{contributor.name[0]}</AvatarFallback>
                                                                 </Avatar>
                                                             </button>
                                                         }
@@ -1095,7 +1132,7 @@ function DashboardPage() {
           </div>
       </main>
 
-      <SubmitProjectModal open={isSubmitProjectOpen} onOpenChange={setIsSubmitProjectOpen} />
+      <ReferNeedModal open={isReferNeedOpen} onOpenChange={setIsReferNeedOpen} />
     </div>
   )
 }

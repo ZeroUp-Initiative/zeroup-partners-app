@@ -20,7 +20,7 @@ export function ProjectBudgetBreakdown({ phases, fundingGoal }: { phases: Projec
             <div className="flex justify-between items-baseline mb-1">
               <span className="font-medium text-sm flex items-center gap-1.5">
                 {phase.name}
-                {isFunded && <CheckCircle2 className="w-3.5 h-3.5 text-[#8d44d1]" />}
+                {isFunded && <CheckCircle2 className="w-3.5 h-3.5 text-editorial-navy" />}
               </span>
               <span className="text-sm text-muted-foreground">
                 ₦{raised.toLocaleString()} of ₦{goal.toLocaleString()}
@@ -28,7 +28,7 @@ export function ProjectBudgetBreakdown({ phases, fundingGoal }: { phases: Projec
             </div>
             <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
               <div
-                className={`h-full rounded-full ${isFunded ? 'bg-[#8d44d1]' : 'bg-gradient-to-r from-[#8d44d1] to-[#7030b0]'}`}
+                className={`h-full rounded-full ${isFunded ? 'bg-editorial-navy' : 'bg-gradient-to-r from-editorial-navy to-editorial-navy-deep'}`}
                 style={{ width: `${pct}%` }}
               />
             </div>

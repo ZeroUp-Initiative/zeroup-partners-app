@@ -7,11 +7,11 @@ const styles = `
   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background: #f4f4f5; }
   .wrapper { padding: 32px 16px; }
   .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-  .header { background: linear-gradient(135deg, #8d44d1, #7030b0); color: white; padding: 36px 32px; text-align: center; }
+  .header { background: #1b2540; color: #f4f0e5; padding: 36px 32px; text-align: center; }
   .header h1 { margin: 0; font-size: 24px; font-weight: 700; }
   .body { padding: 32px; }
   .body p { margin: 0 0 16px; color: #444; }
-  .btn { display: inline-block; background: linear-gradient(135deg, #8d44d1, #7030b0); color: #ffffff !important; text-decoration: none; padding: 13px 28px; border-radius: 8px; font-weight: 600; font-size: 15px; margin-top: 8px; }
+  .btn { display: inline-block; background: #1b2540; color: #f4f0e5 !important; text-decoration: none; padding: 13px 28px; border-radius: 8px; font-weight: 600; font-size: 15px; margin-top: 8px; }
   .footer { text-align: center; padding: 24px 32px; color: #888; font-size: 13px; border-top: 1px solid #f0f0f0; }
 `
 

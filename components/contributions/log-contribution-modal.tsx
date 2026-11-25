@@ -257,9 +257,9 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
             {success && <Alert className="border-green-500 text-green-500"><AlertDescription>{success}</AlertDescription></Alert>}
 
             {/* Bank Account Details */}
-            <div className="bg-slate-50 dark:bg-[#1e1040]/60 border border-slate-200 dark:border-white/10 rounded-xl p-4">
+            <div className="bg-slate-50 dark:bg-editorial-navy/60 border border-slate-200 dark:border-white/10 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-3">
-                    <Banknote className="w-4 h-4 text-[#8d44d1]" />
+                    <Banknote className="w-4 h-4 text-editorial-navy" />
                     <h4 className="font-semibold text-slate-800 dark:text-white text-sm">Bank Transfer Details</h4>
                 </div>
                 <div className="space-y-2 text-sm">
@@ -274,7 +274,7 @@ export function LogContributionModal({ onSuccess, children }: { onSuccess?: () =
                                 variant="ghost"
                                 size="sm"
                                 onClick={copyAccountNumber}
-                                className="h-6 w-6 p-0 text-slate-400 hover:text-[#8d44d1] hover:bg-[#8d44d1]/10 dark:text-white/30 dark:hover:text-white/60"
+                                className="h-6 w-6 p-0 text-slate-400 hover:text-editorial-navy hover:bg-editorial-navy/10 dark:text-white/30 dark:hover:text-white/60"
                             >
                                 <Copy className="w-3 h-3" />
                             </Button>

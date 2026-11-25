@@ -39,7 +39,17 @@ service cloud.firestore {
     match /projects/{projectId} {
       allow read, create, update, delete: if isAuthenticated();
     }
-    
+
+    // Education Cases - DEV: Allow all operations
+    match /cases/{caseId} {
+      allow read, create, update, delete: if isAuthenticated();
+    }
+
+    // Referrals - DEV: Allow all operations
+    match /referrals/{referralId} {
+      allow read, create, update, delete: if isAuthenticated();
+    }
+
     // Notifications - DEV: Allow all operations
     match /notifications/{notificationId} {
       allow read, create, update, delete: if isAuthenticated();

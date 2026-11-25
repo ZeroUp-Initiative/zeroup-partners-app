@@ -3,49 +3,17 @@
 import { useRef, useState, useEffect } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { Quote, ChevronLeft, ChevronRight, Volume2 } from 'lucide-react'
+import { db } from '@/lib/firebase/client'
+import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore'
 
-const testimonials = [
-  {
-    quote: "This wasn't support from afar. We built this together. For the first time, we felt like true partners in our own development.",
-    author: "Amara Okonkwo",
-    role: "Community Innovator",
-    location: "Lagos, Nigeria",
-    avatar: null,
-    type: 'community'
-  },
-  {
-    quote: "I used to think impact meant writing checks. Now I understand it means showing up, listening, and growing alongside communities.",
-    author: "David Chen",
-    role: "Zero Partner",
-    location: "Singapore",
-    avatar: null,
-    type: 'partner'
-  },
-  {
-    quote: "The skills I learned here changed everything. Now I'm teaching others in my village. The impact keeps spreading.",
-    author: "Grace Mutua",
-    role: "Youth Participant",
-    location: "Nairobi, Kenya",
-    avatar: null,
-    type: 'youth'
-  },
-  {
-    quote: "What impressed me most was the transparency. Every contribution, every outcome — we could track it all. That's rare.",
-    author: "Sarah Williams",
-    role: "Corporate Partner",
-    location: "London, UK",
-    avatar: null,
-    type: 'partner'
-  },
-  {
-    quote: "They didn't come with solutions. They came with questions. That respect made all the difference.",
-    author: "Chief Emmanuel Adeyemi",
-    role: "Community Leader",
-    location: "Ibadan, Nigeria",
-    avatar: null,
-    type: 'community'
-  }
-]
+interface Testimonial {
+  quote: string
+  author: string
+  role: string
+  location: string
+  avatar: null
+  type: string
+}
 
 const typeColors: Record<string, string> = {
   community: 'from-[#a05cd4] to-[#8d44d1]',
@@ -62,14 +30,48 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" })
   const [currentIndex, setCurrentIndex] = useState(0)
   const [autoPlay, setAutoPlay] = useState(true)
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([])
+  const [loaded, setLoaded] = useState(false)
+
+  // Live, real partner voices: the public message a partner can leave when
+  // logging a contribution. No placeholder/invented quotes — if nobody has
+  // left one yet, the section says so instead of making one up.
+  useEffect(() => {
+    const q = query(
+      collection(db, 'payments'),
+      where('status', '==', 'approved'),
+      orderBy('createdAt', 'desc'),
+      limit(50)
+    )
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items: Testimonial[] = []
+      snapshot.forEach((doc) => {
+        const data = doc.data() as any
+        const quote = typeof data.message === 'string' ? data.message.trim() : ''
+        if (!quote) return
+        items.push({
+          quote,
+          author: (data.userFullName || 'A Zero Partner').replace(/\s+/g, ' ').trim(),
+          role: 'Zero Partner',
+          location: data.projectTitle || 'General Contribution',
+          avatar: null,
+          type: data.projectId === 'general' ? 'community' : 'partner',
+        })
+      })
+      setTestimonials(items)
+      setLoaded(true)
+      setCurrentIndex(0)
+    })
+    return () => unsubscribe()
+  }, [])
 
   useEffect(() => {
-    if (!autoPlay) return
+    if (!autoPlay || testimonials.length < 2) return
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % testimonials.length)
     }, 6000)
     return () => clearInterval(interval)
-  }, [autoPlay])
+  }, [autoPlay, testimonials.length])
 
   const goToPrev = () => {
     setAutoPlay(false)
@@ -83,12 +85,62 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
 
   const currentTestimonial = testimonials[currentIndex]
 
+  const header = (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.6 }}
+      className="text-center mb-16 md:mb-20"
+    >
+      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6 ${
+        isDark ? 'bg-[#833dc6]/10 border-[#833dc6]/20' : 'bg-[#833dc6]/10 border-[#833dc6]/20'
+      }`}>
+        <Quote className={`w-3.5 h-3.5 text-[#833dc6]`} />
+        <span className={`text-sm font-medium ${isDark ? 'text-[#833dc6]' : 'text-[#833dc6]'}`}>Real Voices</span>
+      </div>
+
+      <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+        Voices From the{' '}
+        <span className="text-[#833dc6]">
+          Ecosystem
+        </span>
+      </h2>
+    </motion.div>
+  )
+
+  // No invented quotes: until a partner leaves a real public message on a
+  // contribution, say so plainly instead of showing placeholder testimonials.
+  if (loaded && testimonials.length === 0) {
+    return (
+      <section
+        ref={sectionRef}
+        className={`relative py-24 md:py-32 overflow-hidden ${
+          isDark
+            ? 'bg-gradient-to-b from-[#130927] via-[#1a0d35] to-[#130927]'
+            : 'bg-gradient-to-b from-amber-50/30 via-white to-orange-50/20'
+        }`}
+      >
+        <div className="mx-auto max-w-7xl px-4 md:px-6 relative z-10">
+          {header}
+          <div className={`max-w-2xl mx-auto text-center rounded-3xl border p-10 md:p-14 ${
+            isDark ? 'bg-[#1e1040]/50 border-white/5 text-white/60' : 'bg-white/90 border-amber-200 shadow-xl text-slate-500'
+          }`}>
+            <Quote className="w-8 h-8 mx-auto mb-4 text-[#833dc6] opacity-40" />
+            <p>No partner voices yet — when someone leaves a public message with their contribution, it shows up here live.</p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (!currentTestimonial) return null
+
   return (
-    <section 
+    <section
       ref={sectionRef}
       className={`relative py-24 md:py-32 overflow-hidden ${
-        isDark 
-          ? 'bg-gradient-to-b from-[#130927] via-[#1a0d35] to-[#130927]' 
+        isDark
+          ? 'bg-gradient-to-b from-[#130927] via-[#1a0d35] to-[#130927]'
           : 'bg-gradient-to-b from-amber-50/30 via-white to-orange-50/20'
       }`}
     >
@@ -98,27 +150,7 @@ export function TestimonialsSection({ isDark = true }: TestimonialsSectionProps)
       {!isDark && <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-amber-50/8 rounded-full blur-3xl" />}
 
       <div className="mx-auto max-w-7xl px-4 md:px-6 relative z-10">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16 md:mb-20"
-        >
-          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6 ${
-            isDark ? 'bg-[#833dc6]/10 border-[#833dc6]/20' : 'bg-[#833dc6]/10 border-[#833dc6]/20'
-          }`}>
-            <Quote className={`w-3.5 h-3.5 text-[#833dc6]`} />
-            <span className={`text-sm font-medium ${isDark ? 'text-[#833dc6]' : 'text-[#833dc6]'}`}>Real Voices</span>
-          </div>
-          
-          <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            Voices From the{' '}
-            <span className="text-[#833dc6]">
-              Ecosystem
-            </span>
-          </h2>
-        </motion.div>
+        {header}
 
         {/* Main testimonial display */}
         <motion.div

@@ -28,16 +28,16 @@ const DEFAULT_HTML = `<!DOCTYPE html>
 <html>
 <head>
 <style>
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background: #f4f4f5; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #3d3b34; margin: 0; padding: 0; background: #f4f0e5; }
   .wrapper { padding: 32px 16px; }
   .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-  .header { background: linear-gradient(135deg, #8d44d1, #7030b0); color: white; padding: 36px 32px; text-align: center; }
+  .header { background: #1b2540; color: #f4f0e5; padding: 36px 32px; text-align: center; }
   .header h1 { margin: 0; font-size: 24px; font-weight: 700; }
   .header p { margin: 8px 0 0; opacity: 0.85; font-size: 15px; }
   .body { padding: 32px; }
-  .body p { margin: 0 0 16px; color: #444; }
-  .highlight { background: #f5ecff; border-left: 4px solid #8d44d1; border-radius: 4px; padding: 16px; margin: 20px 0; }
-  .btn { display: inline-block; background: linear-gradient(135deg, #8d44d1, #7030b0); color: #ffffff !important; text-decoration: none; padding: 13px 28px; border-radius: 8px; font-weight: 600; font-size: 15px; margin-top: 8px; }
+  .body p { margin: 0 0 16px; color: #3d3b34; }
+  .highlight { background: #faf8f2; border-left: 4px solid #1b2540; border-radius: 4px; padding: 16px; margin: 20px 0; }
+  .btn { display: inline-block; background: #1b2540; color: #f4f0e5 !important; text-decoration: none; padding: 13px 28px; border-radius: 8px; font-weight: 600; font-size: 15px; margin-top: 8px; }
   .footer { text-align: center; padding: 24px 32px; color: #888; font-size: 13px; border-top: 1px solid #f0f0f0; }
 </style>
 </head>
@@ -237,7 +237,7 @@ function EmailTemplatesPage() {
         {!isEditing && templates.length < 4 && (
           <Button
             onClick={startCreate}
-            className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
+            className="bg-gradient-to-r from-editorial-navy to-editorial-navy-deep text-white border-0"
           >
             <Plus className="w-4 h-4 mr-2" />
             New Template
@@ -267,14 +267,14 @@ function EmailTemplatesPage() {
               )}
 
               {!isEditing && templates.map(t => (
-                <Card key={t.id} className={t.isActive ? "border-[#8d44d1] shadow-sm" : ""}>
+                <Card key={t.id} className={t.isActive ? "border-editorial-navy shadow-sm" : ""}>
                   <CardContent className="pt-4 pb-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-semibold text-sm truncate">{t.name}</span>
                           {t.isActive && (
-                            <Badge className="bg-[#8d44d1] text-white text-xs px-2 py-0.5">Active</Badge>
+                            <Badge className="bg-editorial-navy text-white text-xs px-2 py-0.5">Active</Badge>
                           )}
                           <Badge variant="outline" className="text-xs capitalize">{t.type}</Badge>
                         </div>
@@ -381,7 +381,7 @@ function EmailTemplatesPage() {
                     <div className="space-y-1.5">
                       <Label className="text-xs">HTML & CSS Content</Label>
                       <textarea
-                        className="w-full min-h-[320px] rounded-md border bg-muted/40 px-3 py-2 text-xs font-mono resize-y focus:outline-none focus:ring-2 focus:ring-[#8d44d1]"
+                        className="w-full min-h-[320px] rounded-md border bg-muted/40 px-3 py-2 text-xs font-mono resize-y focus:outline-none focus:ring-2 focus:ring-editorial-navy"
                         value={form.htmlContent}
                         onChange={e => setForm(f => ({ ...f, htmlContent: e.target.value }))}
                         spellCheck={false}
@@ -394,7 +394,7 @@ function EmailTemplatesPage() {
                       <Button
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="bg-gradient-to-r from-[#8d44d1] to-[#7030b0] text-white border-0"
+                        className="bg-gradient-to-r from-editorial-navy to-editorial-navy-deep text-white border-0"
                       >
                         {isSaving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving…</> : <><Save className="w-4 h-4 mr-2" />Save Template</>}
                       </Button>
@@ -418,7 +418,7 @@ function EmailTemplatesPage() {
             </span>
           </div>
           {showPreview ? (
-            <div className="border rounded-xl overflow-hidden bg-[#f4f4f5]" style={{ height: 600 }}>
+            <div className="border rounded-xl overflow-hidden bg-editorial-cream-soft" style={{ height: 600 }}>
               <iframe
                 srcDoc={editorHtml}
                 title="Email Preview"

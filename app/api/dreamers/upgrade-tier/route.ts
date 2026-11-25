@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminAuth, getAdminDb } from '@/lib/firebase/admin'
 import { getDreamerDashDb } from '@/lib/supabase/admin'
+import { computePartneredTotal } from '@/lib/dreamers/impact'
 import { DEFAULT_DREAM_TIERS, normalizeTiers, getEffectiveTierStatus, sortTiers } from '@/lib/dreamers/tiers'
 
 export const dynamic = 'force-dynamic'
@@ -48,30 +49,7 @@ export async function POST(req: NextRequest) {
     if (cost <= 0) return NextResponse.json({ error: 'This tier can’t be upgraded with dream coins.' }, { status: 400 })
 
     // Current Naira-partnered total (so we don't let them waste DR on a tier they already have)
-    let partneredTotal = 0
-    try {
-      const paySnap = await fdb.collection('payments').where('userId', '==', uid).where('status', '==', 'approved').get()
-      const rows: { amount: number; projectId?: string }[] = []
-      const projectIds = new Set<string>()
-      paySnap.forEach((d) => {
-        const p = d.data() as Record<string, any>
-        rows.push({ amount: Number(p.amount) || 0, projectId: p.projectId })
-        if (p.projectId && p.projectId !== 'general') projectIds.add(String(p.projectId))
-      })
-      const ownedMap = new Map<string, boolean>()
-      await Promise.all(
-        [...projectIds].map(async (pid) => {
-          const ps = await fdb.collection('projects').doc(pid).get()
-          ownedMap.set(pid, ps.data()?.ownedByZeroUp === true)
-        }),
-      )
-      for (const r of rows) {
-        const isZeroUp = !r.projectId || r.projectId === 'general' || ownedMap.get(r.projectId) === true
-        if (isZeroUp) partneredTotal += r.amount
-      }
-    } catch (e) {
-      console.error('[upgrade-tier] partneredTotal calc failed:', e)
-    }
+    const partneredTotal = await computePartneredTotal(fdb, uid)
 
     const eff = getEffectiveTierStatus(partneredTotal, grantedTierId, tiers)
     if (eff.current && eff.current.min >= tier.min) {
