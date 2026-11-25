@@ -89,8 +89,8 @@ function AdminEventsPage() {
             Create physical events and check Dreamers in by scanning their card. (Virtual events use the Telegram mini-app activity codes.)
           </p>
         </div>
-        <Link href="/admin/events/scan">
-          <Button className="whitespace-nowrap"><QrCode className="w-4 h-4 mr-2" /> Open Scanner</Button>
+        <Link href="/admin/events/scan" className="w-full sm:w-auto">
+          <Button className="w-full sm:w-auto min-h-[40px] whitespace-nowrap"><QrCode className="w-4 h-4 mr-2" /> Open Scanner</Button>
         </Link>
       </div>
 
@@ -123,7 +123,7 @@ function AdminEventsPage() {
               <Input value={form.location} onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))} placeholder="e.g. Ibadan" />
             </div>
             <div className="sm:col-span-2">
-              <Button type="submit" disabled={creating}>
+              <Button type="submit" disabled={creating} className="w-full sm:w-auto min-h-[40px]">
                 {creating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
                 Create Event
               </Button>
@@ -157,8 +157,8 @@ function AdminEventsPage() {
                   <span className="flex items-center gap-1 text-muted-foreground"><Users className="w-4 h-4" /> {ev.checkins} checked in</span>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => toggle(ev)}>{ev.isActive ? "Deactivate" : "Activate"}</Button>
-                  <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => remove(ev)}><Trash2 className="w-4 h-4" /></Button>
+                  <Button variant="outline" size="sm" className="min-h-[36px]" onClick={() => toggle(ev)}>{ev.isActive ? "Deactivate" : "Activate"}</Button>
+                  <Button variant="ghost" size="sm" className="min-h-[36px] min-w-[36px] p-2 text-destructive hover:text-destructive flex items-center justify-center" aria-label="Delete event" onClick={() => remove(ev)}><Trash2 className="w-4 h-4" /></Button>
                 </div>
               </CardContent>
             </Card>

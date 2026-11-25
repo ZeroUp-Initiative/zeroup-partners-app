@@ -97,7 +97,7 @@ function NotificationsPage() {
       <Header title="Notifications" subtitle="Stay updated" />
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <Link href="/dashboard" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+          <Link href="/dashboard" className="inline-flex items-center min-h-[44px] py-2 text-sm text-muted-foreground hover:text-primary transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Link>
@@ -112,10 +112,11 @@ function NotificationsPage() {
                 <Badge variant="secondary">{unreadCount} unread</Badge>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Button
                 variant={filter === 'all' ? 'default' : 'outline'}
                 size="sm"
+                className="min-h-[36px]"
                 onClick={() => setFilter('all')}
               >
                 All
@@ -123,6 +124,7 @@ function NotificationsPage() {
               <Button
                 variant={filter === 'unread' ? 'default' : 'outline'}
                 size="sm"
+                className="min-h-[36px]"
                 onClick={() => setFilter('unread')}
               >
                 Unread
@@ -131,6 +133,7 @@ function NotificationsPage() {
                 <Button
                   variant="ghost"
                   size="sm"
+                  className="min-h-[36px]"
                   onClick={handleMarkAllAsRead}
                 >
                   <CheckCheck className="w-4 h-4 mr-2" />
@@ -193,8 +196,10 @@ function NotificationsPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
+                                className="h-9 w-9 min-h-[36px] min-w-[36px] p-0 flex items-center justify-center"
                                 onClick={() => handleMarkAsRead(notification.id)}
                                 title="Mark as read"
+                                aria-label="Mark notification as read"
                               >
                                 <Check className="w-4 h-4" />
                               </Button>
@@ -202,9 +207,10 @@ function NotificationsPage() {
                             <Button
                               variant="ghost"
                               size="sm"
+                              className="h-9 w-9 min-h-[36px] min-w-[36px] p-0 flex items-center justify-center text-muted-foreground hover:text-destructive"
                               onClick={() => handleDelete(notification.id)}
-                              className="text-muted-foreground hover:text-destructive"
                               title="Delete notification"
+                              aria-label="Delete notification"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
@@ -213,7 +219,7 @@ function NotificationsPage() {
                         {notification.link && (
                           <Link 
                             href={notification.link}
-                            className="inline-block mt-3 text-sm text-primary hover:underline"
+                            className="inline-flex items-center mt-3 text-sm text-primary hover:underline min-h-[36px] py-1"
                           >
                             View details →
                           </Link>

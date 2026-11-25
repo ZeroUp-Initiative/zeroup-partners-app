@@ -200,7 +200,7 @@ function ResourcesContent() {
                   <p className="text-sm font-medium">{user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.email}</p>
                 </div>
               </div>
-              <Button variant="outline" size="sm" onClick={logout}>
+              <Button variant="outline" size="sm" onClick={logout} className="min-h-[36px]">
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
               </Button>
@@ -283,11 +283,11 @@ function ResourcesContent() {
 
           {/* Main Content Tabs */}
           <Tabs defaultValue="reports" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
-              <TabsTrigger value="reports" className="text-xs sm:text-sm">Reports</TabsTrigger>
-              <TabsTrigger value="videos" className="text-xs sm:text-sm">Videos</TabsTrigger>
-              <TabsTrigger value="guides" className="text-xs sm:text-sm">Guides</TabsTrigger>
-              <TabsTrigger value="updates" className="text-xs sm:text-sm">Updates</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto p-1 gap-1">
+              <TabsTrigger value="reports" className="py-2 text-xs sm:text-sm">Reports</TabsTrigger>
+              <TabsTrigger value="videos" className="py-2 text-xs sm:text-sm">Videos</TabsTrigger>
+              <TabsTrigger value="guides" className="py-2 text-xs sm:text-sm">Guides</TabsTrigger>
+              <TabsTrigger value="updates" className="py-2 text-xs sm:text-sm">Updates</TabsTrigger>
             </TabsList>
 
             <TabsContent value="reports" className="space-y-6">

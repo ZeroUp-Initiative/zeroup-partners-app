@@ -128,7 +128,8 @@ export function HeroSection({ isDark }: HeroSectionProps) {
       {/* Scroll hint */}
       <button
         onClick={scrollDown}
-        className={`absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 transition-colors cursor-pointer animate-bounce ${
+        aria-label="Scroll down to ecosystem section"
+        className={`absolute bottom-6 left-1/2 -translate-x-1/2 p-3 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors cursor-pointer animate-bounce ${
           isDark ? 'text-white/30 hover:text-white/50' : 'text-slate-400 hover:text-slate-600'
         }`}
       >

@@ -235,7 +235,7 @@ function MyProjectsPage() {
       <Header title="My Projects" subtitle="Manage your submitted projects" />
       <main className="container mx-auto px-4 py-8">
       <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">My Projects</h1>
           <p className="text-sm sm:text-base text-muted-foreground">
@@ -355,7 +355,7 @@ function MyProjectsPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="flex-1"
+                            className="flex-1 min-h-[36px]"
                             onClick={() => handleEditClick(project)}
                           >
                             <Edit className="w-4 h-4 mr-2" /> Edit
@@ -363,7 +363,7 @@ function MyProjectsPage() {
                           <Button
                             size="sm"
                             variant="destructive"
-                            className="flex-1"
+                            className="flex-1 min-h-[36px]"
                             onClick={() => handleDeleteClick(project)}
                           >
                             <Trash2 className="w-4 h-4 mr-2" /> Delete
@@ -414,11 +414,11 @@ function MyProjectsPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Category</Label>
                 <select
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm"
                   value={editForm.category || ''}
                   onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
                 >
@@ -441,7 +441,7 @@ function MyProjectsPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Funding Goal (₦)</Label>
                 <Input
@@ -471,7 +471,7 @@ function MyProjectsPage() {
             <div className="space-y-2">
               <Label>Phase</Label>
               <select
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm"
                 value={editForm.phase || ''}
                 onChange={(e) => setEditForm({ ...editForm, phase: e.target.value })}
               >
@@ -548,14 +548,14 @@ function MyProjectsPage() {
             </div>
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditOpen(false)}>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setIsEditOpen(false)} className="min-h-[40px]">
               Cancel
             </Button>
             <Button
               onClick={handleUpdateProject}
               disabled={isUpdating || isUploading}
-              className="bg-editorial-navy hover:bg-editorial-navy-deep text-editorial-cream border-0"
+              className="min-h-[40px] bg-editorial-navy hover:bg-editorial-navy-deep text-editorial-cream border-0"
             >
               {isUpdating ? (
                 <>
@@ -585,14 +585,15 @@ function MyProjectsPage() {
               <AlertDescription className="ml-2">{deleteError}</AlertDescription>
             </Alert>
           )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteOpen(false)} disabled={isDeleting}>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setIsDeleteOpen(false)} disabled={isDeleting} className="min-h-[40px]">
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleConfirmDelete}
               disabled={isDeleting}
+              className="min-h-[40px]"
             >
               {isDeleting ? (
                 <>

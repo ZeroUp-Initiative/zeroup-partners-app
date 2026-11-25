@@ -113,7 +113,7 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl border border-editorial-border bg-white shadow-sm p-8">
+        <div className="rounded-2xl border border-editorial-border bg-white shadow-sm p-5 sm:p-8">
           <div className="mb-6">
             <h2 className="font-display text-2xl font-bold text-editorial-navy">Welcome back</h2>
             <p className="text-sm text-editorial-muted mt-1">Sign in to your partner account</p>
@@ -161,7 +161,8 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isLoading}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-editorial-muted hover:text-editorial-navy transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center text-editorial-muted hover:text-editorial-navy transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>

@@ -221,7 +221,7 @@ function DreamersCoinContent() {
           </div>
           <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
             <ThemeToggle />
-            <Button variant="outline" size="sm" onClick={logout} className="bg-transparent">
+            <Button variant="outline" size="sm" onClick={logout} className="min-h-[36px] bg-transparent">
               <LogOut className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">Logout</span>
             </Button>
@@ -231,7 +231,7 @@ function DreamersCoinContent() {
 
       <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="mb-6">
-          <Link href="/dashboard" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+          <Link href="/dashboard" className="inline-flex items-center min-h-[44px] py-2 text-sm text-muted-foreground hover:text-primary transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" /> Back to Dashboard
           </Link>
         </div>
@@ -317,11 +317,11 @@ function DreamersCoinContent() {
 
             {/* Tabs */}
             <Tabs defaultValue="card" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4 glass-card">
-                <TabsTrigger value="card" className="text-xs sm:text-sm">Card</TabsTrigger>
-                <TabsTrigger value="vote" className="text-xs sm:text-sm">Vote</TabsTrigger>
-                <TabsTrigger value="leaderboard" className="text-xs sm:text-sm">Top</TabsTrigger>
-                <TabsTrigger value="history" className="text-xs sm:text-sm">History</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-4 h-auto p-1 glass-card">
+                <TabsTrigger value="card" className="py-2.5 min-h-[40px] text-xs sm:text-sm">Card</TabsTrigger>
+                <TabsTrigger value="vote" className="py-2.5 min-h-[40px] text-xs sm:text-sm">Vote</TabsTrigger>
+                <TabsTrigger value="leaderboard" className="py-2.5 min-h-[40px] text-xs sm:text-sm">Top</TabsTrigger>
+                <TabsTrigger value="history" className="py-2.5 min-h-[40px] text-xs sm:text-sm">History</TabsTrigger>
               </TabsList>
 
               <TabsContent value="card" className="space-y-6">
@@ -375,6 +375,8 @@ function DreamersCoinContent() {
                             <Button
                               variant="outline"
                               size="sm"
+                              className="h-9 w-9 min-h-[36px] min-w-[36px] p-0 flex items-center justify-center shrink-0"
+                              aria-label="Copy referral link"
                               onClick={() => {
                                 navigator.clipboard.writeText(`${origin}/?ref=${me?.dreamerId || ""}`)
                                 setRefCopied(true)
@@ -445,7 +447,7 @@ function DreamersCoinContent() {
                                     <p className="font-semibold">{t.name} Dream Card</p>
                                     <p className="text-xs text-muted-foreground">{t.drCost.toLocaleString()} DR</p>
                                   </div>
-                                  <Button size="sm" disabled={!afford || upgradingId === t.id} onClick={() => upgradeTier(t.id)}>
+                                  <Button size="sm" className="min-h-[36px]" disabled={!afford || upgradingId === t.id} onClick={() => upgradeTier(t.id)}>
                                     {upgradingId === t.id ? <Loader2 className="w-4 h-4 animate-spin" /> : afford ? "Upgrade" : "Not enough DR"}
                                   </Button>
                                 </div>
@@ -465,14 +467,14 @@ function DreamersCoinContent() {
                           <select
                             value={sponsorTierId}
                             onChange={(e) => setSponsorTierId(e.target.value)}
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm"
                           >
                             <option value="">Choose a tier to gift…</option>
                             {tiers.filter((t) => t.drCost > 0).map((t) => (
                               <option key={t.id} value={t.id}>{t.name} — {t.drCost.toLocaleString()} DR</option>
                             ))}
                           </select>
-                          <Button className="w-full" disabled={sponsoring} onClick={sponsorTier}>
+                          <Button className="w-full min-h-[44px]" disabled={sponsoring} onClick={sponsorTier}>
                             {sponsoring ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Gift className="w-4 h-4 mr-2" />}
                             Sponsor
                           </Button>
@@ -583,7 +585,8 @@ function DreamersCoinContent() {
                             <button
                               onClick={() => toggleVote(p.id)}
                               disabled={votingId === p.id}
-                              className="flex flex-col items-center gap-0.5 flex-shrink-0 disabled:opacity-50"
+                              className="flex flex-col items-center justify-center gap-0.5 flex-shrink-0 min-h-[44px] min-w-[44px] p-1 rounded-md hover:bg-muted/50 transition-colors disabled:opacity-50"
+                              aria-label={`Vote for ${p.title}`}
                             >
                               {votingId === p.id ? (
                                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />

@@ -117,20 +117,20 @@ export default function AuthResetPasswordPage() {
                   />
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                <Button type="submit" className="w-full min-h-[44px]" disabled={isSubmitting}>
                   {isSubmitting ? 'Updating password…' : 'Reset password'}
                 </Button>
               </form>
             ) : status === 'success' ? (
               <div className="space-y-3">
                 <p className="text-sm text-green-700">Your password was updated successfully. You may now sign in with your new password.</p>
-                <Button className="w-full" onClick={() => router.push('/login')}>
+                <Button className="w-full min-h-[44px]" onClick={() => router.push('/login')}>
                   Go to login
                 </Button>
               </div>
             ) : status === 'error' ? (
               <div className="space-y-3">
-                <Link href="/forgot-password" className="text-primary underline">Request a new reset link</Link>
+                <Link href="/forgot-password" className="text-primary underline inline-flex items-center min-h-[40px] py-1">Request a new reset link</Link>
               </div>
             ) : null}
           </CardContent>

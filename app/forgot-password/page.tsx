@@ -69,13 +69,13 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-md relative z-10">
         <Link
           href="/login"
-          className="inline-flex items-center text-sm text-editorial-muted hover:text-editorial-navy transition-colors mb-8 group"
+          className="inline-flex items-center min-h-[44px] py-2 text-sm text-editorial-muted hover:text-editorial-navy transition-colors mb-8 group"
         >
           <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
           Back to login
         </Link>
 
-        <div className="rounded-2xl border border-editorial-border bg-white shadow-sm p-8">
+        <div className="rounded-2xl border border-editorial-border bg-white shadow-sm p-5 sm:p-8">
           <div className="mb-6">
             <h2 className="font-display text-2xl font-bold text-editorial-navy">Forgot Password</h2>
             <p className="text-sm text-editorial-muted mt-1">Enter your email and we&apos;ll send you a link to reset your password.</p>

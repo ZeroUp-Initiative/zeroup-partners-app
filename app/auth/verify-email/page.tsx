@@ -71,19 +71,19 @@ export default function AuthVerifyEmailPage() {
 
             {status === 'success' ? (
               <div className="space-y-3">
-                <Button className="w-full" onClick={() => router.push('/login')}>
+                <Button className="w-full min-h-[44px]" onClick={() => router.push('/login')}>
                   Go to login
                 </Button>
-                <Link href="/dashboard" className="inline-flex w-full justify-center text-center text-sm text-primary underline">
+                <Link href="/dashboard" className="inline-flex w-full justify-center items-center min-h-[40px] text-center text-sm text-primary underline">
                   Continue to dashboard
                 </Link>
               </div>
             ) : status === 'error' ? (
               <div className="space-y-3">
-                <Button className="w-full" onClick={() => router.push('/login')}>
+                <Button className="w-full min-h-[44px]" onClick={() => router.push('/login')}>
                   Return to login
                 </Button>
-                <Link href="/verify-email" className="inline-flex w-full justify-center text-center text-sm text-primary underline">
+                <Link href="/verify-email" className="inline-flex w-full justify-center items-center min-h-[40px] text-center text-sm text-primary underline">
                   Request new verification email
                 </Link>
               </div>

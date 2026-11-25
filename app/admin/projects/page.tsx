@@ -358,8 +358,8 @@ function AdminProjectsPage() {
                       <CardTitle className="text-base leading-snug">{project.title}</CardTitle>
                       <div className="flex items-center gap-1 flex-shrink-0">
                         {statusBadge(project.status)}
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEditClick(project)}><Pencil className="h-3.5 w-3.5" /></Button>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => { setProjectToDelete(project); setIsDeleteModalOpen(true) }}><Trash2 className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="icon" aria-label="Edit project" className="h-8 w-8 min-h-[32px] min-w-[32px] p-0 flex items-center justify-center" onClick={() => handleEditClick(project)}><Pencil className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="icon" aria-label="Delete project" className="h-8 w-8 min-h-[32px] min-w-[32px] p-0 flex items-center justify-center text-destructive hover:text-destructive" onClick={() => { setProjectToDelete(project); setIsDeleteModalOpen(true) }}><Trash2 className="h-3.5 w-3.5" /></Button>
                       </div>
                     </div>
                     <CardDescription className="line-clamp-2">{project.description}</CardDescription>
@@ -404,10 +404,10 @@ function AdminProjectsPage() {
                         <CardDescription className="mt-1">{project.location}</CardDescription>
                       </div>
                       <div className="flex gap-2 flex-shrink-0">
-                        <Button size="sm" variant="outline" onClick={() => openReview(project)}>
+                        <Button size="sm" variant="outline" onClick={() => openReview(project)} className="min-h-[36px]">
                           <Eye className="w-3.5 h-3.5 mr-1.5" /> Review
                         </Button>
-                        <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => openReview(project)}>
+                        <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white min-h-[36px]" onClick={() => openReview(project)}>
                           <CheckCircle className="w-3.5 h-3.5 mr-1.5" /> Approve
                         </Button>
                       </div>
@@ -445,7 +445,7 @@ function AdminProjectsPage() {
                         {statusBadge(project.status)}
                         <CardTitle className="text-base mt-1">{project.title}</CardTitle>
                       </div>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { setProjectToDelete(project); setIsDeleteModalOpen(true) }}><Trash2 className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" aria-label="Delete project" className="h-8 w-8 min-h-[32px] min-w-[32px] p-0 flex items-center justify-center text-destructive hover:text-destructive" onClick={() => { setProjectToDelete(project); setIsDeleteModalOpen(true) }}><Trash2 className="h-3.5 w-3.5" /></Button>
                     </div>
                     {project.adminNotes && <p className="text-xs text-muted-foreground mt-2 italic">Notes: {project.adminNotes}</p>}
                   </CardHeader>

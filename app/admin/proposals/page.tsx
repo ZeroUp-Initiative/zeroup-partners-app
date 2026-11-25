@@ -92,7 +92,7 @@ function AdminProposalsPage() {
               <Label>Description</Label>
               <Textarea rows={3} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="What is this project and why should Dreamers prioritize it?" />
             </div>
-            <Button type="submit" disabled={creating}>
+            <Button type="submit" disabled={creating} className="w-full sm:w-auto min-h-[40px]">
               {creating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
               Add Proposal
             </Button>
@@ -111,8 +111,8 @@ function AdminProposalsPage() {
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold truncate">{p.title}</h3>
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <h3 className="font-semibold break-words">{p.title}</h3>
                       <Badge variant={p.isActive ? "default" : "secondary"}>{p.isActive ? "Active" : "Hidden"}</Badge>
                     </div>
                     {p.description && <p className="text-sm text-muted-foreground line-clamp-2">{p.description}</p>}
@@ -122,8 +122,8 @@ function AdminProposalsPage() {
                   </div>
                 </div>
                 <div className="flex gap-2 mt-3">
-                  <Button variant="outline" size="sm" onClick={() => toggle(p)}>{p.isActive ? "Hide" : "Show"}</Button>
-                  <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => remove(p)}><Trash2 className="w-4 h-4" /></Button>
+                  <Button variant="outline" size="sm" className="min-h-[36px]" onClick={() => toggle(p)}>{p.isActive ? "Hide" : "Show"}</Button>
+                  <Button variant="ghost" size="sm" className="min-h-[36px] min-w-[36px] p-2 text-destructive hover:text-destructive flex items-center justify-center" aria-label="Delete proposal" onClick={() => remove(p)}><Trash2 className="w-4 h-4" /></Button>
                 </div>
               </CardContent>
             </Card>

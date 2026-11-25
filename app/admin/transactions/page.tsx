@@ -467,7 +467,7 @@ function AdminTransactionsPage() {
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto -mx-6 px-6">
-            <Table>
+            <Table className="min-w-[700px]">
             <TableHeader>
               <TableRow>
                 <TableHead>Date</TableHead>
@@ -504,7 +504,9 @@ function AdminTransactionsPage() {
                       <Button
                         variant="outline"
                         size="sm"
+                        aria-label="View receipt"
                         onClick={() => setSelectedReceipt(transaction.receiptUrl!)}
+                        className="min-h-[32px] px-2.5"
                       >
                         <Eye className="w-4 h-4 mr-1" />
                         View
@@ -521,6 +523,7 @@ function AdminTransactionsPage() {
                             setSelectedTransaction(transaction);
                             setAdminDescription("");
                           }}
+                          className="min-h-[32px] px-2.5"
                         >
                           Review
                         </Button>

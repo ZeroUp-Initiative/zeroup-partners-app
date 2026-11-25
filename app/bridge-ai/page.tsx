@@ -250,11 +250,11 @@ function BridgeAIContent() {
 
           {/* Main Content Tabs */}
           <Tabs defaultValue="projects" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="projects">AI Projects</TabsTrigger>
-              <TabsTrigger value="analytics">AI Analytics</TabsTrigger>
-              <TabsTrigger value="technologies">Technologies</TabsTrigger>
-              <TabsTrigger value="partners">AI Partners</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto p-1 gap-1">
+              <TabsTrigger value="projects" className="py-2 text-xs sm:text-sm">AI Projects</TabsTrigger>
+              <TabsTrigger value="analytics" className="py-2 text-xs sm:text-sm">AI Analytics</TabsTrigger>
+              <TabsTrigger value="technologies" className="py-2 text-xs sm:text-sm">Technologies</TabsTrigger>
+              <TabsTrigger value="partners" className="py-2 text-xs sm:text-sm">AI Partners</TabsTrigger>
             </TabsList>
 
             <TabsContent value="projects" className="space-y-6">

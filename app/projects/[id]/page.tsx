@@ -114,7 +114,7 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
         {project.status.toUpperCase()}
       </Badge>
       <Button
-        className="w-full bg-editorial-navy hover:bg-editorial-navy-deep text-editorial-cream border-0"
+        className="min-h-[44px] w-full bg-editorial-navy hover:bg-editorial-navy-deep text-editorial-cream border-0"
         disabled={!canContribute}
         onClick={() => { setSponsorMode(false); setContributeOpen(true) }}
       >
@@ -132,7 +132,7 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
       {canDelete && (
         <Button
           variant="outline"
-          className="w-full text-destructive hover:text-destructive"
+          className="w-full min-h-[44px] text-destructive hover:text-destructive"
           onClick={() => setDeleteOpen(true)}
         >
           <Trash2 className="w-4 h-4 mr-2" /> Delete Project
@@ -156,7 +156,7 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         )}
         <div className="absolute top-4 left-4">
-          <Link href="/projects" className="inline-flex items-center gap-1.5 text-sm text-white/90 hover:text-white bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full transition-colors">
+          <Link href="/projects" className="inline-flex items-center gap-1.5 text-sm text-white/90 hover:text-white bg-black/30 backdrop-blur-sm px-3.5 py-2 min-h-[40px] rounded-full transition-colors">
             <ArrowLeft className="w-4 h-4" /> Back to Projects
           </Link>
         </div>
@@ -301,7 +301,7 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
               </p>
               <Button
                 size="lg"
-                className="bg-editorial-navy hover:bg-editorial-navy-deep text-editorial-cream border-0"
+                className="w-full sm:w-auto min-h-[44px] bg-editorial-navy hover:bg-editorial-navy-deep text-editorial-cream border-0"
                 disabled={!canContribute}
                 onClick={() => setContributeOpen(true)}
               >
@@ -333,11 +333,11 @@ function ProjectDetailPage({ params }: { params: { id: string } }) {
               Are you sure you want to delete "{project.title}"? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteOpen(false)} disabled={isDeleting}>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setDeleteOpen(false)} disabled={isDeleting} className="min-h-[40px]">
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleConfirmDelete} disabled={isDeleting}>
+            <Button variant="destructive" onClick={handleConfirmDelete} disabled={isDeleting} className="min-h-[40px]">
               {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Delete'}
             </Button>
           </DialogFooter>

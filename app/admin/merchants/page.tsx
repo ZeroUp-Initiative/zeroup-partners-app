@@ -101,14 +101,14 @@ function AdminMerchantsPage() {
             <div className="space-y-1.5"><Label>Location</Label><Input value={form.location} onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))} placeholder="e.g. Ibadan" /></div>
             <div className="space-y-1.5">
               <Label>Minimum tier</Label>
-              <select value={form.minTierId} onChange={(e) => setForm((f) => ({ ...f, minTierId: e.target.value }))} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+              <select value={form.minTierId} onChange={(e) => setForm((f) => ({ ...f, minTierId: e.target.value }))} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm">
                 <option value="">All Dreamers</option>
                 {tiers.map((t) => <option key={t.id} value={t.id}>{t.name} & up</option>)}
               </select>
             </div>
             <div className="space-y-1.5 sm:col-span-2"><Label>Description</Label><Textarea rows={2} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="What's the offer / any conditions?" /></div>
             <div className="sm:col-span-2">
-              <Button type="submit" disabled={creating}>{creating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}Add Merchant</Button>
+              <Button type="submit" disabled={creating} className="w-full sm:w-auto min-h-[40px]">{creating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}Add Merchant</Button>
             </div>
           </form>
         </CardContent>
@@ -140,11 +140,11 @@ function AdminMerchantsPage() {
                 <div className="flex items-center gap-2 text-sm bg-muted/50 rounded px-2 py-1">
                   <span className="text-muted-foreground text-xs">Verify code:</span>
                   <span className="font-mono font-bold">{m.verifyCode}</span>
-                  <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto" onClick={() => { navigator.clipboard.writeText(m.verifyCode); toast.success("Code copied") }}><Copy className="w-3 h-3" /></Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 min-h-[32px] min-w-[32px] ml-auto p-0 flex items-center justify-center" aria-label="Copy verify code" onClick={() => { navigator.clipboard.writeText(m.verifyCode); toast.success("Code copied") }}><Copy className="w-3.5 h-3.5" /></Button>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => toggle(m)}>{m.isActive ? "Deactivate" : "Activate"}</Button>
-                  <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => remove(m)}><Trash2 className="w-4 h-4" /></Button>
+                  <Button variant="outline" size="sm" className="min-h-[36px]" onClick={() => toggle(m)}>{m.isActive ? "Deactivate" : "Activate"}</Button>
+                  <Button variant="ghost" size="sm" className="min-h-[36px] min-w-[36px] p-2 text-destructive hover:text-destructive flex items-center justify-center" aria-label="Delete merchant" onClick={() => remove(m)}><Trash2 className="w-4 h-4" /></Button>
                 </div>
               </CardContent>
             </Card>

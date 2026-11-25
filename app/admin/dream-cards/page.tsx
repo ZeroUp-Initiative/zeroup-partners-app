@@ -72,7 +72,7 @@ function AdminDreamCardsPage() {
             Manage Dreamer card tiers — names, the Naira a Dreamer must partner to reach each tier, the card style, and perks. Changes save to the database and apply everywhere.
           </p>
         </div>
-        <Button onClick={save} disabled={saving || loading} className="whitespace-nowrap">
+        <Button onClick={save} disabled={saving || loading} className="w-full sm:w-auto min-h-[40px] whitespace-nowrap">
           {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
           Save Changes
         </Button>
@@ -98,7 +98,7 @@ function AdminDreamCardsPage() {
                           <CardDescription>Unlocks at ₦{Number(t.min || 0).toLocaleString()}</CardDescription>
                         </div>
                       </div>
-                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive flex-shrink-0" onClick={() => remove(i)}>
+                      <Button variant="ghost" size="icon" className="h-9 w-9 min-h-[36px] min-w-[36px] text-destructive hover:text-destructive flex-shrink-0 flex items-center justify-center" aria-label="Delete tier" onClick={() => remove(i)}>
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
@@ -160,10 +160,10 @@ function AdminDreamCardsPage() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button variant="outline" onClick={add}>
+            <Button variant="outline" onClick={add} className="w-full sm:w-auto min-h-[40px]">
               <Plus className="w-4 h-4 mr-2" /> Add Tier
             </Button>
-            <Button onClick={save} disabled={saving} className="sm:ml-auto">
+            <Button onClick={save} disabled={saving} className="w-full sm:w-auto min-h-[40px] sm:ml-auto">
               {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
               Save Changes
             </Button>

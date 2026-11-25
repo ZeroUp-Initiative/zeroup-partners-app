@@ -107,7 +107,7 @@ export function EcosystemSection({ isDark = true }: EcosystemSectionProps) {
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             className="relative"
           >
-            <div className={`relative rounded-2xl border p-8 md:p-12 backdrop-blur-sm overflow-hidden transition-all duration-300 ${
+            <div className={`relative rounded-2xl border p-4 sm:p-8 md:p-12 backdrop-blur-sm overflow-hidden transition-all duration-300 ${
               isDark 
                 ? 'bg-[#1e1040]/50 border-white/5' 
                 : 'bg-white/80 border-slate-200 hover:shadow-md'

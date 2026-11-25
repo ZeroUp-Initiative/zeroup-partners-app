@@ -61,26 +61,26 @@ export function EmailVerificationBanner() {
   return (
     <Alert className="rounded-none border-x-0 border-t-0 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800">
       <Mail className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-      <AlertDescription className="flex items-center justify-between w-full">
+      <AlertDescription className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 w-full">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-amber-800 dark:text-amber-200">
             Please verify your email address to access all features.
           </span>
           {resendSuccess ? (
             <span className="text-green-600 dark:text-green-400 flex items-center gap-1 text-sm">
-              <CheckCircle className="h-3 w-3" /> Email sent!
+              <CheckCircle className="h-3.5 w-3.5" /> Email sent!
             </span>
           ) : (
             <Button
               variant="link"
               size="sm"
-              className="h-auto p-0 text-amber-700 dark:text-amber-300 underline"
+              className="h-auto py-1 px-0 text-amber-700 dark:text-amber-300 underline font-medium"
               onClick={handleResend}
               disabled={isResending || isChecking}
             >
               {isResending ? (
                 <>
-                  <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                  <RefreshCw className="h-3.5 w-3.5 mr-1 animate-spin" />
                   Sending...
                 </>
               ) : (
@@ -91,13 +91,13 @@ export function EmailVerificationBanner() {
           <Button
             variant="link"
             size="sm"
-            className="h-auto p-0 text-amber-700 dark:text-amber-300 underline"
+            className="h-auto py-1 px-0 text-amber-700 dark:text-amber-300 underline font-medium"
             onClick={handleCheckVerified}
             disabled={isChecking || isResending}
           >
             {isChecking ? (
               <>
-                <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                <RefreshCw className="h-3.5 w-3.5 mr-1 animate-spin" />
                 Checking...
               </>
             ) : (
@@ -108,7 +108,7 @@ export function EmailVerificationBanner() {
         <Button
           variant="ghost"
           size="sm"
-          className="h-6 w-6 p-0 text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-200"
+          className="h-9 w-9 min-h-[36px] min-w-[36px] p-0 text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-200 flex items-center justify-center self-end sm:self-auto shrink-0"
           onClick={() => setDismissed(true)}
         >
           <X className="h-4 w-4" />

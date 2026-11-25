@@ -257,7 +257,7 @@ function CommunityContent() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <Link href="/dashboard" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+          <Link href="/dashboard" className="inline-flex items-center min-h-[44px] py-2 text-sm text-muted-foreground hover:text-primary transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Link>
@@ -308,10 +308,10 @@ function CommunityContent() {
 
           {/* Main Content Tabs */}
           <Tabs defaultValue="leaderboard" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="leaderboard" className="text-xs sm:text-sm">Leaderboard</TabsTrigger>
-              <TabsTrigger value="activity" className="text-xs sm:text-sm">Activity</TabsTrigger>
-              <TabsTrigger value="recognition" className="text-xs sm:text-sm">Recognition</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 h-auto p-1">
+              <TabsTrigger value="leaderboard" className="py-2.5 min-h-[40px] text-xs sm:text-sm">Leaderboard</TabsTrigger>
+              <TabsTrigger value="activity" className="py-2.5 min-h-[40px] text-xs sm:text-sm">Activity</TabsTrigger>
+              <TabsTrigger value="recognition" className="py-2.5 min-h-[40px] text-xs sm:text-sm">Recognition</TabsTrigger>
             </TabsList>
 
             <TabsContent value="leaderboard" className="space-y-6">
@@ -347,7 +347,7 @@ function CommunityContent() {
                               {getRankIcon(partner.rank)}
                               <PartnerFlierModal
                                 trigger={
-                                  <button className="cursor-pointer hover:opacity-80 transition-opacity">
+                                  <button className="cursor-pointer hover:opacity-80 transition-opacity p-0.5 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-full" aria-label={`View ${partner.name}'s flier`}>
                                     <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
                                       {partner.photoURL && (
                                         <AvatarImage src={partner.photoURL} alt={partner.name} />
